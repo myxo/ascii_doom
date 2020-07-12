@@ -1,5 +1,7 @@
 #include "lib.h"
 
+#include "world_object.h"
+
 #include <stdio.h>
 
 int width = 200;
