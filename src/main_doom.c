@@ -197,17 +197,13 @@ void handle_input(float time_elapsed) {
 	}
 	if (olc_get_key(VK_SPACE).held) {
 		snake_expand(&world.snake);
-	}
-	if (olc_get_key(VK_UP).held) {
+	}else if (olc_get_key(VK_UP).held) {
 		snake_turn(&world.snake, UP);
-	}
-	if (olc_get_key(VK_RIGHT).held) {
+	}else if (olc_get_key(VK_RIGHT).held) {
 		snake_turn(&world.snake, RIGHT);
-	}
-	if (olc_get_key(VK_DOWN).held) {
+	}else if (olc_get_key(VK_DOWN).held) {
 		snake_turn(&world.snake, DOWN);
-	}
-	if (olc_get_key(VK_LEFT).held) {
+	}else if (olc_get_key(VK_LEFT).held) {
 		snake_turn(&world.snake, LEFT);
 	}
 }
