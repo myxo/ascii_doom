@@ -18,6 +18,7 @@ int width = 50;
 int height = 50;
 int glyph_size = 16;
 int TPS = 15;
+double timer = 0;
 
 int stop = 0;
 
@@ -174,16 +175,17 @@ int collision_detecter() {
 //	}
 //	logging.vars = realloc(logging.vars, --logging.length * sizeof(var_to_display_t));
 //}
-//
+
 //void display_watch() {
 //	char* str;
 //	int dec, sign;
 //	for (int i = 0; i < logging.length; i++) {
-//		str = "";
-//		str = strcat(str, logging.vars[i].label);
-//		str = strcat(str, " : ");
-//		str = strcat(str, ecvt(logging.vars[i].value, 3, &dec, &sign));
-//		olc_draw_string(0, i, str, FG_WHITE);
+//		str = calloc(20, 20 * sizeof(char));
+//		//str = strcat(str, logging.vars[i].label);
+//		//str = strcat(str, " : ");
+//		//str = strcat(str, ecvt(logging.vars[i].value, 3, &dec, &sign));
+//		//olc_draw_string(0, i, str, FG_WHITE);
+//		free(str);
 //	}
 //}
 
@@ -216,8 +218,11 @@ int update(float time_elapsed) {
 	//add_watch("head x", world.snake.body[0].x);
 	//add_watch("head y", world.snake.body[0].y);
 	olc_fill(0, 0, olc_screen_width(), olc_screen_height(), ' ', BG_BLACK);
-
-	snake_move(&world.snake);
+	timer += time_elapsed;
+	if (timer > 0.1) {
+		snake_move(&world.snake);
+		timer = 0;
+	}
 
 	snake_draw(world.snake);
 	//display_watch();
@@ -226,7 +231,7 @@ int update(float time_elapsed) {
 	//stop_watch("head x");
 	//stop_watch("head y");
 
-	Sleep(1000/TPS);
+	//Sleep(1000/TPS);
 	//const char * hello_str = "Hello world";
 	//olc_draw_string(width / 2 - strlen(hello_str) / 2, height / 2, hello_str, FG_WHITE);
 
