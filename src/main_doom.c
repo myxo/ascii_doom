@@ -76,7 +76,7 @@ void snake_move(snake_t* snake) {
 	for (int i = 0; i < snake->length; i++) {
 		switch (snake->body[i].direction) {
 		case UP:
-			if (--snake->body[i].y == 0) {
+			if (--snake->body[i].y == -1) {
 				snake->body[i].y = height;
 			}
 			break;
@@ -87,7 +87,7 @@ void snake_move(snake_t* snake) {
 			snake->body[i].y = (++snake->body[i].y) % height;
 			break;
 		case LEFT:
-			if (--snake->body[i].x == 0) {
+			if (--snake->body[i].x == -1) {
 				snake->body[i].x = width;
 			}
 			break;
@@ -157,11 +157,11 @@ int collision_detecter() {
 //	logging.vars[logging.length - 1].label = label;
 //	logging.vars[logging.length - 1].value = value;
 //}
-
+//
 //int stop_watch(const char* label) {
 //	int index = -1;
 //	for (int i = 0; i < logging.length; i++) {
-//		if (logging.vars[i].label == label) {
+//		if (strcmp(logging.vars[i].label, label) == 0) {
 //			index = i;
 //			break;
 //		}
@@ -174,7 +174,7 @@ int collision_detecter() {
 //	}
 //	logging.vars = realloc(logging.vars, --logging.length * sizeof(var_to_display_t));
 //}
-
+//
 //void display_watch() {
 //	char* str;
 //	int dec, sign;
@@ -182,7 +182,7 @@ int collision_detecter() {
 //		str = "";
 //		str = strcat(str, logging.vars[i].label);
 //		str = strcat(str, " : ");
-//		str = strcat(str, ecvt(logging.vars[i].value, 2, &dec, &sign));
+//		str = strcat(str, ecvt(logging.vars[i].value, 3, &dec, &sign));
 //		olc_draw_string(0, i, str, FG_WHITE);
 //	}
 //}
@@ -217,17 +217,17 @@ int update(float time_elapsed) {
 	if (stop) {
 		return 0;
 	}
-	/*add_watch("head x", world.snake.body[0].x);*/
+	//add_watch("head x", world.snake.body[0].x);
 	//add_watch("head y", world.snake.body[0].y);
 	olc_fill(0, 0, olc_screen_width(), olc_screen_height(), ' ', BG_BLACK);
 
 	snake_move(&world.snake);
 
 	snake_draw(world.snake);
-	/*display_watch();*/
+	//display_watch();
 	olc_draw(world.food.x, world.food.y, '*', FG_RED);
 
-	/*stop_watch("head x");*/
+	//stop_watch("head x");
 	//stop_watch("head y");
 
 	Sleep(1000/TPS);
