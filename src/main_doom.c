@@ -19,7 +19,7 @@ int stop = 0;
 
 char map[8][8] = {
 	{"########"},
-	{"#  #   #"},
+	{"# ##   #"},
 	{"#      #"},
 	{"#  #   #"},
 	{"#  #   #"},
@@ -31,7 +31,13 @@ char map[8][8] = {
 double player_x = 2;
 double player_y = 6;
 double player_angle = 0;
+double player_speed = 0.05;
 double angle_of_vision = M_PI_4;
+
+int Wbutton = 0x57;
+int Abutton = 0x41;
+int Sbutton = 0x53;
+int Dbutton = 0x44;
 
 void draw_screen() {
 	double d_angle = angle_of_vision / width;
@@ -50,7 +56,7 @@ void draw_screen() {
 			y += d_distance * cos(ray_angle);
 			distance += d_distance;
 		}
-		int num_of_wall_sym = height * (1 / distance);
+		int num_of_wall_sym = height * (2 / (distance));
 		if (num_of_wall_sym > height)
 			num_of_wall_sym = height;
 		for (int i = 0; i < num_of_wall_sym; i++) {
@@ -63,6 +69,13 @@ void draw_screen() {
 	}
 }
 
+void move_player(int forward, int right) {
+	player_x += forward * player_speed * sin(player_angle);
+	player_y += forward * player_speed * cos(player_angle);
+	player_x += right * player_speed * sin(player_angle + M_PI_2);
+	player_y += right * player_speed * cos(player_angle + M_PI_2);
+}
+
 int create() {
 	return 1;
 }
@@ -72,10 +85,22 @@ void handle_input(float time_elapsed) {
 		stop = 1;
 	}
 	if (olc_get_key(VK_LEFT).held) { // Esc
-		player_angle -= 0.01;
+		player_angle -= 0.02;
 	}
 	if (olc_get_key(VK_RIGHT).held) { // Esc
-		player_angle += 0.01;
+		player_angle += 0.02;
+	}
+	if (olc_get_key(Wbutton).held) { // Esc
+		move_player(1, 0);
+	}
+	if (olc_get_key(Abutton).held) { // Esc
+		move_player(0, -1);
+	}
+	if (olc_get_key(Sbutton).held) { // Esc
+		move_player(-1, 0);
+	}
+	if (olc_get_key(Dbutton).held) { // Esc
+		move_player(0, 1);
 	}
 }
 
