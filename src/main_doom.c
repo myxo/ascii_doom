@@ -57,20 +57,20 @@ typedef struct {
 world_t world;
 
 food_t food_init() {
-	food_t* food = malloc(sizeof(food_t));
-	food->x = rand() % width;
-	food->y = rand() % height;
-	return *food;
+	food_t food;
+	food.x = rand() % width;
+	food.y = rand() % height;
+	return food;
 }
 
 snake_t snake_init() {
-	snake_t* snake = malloc(sizeof(snake_t));
-	snake->body = malloc(sizeof(node_t));
-	snake->body[0].x = 10;
-	snake->body[0].y = 10;
-	snake->length = 1;
-	snake->body[0].direction = UP;
-	return *snake;
+	snake_t snake;
+	snake.body = malloc(sizeof(node_t));
+	snake.body[0].x = 10;
+	snake.body[0].y = 10;
+	snake.length = 1;
+	snake.body[0].direction = UP;
+	return snake;
 }
 
 void snake_move(snake_t* snake) {
@@ -153,41 +153,53 @@ int collision_detecter() {
 	return 1;
 }
 
-//void add_watch(const char* label, double value) {
-//	logging.vars = realloc(logging.vars, ++logging.length * sizeof(var_to_display_t));
-//	logging.vars[logging.length - 1].label = label;
-//	logging.vars[logging.length - 1].value = value;
-//}
-//
-//int stop_watch(const char* label) {
-//	int index = -1;
-//	for (int i = 0; i < logging.length; i++) {
-//		if (strcmp(logging.vars[i].label, label) == 0) {
-//			index = i;
-//			break;
-//		}
-//	}
-//	if (index == -1) {
-//		return 0;
-//	}
-//	for (int i = 0; i < logging.length - index; i++) {
-//		logging.vars[index + i] = logging.vars[index + i + 1];
-//	}
-//	logging.vars = realloc(logging.vars, --logging.length * sizeof(var_to_display_t));
-//}
+void add_watch(const char* label, double value) {
+	logging.vars = realloc(logging.vars, ++logging.length * sizeof(var_to_display_t));
+	logging.vars[logging.length - 1].label = label;
+	logging.vars[logging.length - 1].value = value;
+}
 
-//void display_watch() {
-//	char* str;
-//	int dec, sign;
-//	for (int i = 0; i < logging.length; i++) {
-//		str = calloc(20, 20 * sizeof(char));
-//		//str = strcat(str, logging.vars[i].label);
-//		//str = strcat(str, " : ");
-//		//str = strcat(str, ecvt(logging.vars[i].value, 3, &dec, &sign));
-//		//olc_draw_string(0, i, str, FG_WHITE);
-//		free(str);
-//	}
-//}
+int stop_watch(const char* label) {
+	int index = -1;
+	for (int i = 0; i < logging.length; i++) {
+		if (strcmp(logging.vars[i].label, label) == 0) {
+			index = i;
+			break;
+		}
+	}
+	if (index == -1) {
+		return 0;
+	}
+	for (int i = 0; i < logging.length - index; i++) {
+		logging.vars[index + i] = logging.vars[index + i + 1];
+	}
+	logging.vars = realloc(logging.vars, --logging.length * sizeof(var_to_display_t));
+}
+
+void display_watch() {
+	char* str;
+	char* out2;
+	int dec, sign;
+	int precision = 6;
+	for (int i = 0; i < logging.length; i++) {
+		str = calloc(20, 20 * sizeof(char));
+		str = strcat(str, logging.vars[i].label);
+		str = strcat(str, " : ");
+		char* out = ecvt(logging.vars[i].value, precision, &dec, &sign);
+		out2 = calloc(precision + 1, (precision + 1) * sizeof(char));
+		for (int i = 0; i < dec; i++) {
+			out2[i] = out[i];
+		}
+		out2[dec] = '.';
+		for (int i = 0; i < precision - dec; i++) {
+			out2[dec + i + 1] = out[dec + i];
+		}
+		str = strcat(str, out2);
+		olc_draw_string(0, i, str, FG_WHITE);
+		free(str);
+		free(out2);
+	}
+}
 
 int create() {
 	return 1;
@@ -215,25 +227,21 @@ int update(float time_elapsed) {
 	if (stop) {
 		return 0;
 	}
-	//add_watch("head x", world.snake.body[0].x);
-	//add_watch("head y", world.snake.body[0].y);
+	add_watch("head x", world.snake.body[0].x);
+	add_watch("head y", world.snake.body[0].y);
 	olc_fill(0, 0, olc_screen_width(), olc_screen_height(), ' ', BG_BLACK);
 	timer += time_elapsed;
 	if (timer > 0.1) {
 		snake_move(&world.snake);
-		timer = 0;
+		timer -= 0.1;
 	}
 
 	snake_draw(world.snake);
-	//display_watch();
+	display_watch();
 	olc_draw(world.food.x, world.food.y, '*', FG_RED);
 
-	//stop_watch("head x");
-	//stop_watch("head y");
-
-	//Sleep(1000/TPS);
-	//const char * hello_str = "Hello world";
-	//olc_draw_string(width / 2 - strlen(hello_str) / 2, height / 2, hello_str, FG_WHITE);
+	stop_watch("head x");
+	stop_watch("head y");
 
 	return collision_detecter();
 }
