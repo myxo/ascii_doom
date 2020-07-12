@@ -70,10 +70,16 @@ void draw_screen() {
 }
 
 void move_player(int forward, int right) {
-	player_x += forward * player_speed * sin(player_angle);
-	player_y += forward * player_speed * cos(player_angle);
-	player_x += right * player_speed * sin(player_angle + M_PI_2);
-	player_y += right * player_speed * cos(player_angle + M_PI_2);
+	double tmp_x = player_x;
+	tmp_x += forward * player_speed * sin(player_angle);
+	tmp_x += right * player_speed * sin(player_angle + M_PI_2);
+	if (map[(int)tmp_x][(int)player_y] != '#')
+		player_x = tmp_x;
+	double tmp_y = player_y;
+	tmp_y += forward * player_speed * cos(player_angle);
+	tmp_y += right * player_speed * cos(player_angle + M_PI_2);
+	if (map[(int)player_x][(int)tmp_y] != '#')
+		player_y = tmp_y;
 }
 
 int create() {
