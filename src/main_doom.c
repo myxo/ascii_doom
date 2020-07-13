@@ -64,8 +64,15 @@ void handle_player_movement(float time_elapsed) {
     }
 }
 
+void shoot_bullet(world_t* world) {
+    //TODO
+}
+
 void handle_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
+        stop = 1;
+    }
+    if (olc_get_key(VK_SPACE).held) {
         stop = 1;
     }
     handle_player_movement(time_elapsed);
