@@ -28,7 +28,7 @@ typedef struct sweet {
 
 typedef struct world {
 	player_t player;
-	sweet_t* sweet;
+	sweet_t sweet;
 } world_t;
 
 world_t world;
@@ -52,8 +52,7 @@ array_point_t create_array_point(int capacity) {
 
 void increase_arr_point_capacity(array_point_t* array_point) {
 	array_point->capacity = array_point->capacity * 2;
-	point_t* ptr = realloc(array_point->array, array_point->capacity * sizeof(point_t));
-	array_point->array = ptr;
+	array_point->array = realloc(array_point->array, array_point->capacity * sizeof(point_t));
 }
 
 void push_back_array_point(array_point_t* array_point, point_t point) {
@@ -63,12 +62,12 @@ void push_back_array_point(array_point_t* array_point, point_t point) {
 	array_point->array[array_point->len++] = point;
 }
 
-sweet_t* generate_new_sweet(int x, int y, int width, int height) {
-	sweet_t* sweet = malloc(sizeof(sweet_t));
-	sweet->pos.x = (rand() % (width - x)) + x;
-	sweet->pos.y = (rand() % (height - y)) + y;
-	sweet->weight = 1;
-	if (check_collision_player_sweet(world.player, *sweet ))
+sweet_t generate_new_sweet(int x, int y, int width, int height) {
+	sweet_t sweet;
+	sweet.pos.x = (rand() % (width - x)) + x;
+	sweet.pos.y = (rand() % (height - y)) + y;
+	sweet.weight = 1;
+	if (check_collision_player_sweet(world.player, sweet ))
 		return generate_new_sweet(x, y, width, height);
 	return sweet;
 }
@@ -79,10 +78,8 @@ void render_player(player_t player) {
 	}
 }
 
-void render_sweet(sweet_t* sweet) {
-	if (sweet == NULL)
-		return;
-	olc_draw(sweet->pos.x, sweet->pos.y, '*', FG_GREEN);
+void render_sweet(sweet_t sweet) {
+	olc_draw(sweet.pos.x, sweet.pos.y, '*', FG_GREEN);
 }
 
 void render_world(world_t world) {
@@ -133,7 +130,7 @@ int create() {
 	start.x = width / 2;
 	start.y = height / 2;
 	world.player = create_player(start, 3);
-	world.sweet = NULL;
+	world.sweet = generate_new_sweet(0, 0, olc_screen_width(), olc_screen_height());
 	return 1;
 }
 
@@ -165,24 +162,24 @@ int check_collision_walls_player(player_t player) {
 
 void handle_input(float time_elapsed) {
 	time_count += time_elapsed;
+	if (olc_get_key(VK_ESCAPE).held) {
+		stop = 1;
+	}
+	if (olc_get_key(VK_LEFT).held) {
+		move_direction = VK_LEFT;
+	}
+	if (olc_get_key(VK_RIGHT).held) {
+		move_direction = VK_RIGHT;
+	}
+	if (olc_get_key(VK_UP).held) {
+		move_direction = VK_DOWN;
+	}
+	if (olc_get_key(VK_DOWN).held) {
+		move_direction = VK_UP;
+	}
 	if (time_count >= 0.1) {
-		if (olc_get_key(VK_ESCAPE).held) {
-			stop = 1;
-		}
-		if (olc_get_key(VK_LEFT).held) {
-			move_direction = VK_LEFT;
-		}
-		if (olc_get_key(VK_RIGHT).held) {
-			move_direction = VK_RIGHT;
-		}
-		if (olc_get_key(VK_UP).held) {
-			move_direction = VK_DOWN;
-		}
-		if (olc_get_key(VK_DOWN).held) {
-			move_direction = VK_UP;
-		}
 		player_move(&world.player, move_direction);
-		time_count = 0;
+		time_count = time_count - ((int)(time_count / 0.1)) * 0.1;
 	}
 }
 
@@ -191,16 +188,11 @@ int update(float time_elapsed) {
 	if (stop) {
 		return 0;
 	}
-	if (world.sweet != NULL) {
-		if (check_collision_player_sweet(world.player, *(world.sweet))) {
-			world.player.score = world.player.score + (*(world.sweet)).weight;
-			free(world.sweet);
-			world.sweet = NULL;
-			push_back_array_point(&world.player.body, world.player.body.array[world.player.body.len - 1]);
-		}
-	}
-	else {
+	
+	if (check_collision_player_sweet(world.player, world.sweet)) {
+		world.player.score = world.player.score + world.sweet.weight;
 		world.sweet = generate_new_sweet(0, 0, olc_screen_width(), olc_screen_height());
+		push_back_array_point(&world.player.body, world.player.body.array[world.player.body.len - 1]);
 	}
 	if (check_collision_head_player(world.player) || check_collision_walls_player(world.player))
 		return 0;
