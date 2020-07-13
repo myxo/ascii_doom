@@ -11,9 +11,9 @@
 #include <math.h>
 
 
-int width = 200;
-int height = 150;
-int glyph_size = 8;
+int width =  200;
+int height =  150;
+int glyph_size =  8;
 
 int stop = 0;
 
@@ -40,6 +40,7 @@ void turn_player(int dir) {
 
 int create() {
     init_world_object();
+    log_init("debug.txt");
 	return 1;
 }
 
@@ -84,9 +85,8 @@ int update(float time_elapsed) {
 		return 0;
 	}
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
-
+    display_watch();
 	draw_screen(get_world());
-
 	return 1;
 }
 
@@ -100,6 +100,7 @@ int main() {
 
 	olc_start(); // block until update return 0
 	olc_deinitialize();
+    log_deinit();
     deinit_world_object();
 
 	return 0;
