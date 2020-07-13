@@ -48,11 +48,11 @@ void draw_screen(world_t* world) {
 		}
 		row++;
 	}
-    draw_minimap();
+    draw_minimap(world);
 }
 
-void draw_minimap() {
-    world_t* world = get_world();
+void draw_minimap(world_t* world) {
+    //world_t* world = get_world();
     for (int i = 0; i < world->map_length; i++) {
         for (int j = 0; j < world->map_length; j++) {
             olc_draw(i, j, world->map[j][i], FG_WHITE);
