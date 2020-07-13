@@ -17,6 +17,8 @@ typedef struct {
 
 typedef struct {
     point_t pos;
+    double angle;
+    double speed;
 } bullet_t;
 
 
