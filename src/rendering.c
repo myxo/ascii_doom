@@ -53,14 +53,6 @@ void draw_screen(world_t world, int width, int height) {
 				}
 			}
 		}
-		/*for (int i = 0; i < (height - num_of_wall_sym) / 2 + 1; i++) {
-			if (i < 20)
-				olc_draw(row, (height + num_of_wall_sym) / 2 + i, '-', FG_GREY);
-			if (i >= 20 && i < 30)
-				olc_draw(row, (height + num_of_wall_sym) / 2 + i, 'x', FG_GREY);
-			if (i >= 30 )
-				olc_draw(row, (height + num_of_wall_sym) / 2 + i, 'X', FG_GREY);
-		}*/
 		row++;
 	}
 }
