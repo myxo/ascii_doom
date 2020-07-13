@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "olc/olc.h"
 
 #include "world_object.h"
 
