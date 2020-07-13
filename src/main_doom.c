@@ -42,28 +42,32 @@ int create() {
 	return 1;
 }
 
-void handle_input(float time_elapsed) {
-	if (olc_get_key(VK_ESCAPE).held) {
-		stop = 1;
-	}
-	if (olc_get_key(VK_LEFT).held) {
+void hande_player_movement(float time_elapsed) {
+    if (olc_get_key(VK_LEFT).held) {
         turn_player(-1);
-	}
-	if (olc_get_key(VK_RIGHT).held) {
+    }
+    if (olc_get_key(VK_RIGHT).held) {
         turn_player(1);
-	}
-	if (olc_get_key('W').held) {
-		move_player(1, 0, time_elapsed);
-	}
-	if (olc_get_key('A').held) {
-		move_player(0, -1, time_elapsed);
-	}
-	if (olc_get_key('S').held) {
-		move_player(-1, 0, time_elapsed);
-	}
-	if (olc_get_key('D').held) {
-		move_player(0, 1, time_elapsed);
-	}
+    }
+    if (olc_get_key('W').held) {
+        move_player(1, 0, time_elapsed);
+    }
+    if (olc_get_key('A').held) {
+        move_player(0, -1, time_elapsed);
+    }
+    if (olc_get_key('S').held) {
+        move_player(-1, 0, time_elapsed);
+    }
+    if (olc_get_key('D').held) {
+        move_player(0, 1, time_elapsed);
+    }
+}
+
+void handle_input(float time_elapsed) {
+    if (olc_get_key(VK_ESCAPE).held) {
+        stop = 1;
+    }
+    hande_player_movement(time_elapsed);
 }
 
 int update(float time_elapsed) {
