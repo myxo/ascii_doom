@@ -35,17 +35,15 @@ void draw_screen(world_t* world) {
 		for (int i = ceiling_level; i < floor_level; i++) {
 			olc_draw(row, i, sym, FG_WHITE);
 		}
-		for (int i = height / 2; i < height; i++) {
-			if (i >= floor_level) {
-				if (i < threshold1) {
-					olc_draw(row, i, '-', FG_GREY);
-				}
-				else if (i < threshold2) {
-					olc_draw(row, i, 'x', FG_GREY);
-				}
-				else {
-					olc_draw(row, i, 'X', FG_GREY);
-				}
+		for (int i = floor_level; i < height; i++) {
+			if (i < threshold1) {
+				olc_draw(row, i, '-', FG_GREY);
+			}
+			else if (i < threshold2) {
+				olc_draw(row, i, 'x', FG_GREY);
+			}
+			else {
+				olc_draw(row, i, 'X', FG_GREY);
 			}
 		}
 		row++;
