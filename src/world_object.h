@@ -19,6 +19,7 @@ typedef struct {
 typedef struct {
     player_t player;
     char map[16][16];
+    int map_length;
 } world_t;
 
 
