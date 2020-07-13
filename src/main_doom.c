@@ -11,6 +11,7 @@ int glyph_size = 8;
 int stop = 0;
 
 int create() {
+    init_world_object();
 	return 1;
 }
 
@@ -42,6 +43,7 @@ int main() {
 
 	olc_start(); // block until update return 0
 	olc_deinitialize();
+    deinit_world_object();
 
 	return 0;
 }
