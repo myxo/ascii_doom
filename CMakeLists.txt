@@ -19,6 +19,8 @@ PRIVATE
 	src/main_doom.c
     src/world_object.h 
     src/world_object.c 
+	src/logging.h
+	src/logging.c
 )
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)
