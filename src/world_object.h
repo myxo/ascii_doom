@@ -9,12 +9,16 @@ typedef struct {
 
 typedef struct {
     point_t pos;
+    double angle_of_vision;
     double angle;
+    double speed;
+    double angular_speed;
 } player_t;
 
 
 typedef struct {
     player_t player;
+    char map[16][16];
 } world_t;
 
 
