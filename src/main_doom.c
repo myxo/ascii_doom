@@ -1,4 +1,3 @@
-
 #include "olc/olc.h"
 
 #include "world_object.h"
@@ -20,15 +19,17 @@ int stop = 0;
 
 void move_player(int forward, int right, float time_elapsed) {
     world_t* world = get_world();
+
 	double new_x = world->player.pos.x;
 	new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
 	new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
-	if (world->map[(int)new_x][(int)world->player.pos.y] != '#')
+	if (!is_wall(new_x, world->player.pos.y))
 		world->player.pos.x = new_x;
+
 	double new_y = world->player.pos.y;
 	new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
 	new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
-	if (world->map[(int)world->player.pos.x][(int)new_y] != '#')
+	if (!is_wall(world->player.pos.x, new_y))
 		world->player.pos.y = new_y;
 }
 
@@ -42,7 +43,7 @@ int create() {
 	return 1;
 }
 
-void hande_player_movement(float time_elapsed) {
+void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
         turn_player(-1);
     }
@@ -67,7 +68,7 @@ void handle_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
         stop = 1;
     }
-    hande_player_movement(time_elapsed);
+    handle_player_movement(time_elapsed);
 }
 
 int update(float time_elapsed) {

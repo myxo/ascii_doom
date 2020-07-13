@@ -25,5 +25,6 @@ typedef struct {
 void init_world_object();
 void deinit_world_object();
 world_t* get_world();
+int is_wall(double x, double y);
 
 #endif

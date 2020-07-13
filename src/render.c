@@ -21,7 +21,7 @@ void draw_screen(world_t* world) {
 		double distance = 0;
 		double ray_sin = sin(ray_angle);
 		double ray_cos = cos(ray_angle);
-		while (world->map[(int)x][(int)y] != '#') {
+		while (!is_wall(x, y)) {
 			x += d_distance * ray_sin;
 			y += d_distance * ray_cos;
 			distance += d_distance;
@@ -32,24 +32,18 @@ void draw_screen(world_t* world) {
 		if (num_of_wall_sym > height)
 			num_of_wall_sym = height;
 		char sym = '#';
-		if (distance > 2)
-			sym = '"';
-		if (distance > 3)
-			sym = '.';
 		for (int i = ceiling_level; i < floor_level; i++) {
 			olc_draw(row, i, sym, FG_WHITE);
 		}
-		for (int i = height / 2; i < height; i++) {
-			if (i >= floor_level) {
-				if (i < threshold1) {
-					olc_draw(row, i, '-', FG_GREY);
-				}
-				else if (i < threshold2) {
-					olc_draw(row, i, 'x', FG_GREY);
-				}
-				else {
-					olc_draw(row, i, 'X', FG_GREY);
-				}
+		for (int i = floor_level; i < height; i++) {
+			if (i < threshold1) {
+				olc_draw(row, i, '-', FG_GREY);
+			}
+			else if (i < threshold2) {
+				olc_draw(row, i, 'x', FG_GREY);
+			}
+			else {
+				olc_draw(row, i, 'X', FG_GREY);
 			}
 		}
 		row++;
