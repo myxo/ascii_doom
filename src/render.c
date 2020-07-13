@@ -21,7 +21,7 @@ void draw_screen(world_t* world) {
 		double distance = 0;
 		double ray_sin = sin(ray_angle);
 		double ray_cos = cos(ray_angle);
-		while (world->map[(int)x][(int)y] != '#') {
+		while (!is_wall(x, y)) {
 			x += d_distance * ray_sin;
 			y += d_distance * ray_cos;
 			distance += d_distance;

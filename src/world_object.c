@@ -40,3 +40,7 @@ void deinit_world_object() {
 world_t* get_world() {
     return world_global;
 }
+
+int is_wall(double x, double y) {
+    return world_global->map[(int)x][(int)y] == '#';
+}
