@@ -18,17 +18,25 @@ int glyph_size = 8;
 
 int stop = 0;
 
+int isWall(double x, double y) {
+    world_t* world = get_world();
+    if (world->map[(int)x][(int)y] == '#')
+        return 1;
+    else
+        return 0;
+}
+
 void move_player(int forward, int right, float time_elapsed) {
     world_t* world = get_world();
 	double new_x = world->player.pos.x;
 	new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
 	new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
-	if (world->map[(int)new_x][(int)world->player.pos.y] != '#')
+	if (!isWall(new_x, world->player.pos.y))
 		world->player.pos.x = new_x;
 	double new_y = world->player.pos.y;
 	new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
 	new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
-	if (world->map[(int)world->player.pos.x][(int)new_y] != '#')
+	if (!isWall(world->player.pos.x, new_y))
 		world->player.pos.y = new_y;
 }
 

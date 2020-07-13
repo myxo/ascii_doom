@@ -32,10 +32,6 @@ void draw_screen(world_t* world) {
 		if (num_of_wall_sym > height)
 			num_of_wall_sym = height;
 		char sym = '#';
-		if (distance > 2)
-			sym = '"';
-		if (distance > 3)
-			sym = '.';
 		for (int i = ceiling_level; i < floor_level; i++) {
 			olc_draw(row, i, sym, FG_WHITE);
 		}
