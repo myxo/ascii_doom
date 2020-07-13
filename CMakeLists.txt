@@ -20,6 +20,8 @@ PRIVATE
 	src/main_doom.c
     src/world_object.h 
     src/world_object.c 
+	src/logging.h
+	src/logging.c
 	src/render.h
 	src/render.c
 )
