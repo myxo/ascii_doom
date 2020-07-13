@@ -18,13 +18,16 @@ typedef struct {
 
 typedef struct {
     player_t player;
-    char map[16][16];
+    char** map;
+    int map_width;
+    int map_height;
 } world_t;
 
 
 void init_world_object();
 void deinit_world_object();
 world_t* get_world();
+void read_map_for_file();
 int is_wall(double x, double y);
 
 #endif

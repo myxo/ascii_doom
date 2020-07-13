@@ -3,7 +3,10 @@
 
 #include <stdlib.h>
 
+#include <stdio.h>
+
 #include <math.h>
+
 
 world_t * world_global = NULL;
 
@@ -15,22 +18,7 @@ void init_world_object() {
     world_global->player.speed = 1.5;
     world_global->player.angle_of_vision = M_PI_4;
     world_global->player.angular_speed = 0.02;
-    strcpy(world_global->map[0], "###############");
-    strcpy(world_global->map[1], "# #######     #");
-    strcpy(world_global->map[2], "#  ######     #");
-    strcpy(world_global->map[3], "#  ########  ##");
-    strcpy(world_global->map[4], "#    #####  ###");
-    strcpy(world_global->map[5], "###  ####  ####");
-    strcpy(world_global->map[6], "####  ##  #####");
-    strcpy(world_global->map[7], "#####    ######");
-    strcpy(world_global->map[8], "######  #######");
-    strcpy(world_global->map[9], "#####  ########");
-    strcpy(world_global->map[10], "####  #########");
-    strcpy(world_global->map[11], "###  ##########");
-    strcpy(world_global->map[12], "##  ###########");
-    strcpy(world_global->map[13], "#  ######     #");
-    strcpy(world_global->map[14], "#          ####");
-    strcpy(world_global->map[15], "###############");
+    read_map_for_file();
 }
 
 void deinit_world_object() {
@@ -43,4 +31,40 @@ world_t* get_world() {
 
 int is_wall(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+void read_map_for_file() {
+    FILE* fmap;
+    fmap = fopen("map.txt", "r");
+    char tmp;
+    int i = 0;
+    int length = 0;
+    int capacity = 1;
+    int vertical_capacity = 1;
+    world_global->map = malloc(sizeof(char*));
+    world_global->map[0] = malloc(sizeof(char));
+    world_global->map_height = 0;
+    tmp = fgetc(fmap);
+    while (tmp != EOF) {
+        while (tmp != '\n') {
+            world_global->map[i][length++] = tmp;
+            if (length == capacity) {
+                capacity *= 2;
+                world_global->map[i] = realloc(world_global->map[i], (capacity + 1) * sizeof(char));
+            }
+            tmp = fgetc(fmap);
+        }
+        if (length > world_global->map_height) {
+            world_global->map_height = length;
+        }
+        world_global->map[i][length] = 0;
+        world_global->map = realloc(world_global->map, (++vertical_capacity)* sizeof(char*));
+        i++;
+        length = 0;
+        capacity = 1;
+        world_global->map[i] = malloc(sizeof(char));
+        tmp = fgetc(fmap);
+    }
+    world_global->map_height = i;
+    fclose(fmap);
 }
