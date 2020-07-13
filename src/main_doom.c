@@ -92,6 +92,7 @@ int main() {
 
 	olc_start(); // block until update return 0
 	olc_deinitialize();
+    log_deinit();
     deinit_world_object();
 
 	return 0;
