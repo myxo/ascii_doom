@@ -5,7 +5,7 @@
 
 #include <math.h>
 
-world_t * world_global = NULL;
+world_t* world_global = NULL;
 
 void init_world_object() {
     world_global = malloc(sizeof(world_t));
@@ -46,4 +46,13 @@ world_t* get_world() {
 
 int is_wall(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_bullet(double x, double y) {
+    for (int i = 0; i < world_global->bullet_array.len; i++) {
+        if (pow(x - world_global->bullet_array.array[i].pos.x, 2) + pow(y - world_global->bullet_array.array[i].pos.y, 2) <= pow(world_global->bullet_array.array[i].radius, 2)){
+            return 1;
+}
+    }
+    return 0;
 }
