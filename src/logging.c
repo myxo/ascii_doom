@@ -6,7 +6,7 @@
 
 typedef struct {
     double value;
-    char label[30];
+    char label[10];
 } var_to_display_t;
 
 typedef struct {
@@ -60,7 +60,7 @@ void add_watch(const char* label, double value) {
         increase_arr_vars_capacity(&display_logging);
     }
     display_logging.array[display_logging.len].value = value;
-    strcpy(display_logging.array[display_logging.len].label, label);
+    strncpy(display_logging.array[display_logging.len].label, label, 10);
     display_logging.len++;
 }
 
@@ -82,20 +82,12 @@ void stop_watch(const char* label) {
 }
 
 void display_watch() {
-    char** str = malloc(display_logging.len * sizeof(char*));
-    int max = 0;
+    if (display_logging.len == 0)
+        return;
+    char str[27];
+    olc_fill(0, 0, 27, display_logging.len + 1, ' ', BG_BLACK);
     for (int i = 0; i < display_logging.len; i++) {
-        str[i] = malloc(50 * sizeof(char));
-        sprintf(str[i], "%s : %lf", display_logging.array[i].label, display_logging.array[i].value);
-        int temp = strlen(str[i]);
-        if (temp > max) {
-            max = temp;
-        }
+        sprintf(str, "%s : %9.5f", display_logging.array[i].label, display_logging.array[i].value);
+        olc_draw_string(0, i, str, FG_WHITE);
     }
-    olc_fill(0, 0, max, display_logging.len, ' ', BG_BLACK);
-    for (int i = 0; i < display_logging.len; i++) {
-        olc_draw_string(0, i, str[i], FG_WHITE);
-        free(str[i]);
-    }
-    free(str);
 }

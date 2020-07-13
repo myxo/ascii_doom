@@ -4,14 +4,15 @@
 
 #include <stdio.h>
 
-int width = 200;
-int height = 150;
-int glyph_size = 8;
+int width = 50;
+int height = 50;
+int glyph_size = 12;
 
 int stop = 0;
 
 int create() {
     init_world_object();
+    log_init("debug.txt");
 	return 1;
 }
 
@@ -29,7 +30,7 @@ int update(float time_elapsed) {
 
 	const char * hello_str = "Hello world";
 	olc_draw_string(width / 2 - strlen(hello_str) / 2, height / 2, hello_str, FG_WHITE);
-
+    display_watch();
 	return 1;
 }
 
