@@ -4,7 +4,7 @@
 
 #include "world_object.h"
 
-#include "rendering.h"
+#include "render.h"
 
 #include <windows.h>
 
@@ -21,22 +21,17 @@ int stop = 0;
 
 world_t world;
 
-int Wbutton = 0x57;
-int Abutton = 0x41;
-int Sbutton = 0x53;
-int Dbutton = 0x44;
-
 void move_player(int forward, int right, float time_elapsed) {
-	double tmp_x = world.player_pos_x;
-	tmp_x += forward * time_elapsed * world.player_speed * sin(world.player_angle);
-	tmp_x += right * time_elapsed * world.player_speed * sin(world.player_angle + M_PI_2);
-	if (map[(int)tmp_x][(int)world.player_pos_y] != '#')
-		world.player_pos_x = tmp_x;
-	double tmp_y = world.player_pos_y;
-	tmp_y += forward * time_elapsed * world.player_speed * cos(world.player_angle);
-	tmp_y += right * time_elapsed * world.player_speed * cos(world.player_angle + M_PI_2);
-	if (map[(int)world.player_pos_x][(int)tmp_y] != '#')
-		world.player_pos_y = tmp_y;
+	double new_x = world.player_pos_x;
+	new_x += forward * time_elapsed * world.player_speed * sin(world.player_angle);
+	new_x += right * time_elapsed * world.player_speed * cos(world.player_angle);
+	if (map[(int)new_x][(int)world.player_pos_y] != '#')
+		world.player_pos_x = new_x;
+	double new_y = world.player_pos_y;
+	new_y += forward * time_elapsed * world.player_speed * cos(world.player_angle);
+	new_y -= right * time_elapsed * world.player_speed * sin(world.player_angle);
+	if (map[(int)world.player_pos_x][(int)new_y] != '#')
+		world.player_pos_y = new_y;
 }
 
 int create() {
@@ -44,25 +39,25 @@ int create() {
 }
 
 void handle_input(float time_elapsed) {
-	if (olc_get_key(VK_ESCAPE).held) { // Esc
+	if (olc_get_key(VK_ESCAPE).held) {
 		stop = 1;
 	}
-	if (olc_get_key(VK_LEFT).held) { // Esc
-		world.player_angle -= 0.02;
+	if (olc_get_key(VK_LEFT).held) {
+		world.player_angle -= world.player_angular_speed;
 	}
-	if (olc_get_key(VK_RIGHT).held) { // Esc
-		world.player_angle += 0.02;
+	if (olc_get_key(VK_RIGHT).held) {
+		world.player_angle += world.player_angular_speed;
 	}
-	if (olc_get_key(Wbutton).held) { // Esc
+	if (olc_get_key('W').held) {
 		move_player(1, 0, time_elapsed);
 	}
-	if (olc_get_key(Abutton).held) { // Esc
+	if (olc_get_key('A').held) {
 		move_player(0, -1, time_elapsed);
 	}
-	if (olc_get_key(Sbutton).held) { // Esc
+	if (olc_get_key('S').held) {
 		move_player(-1, 0, time_elapsed);
 	}
-	if (olc_get_key(Dbutton).held) { // Esc
+	if (olc_get_key('D').held) {
 		move_player(0, 1, time_elapsed);
 	}
 }
@@ -92,7 +87,7 @@ int main() {
 	world.player_angle = 0;
 	world.player_speed = 1.5;
 	world.player_angle_of_vision= M_PI_4;
-	
+	world.player_angular_speed = 0.02;
 
 
 	olc_start(); // block until update return 0

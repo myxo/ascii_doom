@@ -7,6 +7,7 @@ typedef struct {
     double player_angle_of_vision;
     double player_angle;
     double player_speed;
+    double player_angular_speed;
 } world_t;
 
 #endif
