@@ -1,4 +1,4 @@
-#include "..\third_party\lib.h"
+#include "../third_party/olc/olc.h"
 
 #include "world_object.h"
 
@@ -20,13 +20,13 @@ char map[16][16] = {
 void draw_screen(world_t world, int width, int height) {
 	int threshold1 = 125;
 	int threshold2 = 140;
-	double d_angle = world.player_angle_of_vision / width;
-	double ray_angle = world.player_angle - world.player_angle_of_vision / 2;
+	double d_angle = world.player.angle_of_vision / width;
+	double ray_angle = world.player.angle - world.player.angle_of_vision / 2;
 	double d_distance = 0.01;
 	int row = 0;
-	for (; ray_angle < world.player_angle + world.player_angle_of_vision / 2; ray_angle += d_angle) {
-		double x = world.player_pos_x;
-		double y = world.player_pos_y;
+	for (; ray_angle < world.player.angle + world.player.angle_of_vision / 2; ray_angle += d_angle) {
+		double x = world.player.pos.x;
+		double y = world.player.pos.y;
 		double distance = 0;
 		double ray_sin = sin(ray_angle);
 		double ray_cos = cos(ray_angle);
@@ -41,7 +41,7 @@ void draw_screen(world_t world, int width, int height) {
 		if (num_of_wall_sym > height)
 			num_of_wall_sym = height;
 		char sym = '#';
-		if (distance > 1.7)
+		if (distance > 2)
 			sym = '"';
 		if (distance > 3)
 			sym = '.';

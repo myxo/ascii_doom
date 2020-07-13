@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "olc.h"
 
 #include "olcConsoleGameEngine.h"
 

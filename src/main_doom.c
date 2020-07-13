@@ -1,6 +1,5 @@
-#define _USE_MATH_DEFINES
 
-#include "lib.h"
+#include "olc/olc.h"
 
 #include "world_object.h"
 
@@ -19,22 +18,27 @@ int glyph_size = 8;
 
 int stop = 0;
 
-world_t world;
-
 void move_player(int forward, int right, float time_elapsed) {
-	double new_x = world.player_pos_x;
-	new_x += forward * time_elapsed * world.player_speed * sin(world.player_angle);
-	new_x += right * time_elapsed * world.player_speed * cos(world.player_angle);
-	if (map[(int)new_x][(int)world.player_pos_y] != '#')
-		world.player_pos_x = new_x;
-	double new_y = world.player_pos_y;
-	new_y += forward * time_elapsed * world.player_speed * cos(world.player_angle);
-	new_y -= right * time_elapsed * world.player_speed * sin(world.player_angle);
-	if (map[(int)world.player_pos_x][(int)new_y] != '#')
-		world.player_pos_y = new_y;
+    world_t* world = get_world();
+	double new_x = world->player.pos.x;
+	new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
+	new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
+	if (map[(int)new_x][(int)world->player.pos.y] != '#')
+		world->player.pos.x = new_x;
+	double new_y = world->player.pos.y;
+	new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
+	new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
+	if (map[(int)world->player.pos.x][(int)new_y] != '#')
+		world->player.pos.y = new_y;
+}
+
+void turn_player(int dir) {
+    world_t* world = get_world();
+    world->player.angle += dir * world->player.angular_speed;
 }
 
 int create() {
+    init_world_object();
 	return 1;
 }
 
@@ -43,10 +47,10 @@ void handle_input(float time_elapsed) {
 		stop = 1;
 	}
 	if (olc_get_key(VK_LEFT).held) {
-		world.player_angle -= world.player_angular_speed;
+        turn_player(-1);
 	}
 	if (olc_get_key(VK_RIGHT).held) {
-		world.player_angle += world.player_angular_speed;
+        turn_player(1);
 	}
 	if (olc_get_key('W').held) {
 		move_player(1, 0, time_elapsed);
@@ -69,7 +73,7 @@ int update(float time_elapsed) {
 	}
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
-	draw_screen(world, width, height);
+	draw_screen(*get_world(), width, height);
 
 	return 1;
 }
@@ -82,16 +86,9 @@ int main() {
 	olc_register_create(&create);
 	olc_register_update(&update);
 
-	world.player_pos_x = 2;
-	world.player_pos_y = 6;
-	world.player_angle = 0;
-	world.player_speed = 1.5;
-	world.player_angle_of_vision= M_PI_4;
-	world.player_angular_speed = 0.02;
-
-
 	olc_start(); // block until update return 0
 	olc_deinitialize();
+    deinit_world_object();
 
 	return 0;
 }

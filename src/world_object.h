@@ -2,12 +2,27 @@
 #define WORLD_OBJECT_H_
 
 typedef struct {
-    double player_pos_x;
-    double player_pos_y;
-    double player_angle_of_vision;
-    double player_angle;
-    double player_speed;
-    double player_angular_speed;
+    double x;
+    double y;
+} point_t;
+
+
+typedef struct {
+    point_t pos;
+    double angle_of_vision;
+    double angle;
+    double speed;
+    double angular_speed;
+} player_t;
+
+
+typedef struct {
+    player_t player;
 } world_t;
+
+
+void init_world_object();
+void deinit_world_object();
+world_t* get_world();
 
 #endif
