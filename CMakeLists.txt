@@ -18,6 +18,7 @@ target_sources(ascii_doom
 PRIVATE
 	src/main_doom.c
     src/world_object.h 
+    src/world_object.c 
 )
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)
