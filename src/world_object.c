@@ -31,7 +31,7 @@ void init_world_object() {
     strcpy(world_global->map[13], "#  ######     #");
     strcpy(world_global->map[14], "#          ####");
     strcpy(world_global->map[15], "###############");
-    world_global->bullet_array.capacity = 2;
+    world_global->bullet_array.capacity = 5;
     world_global->bullet_array.len = 0;
     world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
 }
