@@ -13,7 +13,7 @@
 
 
 int width =  200;
-int height = 100;
+int height = 150;
 int glyph_size =  8;
 
 int stop = 0;
@@ -72,18 +72,6 @@ int update(float time_elapsed) {
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
-    for (int i = 0; i < get_world()->enemy_array.len; i++) {
-        //add_watch("health", get_world()->enemy_array.array[0].health);
-        //add_watch("enemy x", get_world()->enemy_array.array[i].pos.x);
-        //add_watch("enemy y", get_world()->enemy_array.array[i].pos.y);
-        //add_watch("target x", get_world()->enemy_array.array[i].target.x);
-        //add_watch("target y", get_world()->enemy_array.array[i].target.y);
-        //add_watch("angle en", get_world()->enemy_array.array[i].angle);
-        //add_watch("player x", get_world()->player.pos.x);
-        //add_watch("player y", get_world()->player.pos.y);
-        //add_watch("angle pl", get_world()->player.angle);
-    }
-    add_watch("bullets", get_world()->bullet_array.len);
     bullets_movement(get_world(), time_elapsed);
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
