@@ -26,7 +26,7 @@ void draw_screen(world_t* world) {
             y += d_distance * ray_cos;
             distance += d_distance;
         }
-        int num_of_wall_sym = height * (2 / (distance));
+        int num_of_wall_sym = height * (1 / (distance));
         if (num_of_wall_sym > height)
             num_of_wall_sym = height;
 

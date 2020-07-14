@@ -19,10 +19,10 @@ int init_world_object() {
     world_global = malloc(sizeof(world_t));
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
-    world_global->player.angle = 0;
-    world_global->player.speed = 1.5;
+    world_global->player.angle = M_PI_4;
+    world_global->player.speed = 2.5;
     world_global->player.angle_of_vision = M_PI_4;
-    world_global->player.angular_speed = 1.0;
+    world_global->player.angular_speed = 1.5;
     init_bullet_array(world_global, 5);
     return read_map_for_file();
 }
