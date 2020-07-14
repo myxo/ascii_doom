@@ -48,6 +48,20 @@ void draw_screen(world_t* world) {
 				olc_draw(row, i, 'X', FG_GREY);
 			}
 		}
+
+        x = world->player.pos.x;
+        y = world->player.pos.y;
+        distance = 0;
+        while (!is_wall(x, y)) {
+            x += d_distance * ray_sin;
+            y += d_distance * ray_cos;
+            distance += d_distance;
+            if (is_bullet(x, y)) {
+                int bullet_height = 1/distance;
+                for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
+                    olc_draw(row, i, '*', FG_RED);
+            }
+        }
 		row++;
 	}
 }
