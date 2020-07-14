@@ -99,7 +99,8 @@ int update(float time_elapsed) {
         add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
     }
     bullets_movement(get_world(), time_elapsed);
-	draw_screen(get_world());
+	draw_screen(get_world());   
+    draw_minimap(get_world());
     display_watch();
 	return 1;
 }
