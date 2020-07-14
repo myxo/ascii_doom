@@ -22,6 +22,7 @@ int init_world_object() {
 }
 
 void deinit_world_object() {
+    free(world_global->map);
     free(world_global);
 }
 
