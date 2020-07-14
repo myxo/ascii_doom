@@ -39,7 +39,9 @@ void turn_player(int dir) {
 }
 
 int create() {
-    init_world_object();
+    if (init_world_object() == 0) {
+        return 0;
+    }
     log_init("debug.txt");
 	return 1;
 }

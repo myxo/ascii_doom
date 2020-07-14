@@ -24,10 +24,10 @@ typedef struct {
 } world_t;
 
 
-void init_world_object();
+int init_world_object();
 void deinit_world_object();
 world_t* get_world();
-void read_map_for_file();
+int read_map_for_file();
 int is_wall(double x, double y);
 
 #endif
