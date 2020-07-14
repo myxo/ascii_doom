@@ -25,9 +25,7 @@ void draw_screen(world_t* world) {
 			x += d_distance * ray_sin;
 			y += d_distance * ray_cos;
 			distance += d_distance;
-            world->seeable[(int)x][(int)y] = 1;
 		}
-        world->seeable[(int)x][(int)y] = 1;
 		int num_of_wall_sym = height * (2 / (distance));
 		int ceiling_level = (height - num_of_wall_sym) / 2;
 		int floor_level = (height + num_of_wall_sym) / 2;
@@ -81,14 +79,30 @@ void draw_minimap(world_t* world) {
                 sym_col_FG = FG_BLACK;
                 sym_col_BG = BG_BLACK;
             }
-            if (world->seeable[j][i]) {
-                sym_col_FG = FG_DARK_GREY;
-                //sym_col_BG = BG_WHITE;
-                //sym_col_FG = FG_WHITE;
-                sym = '*';
-                world->seeable[j][i] = 0;
-            }
             olc_draw(i, j, sym, sym_col_FG + sym_col_BG);
+        }
+    }
+    double d_angle = world->player.angle_of_vision / olc_screen_width();
+    double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
+    double d_distance = 0.1;
+    for (; ray_angle < world->player.angle + world->player.angle_of_vision / 2; ray_angle += d_angle) {
+        double x = world->player.pos.x;
+        double y = world->player.pos.y;
+        double ray_sin = sin(ray_angle);
+        double ray_cos = cos(ray_angle);
+        for (int i = 0; i < 2; i++) {
+            double last_x = x;
+            double last_y = y;
+            while ((int)last_x == (int)x && (int)last_y == (int)y) {
+                x += d_distance * ray_sin;
+                y += d_distance * ray_cos;
+            }
+            if (world->map[(int)x][(int)y] == '#') {
+                olc_draw((int)y, (int)x, '*', FG_RED + BG_GREY);
+            }
+            else {
+                olc_draw((int)y, (int)x, '*', FG_RED + BG_BLACK);
+            }
         }
     }
     olc_draw((int)world->player.pos.y, (int)world->player.pos.x, '@', FG_GREEN);

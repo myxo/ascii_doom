@@ -33,7 +33,6 @@ typedef struct {
     player_t player;
     bullet_array_t bullet_array;
     char map[16][16];
-    int** seeable;
     int map_width;
     int map_height;
 } world_t;
