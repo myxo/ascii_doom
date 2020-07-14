@@ -55,6 +55,11 @@ void draw_screen(world_t* world) {
             y += d_distance * ray_cos;
             distance += d_distance;
             if (is_bullet(x, y)) {
+                int bullet_height = 4 / distance;
+                for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
+                    olc_draw(row, i, '%', FG_BLUE);
+            }
+            if (is_bullet(x, y)) {
                 int bullet_height = 1/distance;
                 for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
                     olc_draw(row, i, '*', FG_RED);

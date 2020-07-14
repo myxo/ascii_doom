@@ -11,7 +11,7 @@
 
 
 int width =  200;
-int height = 150;
+int height = 100;
 int glyph_size =  8;
 
 int stop = 0;

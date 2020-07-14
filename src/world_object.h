@@ -36,6 +36,7 @@ typedef struct {
     double angle_of_vision;
     double angle;
     double speed;
+    double radius;
 } enemy_t;
 
 typedef struct {
@@ -58,5 +59,6 @@ world_t* get_world();
 int is_wall(double x, double y);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
+int is_enemy(double x, double y);
 
 #endif

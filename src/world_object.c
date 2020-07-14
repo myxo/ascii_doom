@@ -67,17 +67,29 @@ int is_bullet(double x, double y) {
         double r = world_global->bullet_array.array[i].radius;
         if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)){
             return 1;
-}
+        }
     }
     return 0;
 }
 
 int is_player(double x, double y) {
-    double ox_vec = x - world_global->player.pos.x;
-    double oy_vec = y - world_global->player.pos.y;
+    double dx = x - world_global->player.pos.x;
+    double dy = y - world_global->player.pos.y;
     double r = world_global->player.radius;
-    if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)) {
+    if (pow(dx, 2) + pow(dy, 2) <= pow(r, 2)) {
         return 1;
+    }
+    return 0;
+}
+
+int is_enemy(double x, double y) {
+    for (int i = 0; i < world_global->enemy_array.len; i++) {
+        double ox_vec = x - world_global->enemy_array.array[i].pos.x;
+        double oy_vec = y - world_global->enemy_array.array[i].pos.y;
+        double r = world_global->enemy_array.array[i].radius;
+        if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)) {
+            return 1;
+        }
     }
     return 0;
 }

@@ -3,8 +3,8 @@
 
 #include "world_object.h"
 
-void bullet_destruct(world_t* world, int index);
-void bullets_movement(world_t* world, float time_elapsed);
-void shoot_bullet(world_t* world, float time_elapsed);
+void add_enemy(world_t* world);
+void enemy_destruct(world_t* world, int index);
+void enemy_movement(world_t* world, float time_elapsed);
 
 #endif
