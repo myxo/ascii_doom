@@ -48,8 +48,8 @@ int load_sprite_from_file(const char* filename, sprite_t* sprite) {
     sprite->width = size[0];
     sprite->height = size[1];
     int len = sprite->width * sprite->height;
-    sprite->colours = CheckNull(calloc(len, sizeof(short)));
-    fread(&sprite->colours, sizeof(short), len, file);
+    sprite->colours = CheckNull(realloc(sprite->colours, len * sizeof(short)));
+    fread(sprite->colours, sizeof(short), len, file);
     fclose(file);
     return 0;
 }
