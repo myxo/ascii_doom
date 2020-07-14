@@ -96,3 +96,4 @@ int is_enemy(double x, double y) {
     }
     return 0;
 }
+

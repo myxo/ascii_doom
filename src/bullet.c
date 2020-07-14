@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "enemy.h"
 #include "bullet.h"
+#include "player.h"
 
 void increase_arr_bullets_capacity(world_t* world) {
     world->bullet_array.capacity = world->bullet_array.capacity * 2;
@@ -36,7 +37,10 @@ void bullets_movement(world_t* world, float time_elapsed) {
                 enemy_hit(world, index_minux_one - 1, 1);
             }
         }
-        //.if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y))
+        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y) && world->bullet_array.array[i].host == ENEMY_BULLET) {
+            bullet_destruct(get_world(), i);
+            player_hit(1);
+        }
     }
 }
 

@@ -4,6 +4,7 @@
 #include "logging.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "player.h"
 
 #include<time.h> 
 #include <windows.h>
@@ -18,27 +19,6 @@ int glyph_size =  8;
 int stop = 0;
 
 double time_from_last_shot = 0;
-
-void move_player(int forward, int right, float time_elapsed) {
-    world_t* world = get_world();
-
-	double new_x = world->player.pos.x;
-	new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
-	new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
-	if (!is_wall(new_x, world->player.pos.y))
-		world->player.pos.x = new_x;
-
-	double new_y = world->player.pos.y;
-	new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
-	new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
-	if (!is_wall(world->player.pos.x, new_y))
-		world->player.pos.y = new_y;
-}
-
-void turn_player(int dir) {
-    world_t* world = get_world();
-    world->player.angle += dir * world->player.angular_speed;
-}
 
 int create() {
     init_world_object();

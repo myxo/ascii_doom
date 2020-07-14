@@ -30,6 +30,8 @@ PRIVATE
 	src/enemy.c
 	src/sprite.h
 	src/sprite.c
+	src/player.h
+	src/player.c
 )
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)
