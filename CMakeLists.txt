@@ -29,7 +29,7 @@ PRIVATE
 	src/sprite.h
 	src/sprite.c
 )
-configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/src/map.txt
+configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/res/map.txt
 				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 
