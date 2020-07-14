@@ -29,6 +29,9 @@ PRIVATE
 	src/sprite.h
 	src/sprite.c
 )
+configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/src/map.txt
+				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)
 target_include_directories(ascii_doom PRIVATE third_party)

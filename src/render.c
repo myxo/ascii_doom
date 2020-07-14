@@ -70,7 +70,7 @@ void draw_minimap(world_t* world) {
         for (int j = 0; j < world->map_width; j++) {
             enum COLOR sym_col_BG;
             enum COLOR sym_col_FG;
-            char sym = world->map[j][i];
+            char sym = world->map[i][j];
             if (sym == '#') {
                 sym_col_FG = FG_GREY;
                 sym_col_BG = BG_GREY;
@@ -79,7 +79,7 @@ void draw_minimap(world_t* world) {
                 sym_col_FG = FG_BLACK;
                 sym_col_BG = BG_BLACK;
             }
-            olc_draw(i, j, sym, sym_col_FG + sym_col_BG);
+            olc_draw(i, world->map_width - j - 1, sym, sym_col_FG + sym_col_BG);
         }
     }
     double d_angle = world->player.angle_of_vision / olc_screen_width();
@@ -97,13 +97,15 @@ void draw_minimap(world_t* world) {
                 x += d_distance * ray_sin;
                 y += d_distance * ray_cos;
             }
-            if (world->map[(int)x][(int)y] == '#') {
-                olc_draw((int)y, (int)x, '*', FG_RED + BG_GREY);
-            }
-            else {
-                olc_draw((int)y, (int)x, '*', FG_RED + BG_BLACK);
+            if ((int)x >= 0 && (int)x < world->map_height && (int)y >= 0 && (int)y < world->map_width) {
+                if (world->map[(int)x][(int)y] == '#') {
+                    olc_draw((int)x, world->map_width - (int)y - 1, '*', FG_RED + BG_GREY);
+                }
+                else {
+                    olc_draw((int)x, world->map_width - (int)y - 1, '*', FG_RED + BG_BLACK);
+                }
             }
         }
     }
-    olc_draw((int)world->player.pos.y, (int)world->player.pos.x, '@', FG_GREEN);
+    olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
 }
