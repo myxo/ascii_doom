@@ -22,6 +22,9 @@ int init_world_object() {
 }
 
 void deinit_world_object() {
+    for (int i = 0; i < world_global->map_height; i++) {
+        free(world_global->map[i]);
+    }
     free(world_global->map);
     free(world_global);
 }
