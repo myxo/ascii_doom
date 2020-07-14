@@ -25,8 +25,9 @@ void draw_screen(world_t* world) {
 			x += d_distance * ray_sin;
 			y += d_distance * ray_cos;
 			distance += d_distance;
+            world->seeable[(int)x][(int)y] = 1;
 		}
-        world->seeable_walls[(int)x][(int)y] = 1;
+        world->seeable[(int)x][(int)y] = 1;
 		int num_of_wall_sym = height * (2 / (distance));
 		int ceiling_level = (height - num_of_wall_sym) / 2;
 		int floor_level = (height + num_of_wall_sym) / 2;
@@ -55,13 +56,25 @@ void draw_minimap(world_t* world) {
 
     for (int i = 0; i < world->map_height; i++) {
         for (int j = 0; j < world->map_width; j++) {
-            if (world->seeable_walls[j][i] == 1) {
-                olc_draw(i, j, world->map[j][i], FG_RED);
-                world->seeable_walls[j][i] = 0;
+            enum COLOR sym_col_BG;
+            enum COLOR sym_col_FG;
+            char sym = world->map[j][i];
+            if (sym == '#') {
+                sym_col_FG = FG_GREY;
+                sym_col_BG = BG_GREY;
             }
             else {
-                olc_draw(i, j, world->map[j][i], FG_WHITE);
+                sym_col_FG = FG_BLACK;
+                sym_col_BG = BG_BLACK;
             }
+            if (world->seeable[j][i]) {
+                sym_col_FG = FG_DARK_GREY;
+                //sym_col_BG = BG_WHITE;
+                //sym_col_FG = FG_WHITE;
+                sym = '*';
+                world->seeable[j][i] = 0;
+            }
+            olc_draw(i, j, sym, sym_col_FG + sym_col_BG);
         }
     }
     olc_draw((int)world->player.pos.y, (int)world->player.pos.x, '@', FG_GREEN);
