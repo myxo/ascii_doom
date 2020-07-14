@@ -24,6 +24,8 @@ PRIVATE
 	src/logging.c
 	src/render.h
 	src/render.c
+	src/bullet.h
+	src/bullet.c
 )
 configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/src/map.txt
 				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)

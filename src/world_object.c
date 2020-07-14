@@ -7,8 +7,13 @@
 
 #include <math.h>
 
+world_t* world_global = NULL;
 
-world_t * world_global = NULL;
+void init_bullet_array(world_t* world, int capacity) {
+    world_global->bullet_array.capacity = capacity;
+    world_global->bullet_array.len = 0;
+    world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
+}
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
@@ -18,6 +23,7 @@ int init_world_object() {
     world_global->player.speed = 1.5;
     world_global->player.angle_of_vision = M_PI_4;
     world_global->player.angular_speed = 0.02;
+    init_bullet_array(world_global, 5);
     return read_map_for_file();
 }
 
@@ -51,7 +57,7 @@ int read_map_for_file() {
     }
     fgetc(fmap);
     for (int i = 0; i < world_global->map_height; i++) {
-        for (int j = 0;  j < world_global->map_width; j++) {
+        for (int j = 0; j < world_global->map_width; j++) {
             world_global->map[i][j] = fgetc(fmap);
         }
         world_global->map[i][world_global->map_width] = 0;
@@ -59,4 +65,16 @@ int read_map_for_file() {
     }
     fclose(fmap);
     return 1;
+}
+
+int is_bullet(double x, double y) {
+    for (int i = 0; i < world_global->bullet_array.len; i++) {
+        double ox_vec = x - world_global->bullet_array.array[i].pos.x;
+        double oy_vec = y - world_global->bullet_array.array[i].pos.y;
+        double r = world_global->bullet_array.array[i].radius;
+        if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)){
+            return 1;
+}
+    }
+    return 0;
 }
