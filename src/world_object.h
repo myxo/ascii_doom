@@ -50,6 +50,8 @@ typedef struct {
     bullet_array_t bullet_array;
     enemy_array_t enemy_array;
     char map[16][16];
+    int map_width;
+    int map_height;
 } world_t;
 
 
