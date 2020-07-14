@@ -33,9 +33,14 @@ void init_world_object() {
     strcpy(world_global->map[15], "################");
     world_global->map_width = 16;
     world_global->map_height = 16;
+    world_global->seeable_walls = calloc(world_global->map_height, world_global->map_height * sizeof(int));
+    for (int i = 0; i < world_global->map_height; i++) {
+        world_global->seeable_walls[i] = calloc(world_global->map_width, world_global->map_width * sizeof(int));
+    }
 }
 
 void deinit_world_object() {
+    free(world_global->seeable_walls);
     free(world_global);
 }
 

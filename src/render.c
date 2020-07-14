@@ -26,6 +26,7 @@ void draw_screen(world_t* world) {
 			y += d_distance * ray_cos;
 			distance += d_distance;
 		}
+        world->seeable_walls[(int)x][(int)y] = 1;
 		int num_of_wall_sym = height * (2 / (distance));
 		int ceiling_level = (height - num_of_wall_sym) / 2;
 		int floor_level = (height + num_of_wall_sym) / 2;
@@ -51,10 +52,16 @@ void draw_screen(world_t* world) {
 }
 
 void draw_minimap(world_t* world) {
-    //world_t* world = get_world();
+
     for (int i = 0; i < world->map_height; i++) {
         for (int j = 0; j < world->map_width; j++) {
-            olc_draw(i, j, world->map[j][i], FG_WHITE);
+            if (world->seeable_walls[j][i] == 1) {
+                olc_draw(i, j, world->map[j][i], FG_RED);
+                world->seeable_walls[j][i] = 0;
+            }
+            else {
+                olc_draw(i, j, world->map[j][i], FG_WHITE);
+            }
         }
     }
     olc_draw((int)world->player.pos.y, (int)world->player.pos.x, '@', FG_GREEN);
