@@ -8,6 +8,7 @@ typedef struct {
 
 
 typedef struct {
+    int health;
     point_t pos;
     double angle_of_vision;
     double angle;
@@ -21,6 +22,7 @@ typedef struct {
     double angle;
     double speed;
     double radius;
+    int host;
 } bullet_t;
 
 typedef struct {
@@ -37,6 +39,7 @@ typedef struct {
     double angle;
     double speed;
     double radius;
+    double time_from_last_shot;
 } enemy_t;
 
 typedef struct {

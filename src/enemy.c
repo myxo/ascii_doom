@@ -1,10 +1,11 @@
 #define _USE_MATH_DEFINES
 
 #include "world_object.h"
+#include "bullet.h"
+
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-
 
 void increase_arr_enemy_capacity(world_t* world) {
     world->enemy_array.capacity = world->enemy_array.capacity * 2;
@@ -27,6 +28,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.len++;
 }
 
@@ -49,12 +51,17 @@ void enemy_movement(world_t* world, float time_elapsed) {
         double distance_to_player = 0;
         double d_distance = 0.01;
         int check_move = 1;
+        world->enemy_array.array[i].time_from_last_shot += time_elapsed;
         if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
             while (!is_wall(x, y)) {
                 x += d_distance * sin(angle_to_player);
                 y += d_distance * cos(angle_to_player);
                 distance_to_player += d_distance;
                 if (is_player(x, y)) {
+                    if (distance_to_player <= 10 && world->enemy_array.array[i].time_from_last_shot >= 2) {
+                        world->enemy_array.array[i].time_from_last_shot = 0;
+                        shoot_bullet(world, world->enemy_array.array[i].pos, angle_to_player, time_elapsed, ENEMY_BULLET);
+                    }
                     if (distance_to_player <= 4) {
                         check_move = 0;
                     }

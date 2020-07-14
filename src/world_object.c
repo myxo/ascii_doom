@@ -21,6 +21,7 @@ void init_enemy_array(world_t* world, int capacity) {
 
 void init_world_object() {
     world_global = malloc(sizeof(world_t));
+    world_global->player.health = 3;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = 0;
