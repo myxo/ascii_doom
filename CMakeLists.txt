@@ -26,6 +26,8 @@ PRIVATE
 	src/render.c
 	src/bullet.h
 	src/bullet.c
+	src/enemy.h
+	src/enemy.c
 )
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)

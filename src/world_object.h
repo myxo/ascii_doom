@@ -22,12 +22,27 @@ typedef struct {
     double radius;
 } bullet_t;
 
-
 typedef struct {
     bullet_t* array;
     int len;
     int capacity;
 } bullet_array_t;
+
+typedef struct {
+    int health;
+    point_t pos;
+    point_t target;
+    double angle_of_vision;
+    double angle;
+    double speed;
+    double angular_speed;
+} enemy_t;
+
+typedef struct {
+    enemy_t* array;
+    int len;
+    int capacity;
+} enemy_array_t;
 
 typedef struct {
     player_t player;
