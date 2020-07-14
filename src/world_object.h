@@ -50,17 +50,18 @@ typedef struct {
 
 typedef struct {
     player_t player;
+    char** map;
     bullet_array_t bullet_array;
     enemy_array_t enemy_array;
-    char map[16][16];
     int map_width;
     int map_height;
 } world_t;
 
 
-void init_world_object();
+int init_world_object();
 void deinit_world_object();
 world_t* get_world();
+int read_map_for_file();
 int is_wall(double x, double y);
 int is_bullet(double x, double y);
 int is_player(double x, double y);

@@ -9,7 +9,7 @@
 
 void increase_arr_enemy_capacity(world_t* world) {
     world->enemy_array.capacity = world->enemy_array.capacity * 2;
-    world->enemy_array.array = realloc(world->enemy_array.array, world->enemy_array.capacity * sizeof(bullet_t));
+    world->enemy_array.array = realloc(world->enemy_array.array, world->enemy_array.capacity * sizeof(enemy_t));
 }
 
 void add_enemy(world_t* world) {
@@ -17,12 +17,12 @@ void add_enemy(world_t* world) {
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
     do {
-        world->enemy_array.array[world->enemy_array.len].target.x = rand() % 16;
-        world->enemy_array.array[world->enemy_array.len].target.y = rand() % 16;
+        world->enemy_array.array[world->enemy_array.len].target.x = rand() % world->map_width;
+        world->enemy_array.array[world->enemy_array.len].target.y = rand() % world->map_height;
     } while (is_wall(world->enemy_array.array[world->enemy_array.len].target.x, world->enemy_array.array[world->enemy_array.len].target.y));
     do {
-        world->enemy_array.array[world->enemy_array.len].pos.x = rand() % 16;
-        world->enemy_array.array[world->enemy_array.len].pos.y = rand() % 16;
+        world->enemy_array.array[world->enemy_array.len].pos.x = rand() % world->map_width;
+        world->enemy_array.array[world->enemy_array.len].pos.y = rand() % world->map_height;
     } while (is_wall(world->enemy_array.array[world->enemy_array.len].pos.x, world->enemy_array.array[world->enemy_array.len].pos.y));
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;

@@ -13,7 +13,7 @@
 
 
 int width =  200;
-int height = 150;
+int height = 100;
 int glyph_size =  8;
 
 int stop = 0;
@@ -21,7 +21,9 @@ int stop = 0;
 double time_from_last_shot = 0;
 
 int create() {
-    init_world_object();
+    if (init_world_object() == 0) {
+        return 0;
+    }
     log_init("debug.txt");
 	return 1;
 }
