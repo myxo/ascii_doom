@@ -23,7 +23,7 @@ int stop = 0;
 
 double time_from_last_shot = 0;
 
-void move_player(int forward, int right, float time_elapsed) {
+void move_player(int forward, int right, double time_elapsed) {
     world_t* world = get_world();
 
 	double new_x = world->player.pos.x;
@@ -39,9 +39,9 @@ void move_player(int forward, int right, float time_elapsed) {
 		world->player.pos.y = new_y;
 }
 
-void turn_player(int dir) {
+void turn_player(int dir, double time_elapsed) {
     world_t* world = get_world();
-    world->player.angle += dir * world->player.angular_speed;
+    world->player.angle += dir * time_elapsed * world->player.angular_speed;
 }
 
 int create() {
@@ -54,10 +54,10 @@ int create() {
 
 void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
-        turn_player(-1);
+        turn_player(-1, time_elapsed);
     }
     if (olc_get_key(VK_RIGHT).held) {
-        turn_player(1);
+        turn_player(1, time_elapsed);
     }
     if (olc_get_key('W').held) {
         move_player(1, 0, time_elapsed);

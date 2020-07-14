@@ -22,7 +22,7 @@ int init_world_object() {
     world_global->player.angle = 0;
     world_global->player.speed = 1.5;
     world_global->player.angle_of_vision = M_PI_4;
-    world_global->player.angular_speed = 0.02;
+    world_global->player.angular_speed = 1.0;
     init_bullet_array(world_global, 5);
     return read_map_for_file();
 }

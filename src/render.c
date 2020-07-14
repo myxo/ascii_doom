@@ -27,10 +27,11 @@ void draw_screen(world_t* world) {
 			distance += d_distance;
 		}
 		int num_of_wall_sym = height * (2 / (distance));
-		int ceiling_level = (height - num_of_wall_sym) / 2;
-		int floor_level = (height + num_of_wall_sym) / 2;
 		if (num_of_wall_sym > height)
 			num_of_wall_sym = height;
+
+		int ceiling_level = (height - num_of_wall_sym) / 2;
+		int floor_level = (height + num_of_wall_sym) / 2;
 		char sym = '#';
 		for (int i = ceiling_level; i < floor_level; i++) {
 			olc_draw(row, i, sym, FG_WHITE);
