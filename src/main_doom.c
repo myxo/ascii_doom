@@ -23,25 +23,25 @@ int stop = 0;
 
 double time_from_last_shot = 0;
 
-void move_player(int forward, int right, float time_elapsed) {
+void move_player(int forward, int right, double time_elapsed) {
     world_t* world = get_world();
 
-	double new_x = world->player.pos.x;
-	new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
-	new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
-	if (!is_wall(new_x, world->player.pos.y))
-		world->player.pos.x = new_x;
+    double new_x = world->player.pos.x;
+    new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
+    new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
+    if (!is_wall(new_x, world->player.pos.y))
+        world->player.pos.x = new_x;
 
-	double new_y = world->player.pos.y;
-	new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
-	new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
-	if (!is_wall(world->player.pos.x, new_y))
-		world->player.pos.y = new_y;
+    double new_y = world->player.pos.y;
+    new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
+    new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
+    if (!is_wall(world->player.pos.x, new_y))
+        world->player.pos.y = new_y;
 }
 
-void turn_player(int dir) {
+void turn_player(int dir, double time_elapsed) {
     world_t* world = get_world();
-    world->player.angle += dir * world->player.angular_speed;
+    world->player.angle += dir * time_elapsed * world->player.angular_speed;
 }
 
 int create() {
@@ -49,15 +49,15 @@ int create() {
         return 0;
     }
     log_init("debug.txt");
-	return 1;
+    return 1;
 }
 
 void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
-        turn_player(-1);
+        turn_player(-1, time_elapsed);
     }
     if (olc_get_key(VK_RIGHT).held) {
-        turn_player(1);
+        turn_player(1, time_elapsed);
     }
     if (olc_get_key('W').held) {
         move_player(1, 0, time_elapsed);
@@ -108,17 +108,17 @@ int update(float time_elapsed) {
 }
 
 int main() {
-	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
-		fprintf(stderr, "Cannot initialize olc");
-		return 0;
-	}
-	olc_register_create(&create);
-	olc_register_update(&update);
+    if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
+        fprintf(stderr, "Cannot initialize olc");
+        return 0;
+    }
+    olc_register_create(&create);
+    olc_register_update(&update);
 
-	olc_start(); // block until update return 0
-	olc_deinitialize();
+    olc_start(); // block until update return 0
+    olc_deinitialize();
     log_deinit();
     deinit_world_object();
 
-	return 0;
+    return 0;
 }
