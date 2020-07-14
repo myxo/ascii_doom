@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 
+
 void increase_arr_enemy_capacity(world_t* world) {
     world->enemy_array.capacity = world->enemy_array.capacity * 2;
     world->enemy_array.array = realloc(world->enemy_array.array, world->enemy_array.capacity * sizeof(bullet_t));
@@ -24,7 +25,7 @@ void add_enemy(world_t* world) {
     } while (is_wall(world->enemy_array.array[world->enemy_array.len].pos.x, world->enemy_array.array[world->enemy_array.len].pos.y));
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
-    world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_4;
+    world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.03;
     world->enemy_array.len++;
 }
@@ -53,7 +54,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 y += d_distance * cos(angle_to_player);
                 distance_to_player += d_distance;
                 if (is_player(x, y)) {
-                    world->enemy_array.array[world->enemy_array.len].target = world->player.pos;
+                    world->enemy_array.array[i].target = world->player.pos;
                 }
             }
         }
@@ -62,15 +63,15 @@ void enemy_movement(world_t* world, float time_elapsed) {
         new_x += time_elapsed * world->enemy_array.array[i].speed * sin(world->enemy_array.array[i].angle);
         double new_y = world->enemy_array.array[i].pos.y;
         new_y += time_elapsed * world->enemy_array.array[i].speed * cos(world->enemy_array.array[i].angle);
-        if (!is_wall(new_x, new_y)) {
+        if (!is_wall(new_x, new_y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y)) {
             world->enemy_array.array[i].pos.x = new_x;
             world->enemy_array.array[i].pos.y = new_y;
         }
         else {
             do {
-                world->enemy_array.array[world->enemy_array.len].target.x = rand() % 16;
-                world->enemy_array.array[world->enemy_array.len].target.y = rand() % 16;
-            } while (is_wall(world->enemy_array.array[world->enemy_array.len].target.x, world->enemy_array.array[world->enemy_array.len].target.y));
+                world->enemy_array.array[i].target.x = rand() % 16;
+                world->enemy_array.array[i].target.y = rand() % 16;
+            } while (is_wall(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y));
         }
     }
 }
