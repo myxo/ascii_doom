@@ -60,10 +60,6 @@ void draw_screen(world_t* world) {
                     olc_draw(row, i, '*', FG_RED);
             }
         }
-        //int bullet_height = height * (2 / (distance));
-        //for (int i = ceiling_level; i < floor_level; i++) {
-        //    olc_draw(row, i, '*', FG_RED);
-        //}
 		row++;
 	}
 }

@@ -12,14 +12,16 @@
 
 #include "logging.h"
 
+#include "bullet.h"
+
 
 int width =  200;
-int height =  100;
+int height = 150;
 int glyph_size =  8;
 
 int stop = 0;
 
-double space_delay = 0;
+double time_from_last_shot = 0;
 
 void move_player(int forward, int right, float time_elapsed) {
     world_t* world = get_world();
@@ -48,21 +50,6 @@ int create() {
 	return 1;
 }
 
-void increase_arr_bullets_capacity(world_t* world) {
-    world->bullet_array.capacity = world->bullet_array.capacity * 2;
-    world->bullet_array.array = realloc(world->bullet_array.array, world->bullet_array.capacity * sizeof(bullet_t));
-}
-
-void shoot_bullet(world_t* world) {
-    if (world->bullet_array.len >= world->bullet_array.capacity-1)
-        increase_arr_bullets_capacity(world);
-    world->bullet_array.array[world->bullet_array.len].angle = world->player.angle;
-    world->bullet_array.array[world->bullet_array.len].pos = world->player.pos;
-    world->bullet_array.array[world->bullet_array.len].speed = 2;
-    world->bullet_array.array[world->bullet_array.len].radius = 0.01;
-    world->bullet_array.len++;
-}
-
 void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
         turn_player(-1);
@@ -82,38 +69,15 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_player(0, 1, time_elapsed);
     }
-    space_delay += time_elapsed;
-    if (olc_get_key(VK_SPACE).held) {
-        if (space_delay >= 1) {
-            space_delay = 0;
-            shoot_bullet(get_world());
+    time_from_last_shot += time_elapsed;
+    if (olc_get_key(VK_SPACE).pressed) {
+        if (time_from_last_shot >= 0.5) {
+            time_from_last_shot = 0;
+            shoot_bullet(get_world(), time_elapsed);
         }
     }
 }
 
-
-void bullet_destruct(world_t* world, int index) {
-    for (int i = index; i < world->bullet_array.len - 1; i++) {
-        world->bullet_array.array[i] = world->bullet_array.array[i + 1];
-    }
-    world->bullet_array.len--;
-}
-
-void bullets_movement(world_t* world, float time_elapsed) {
-    for (int i = 0; i < world->bullet_array.len; i++) {
-        double new_x = world->bullet_array.array[i].pos.x;
-        new_x += time_elapsed * world->bullet_array.array[i].speed * sin(world->bullet_array.array[i].angle);
-        double new_y = world->bullet_array.array[i].pos.y;
-        new_y += time_elapsed * world->bullet_array.array[i].speed * cos(world->bullet_array.array[i].angle);
-        if (!is_wall(new_x, new_y)) {
-            world->bullet_array.array[i].pos.x = new_x;
-            world->bullet_array.array[i].pos.y = new_y;
-        }
-        else {
-            bullet_destruct(get_world(), i);
-        }
-    }
-}
 
 void handle_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
@@ -130,6 +94,7 @@ int update(float time_elapsed) {
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
     for (int i = 0; i < get_world()->bullet_array.len; i++) {
+        add_watch("bullet xx", (double)get_world()->bullet_array.len);
         add_watch("bullet x", get_world()->bullet_array.array[i].pos.x);
         add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
     }

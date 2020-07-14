@@ -7,6 +7,12 @@
 
 world_t* world_global = NULL;
 
+void init_bullet_array(world_t* world, int capacity) {
+    world_global->bullet_array.capacity = capacity;
+    world_global->bullet_array.len = 0;
+    world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
+}
+
 void init_world_object() {
     world_global = malloc(sizeof(world_t));
     world_global->player.pos.x = 1;
@@ -31,9 +37,7 @@ void init_world_object() {
     strcpy(world_global->map[13], "#  ######     #");
     strcpy(world_global->map[14], "#          ####");
     strcpy(world_global->map[15], "###############");
-    world_global->bullet_array.capacity = 5;
-    world_global->bullet_array.len = 0;
-    world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
+    init_bullet_array(world_global, 5);
 }
 
 void deinit_world_object() {
@@ -50,7 +54,10 @@ int is_wall(double x, double y) {
 
 int is_bullet(double x, double y) {
     for (int i = 0; i < world_global->bullet_array.len; i++) {
-        if (pow(x - world_global->bullet_array.array[i].pos.x, 2) + pow(y - world_global->bullet_array.array[i].pos.y, 2) <= pow(world_global->bullet_array.array[i].radius, 2)){
+        double ox_vec = x - world_global->bullet_array.array[i].pos.x;
+        double oy_vec = y - world_global->bullet_array.array[i].pos.y;
+        double r = world_global->bullet_array.array[i].radius;
+        if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)){
             return 1;
 }
     }
