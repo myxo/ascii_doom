@@ -93,7 +93,7 @@ int update(float time_elapsed) {
         add_enemy(get_world());
     }
     for (int i = 0; i < get_world()->enemy_array.len; i++) {
-        add_watch("enemy", (double)get_world()->enemy_array.len);
+        add_watch("health", get_world()->enemy_array.array[0].health);
         add_watch("enemy x", get_world()->enemy_array.array[i].pos.x);
         add_watch("enemy y", get_world()->enemy_array.array[i].pos.y);
         add_watch("target x", get_world()->enemy_array.array[i].target.x);
@@ -111,7 +111,7 @@ int update(float time_elapsed) {
 }
 
 int main() {
-    //srand(time(0));
+    srand(time(0));
 	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;

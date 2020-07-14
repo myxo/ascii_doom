@@ -27,7 +27,7 @@ void init_world_object() {
     world_global->player.speed = 1.5;
     world_global->player.angle_of_vision = M_PI_4;
     world_global->player.angular_speed = 0.02;
-    world_global->player.radius = 0.03;
+    world_global->player.radius = 0.2;
     strcpy(world_global->map[0], "###############");
     strcpy(world_global->map[1], "# #######     #");
     strcpy(world_global->map[2], "#  ######     #");
@@ -88,7 +88,7 @@ int is_enemy(double x, double y) {
         double oy_vec = y - world_global->enemy_array.array[i].pos.y;
         double r = world_global->enemy_array.array[i].radius;
         if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)) {
-            return 1;
+            return i + 1;
         }
     }
     return 0;

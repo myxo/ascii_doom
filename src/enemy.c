@@ -26,7 +26,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
-    world->enemy_array.array[world->enemy_array.len].radius = 0.03;
+    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.len++;
 }
 
@@ -48,30 +48,36 @@ void enemy_movement(world_t* world, float time_elapsed) {
         double y = world->enemy_array.array[i].pos.y;
         double distance_to_player = 0;
         double d_distance = 0.01;
+        int check_move = 1;
         if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
             while (!is_wall(x, y)) {
                 x += d_distance * sin(angle_to_player);
                 y += d_distance * cos(angle_to_player);
                 distance_to_player += d_distance;
                 if (is_player(x, y)) {
+                    if (distance_to_player <= 4) {
+                        check_move = 0;
+                    }
                     world->enemy_array.array[i].target = world->player.pos;
+                    break;
                 }
             }
         }
-
-        double new_x = world->enemy_array.array[i].pos.x;
-        new_x += time_elapsed * world->enemy_array.array[i].speed * sin(world->enemy_array.array[i].angle);
-        double new_y = world->enemy_array.array[i].pos.y;
-        new_y += time_elapsed * world->enemy_array.array[i].speed * cos(world->enemy_array.array[i].angle);
-        if (!is_wall(new_x, new_y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y)) {
-            world->enemy_array.array[i].pos.x = new_x;
-            world->enemy_array.array[i].pos.y = new_y;
-        }
-        else {
-            do {
-                world->enemy_array.array[i].target.x = rand() % 16;
-                world->enemy_array.array[i].target.y = rand() % 16;
-            } while (is_wall(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y));
+        if (check_move) {
+            double new_x = world->enemy_array.array[i].pos.x;
+            new_x += time_elapsed * world->enemy_array.array[i].speed * sin(world->enemy_array.array[i].angle);
+            double new_y = world->enemy_array.array[i].pos.y;
+            new_y += time_elapsed * world->enemy_array.array[i].speed * cos(world->enemy_array.array[i].angle);
+            if (!is_wall(new_x, new_y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y)) {
+                world->enemy_array.array[i].pos.x = new_x;
+                world->enemy_array.array[i].pos.y = new_y;
+            }
+            else {
+                do {
+                    world->enemy_array.array[i].target.x = rand() % 16;
+                    world->enemy_array.array[i].target.y = rand() % 16;
+                } while (is_wall(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y));
+            }
         }
     }
 }
@@ -81,4 +87,10 @@ void enemy_destruct(world_t* world, int index) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
     world->enemy_array.len--;
+}
+
+void enemy_hit(world_t* world, int index, int damage) {
+    world->enemy_array.array[index].health -= damage;
+    if (world->enemy_array.array[index].health <= 0)
+        enemy_destruct(world, index);
 }

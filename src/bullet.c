@@ -1,6 +1,7 @@
 #include "world_object.h"
 #include <math.h>
 #include <stdlib.h>
+#include "enemy.h"
 
 void increase_arr_bullets_capacity(world_t* world) {
     world->bullet_array.capacity = world->bullet_array.capacity * 2;
@@ -27,6 +28,11 @@ void bullets_movement(world_t* world, float time_elapsed) {
         else {
             bullet_destruct(get_world(), i);
         }
+        int index;
+        if (index = is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
+            bullet_destruct(get_world(), i);
+            enemy_hit(world, index - 1, 1);
+        }
     }
 }
 
@@ -35,7 +41,7 @@ void shoot_bullet(world_t* world, float time_elapsed) {
         increase_arr_bullets_capacity(world);
     world->bullet_array.array[world->bullet_array.len].pos = world->player.pos;
     world->bullet_array.array[world->bullet_array.len].angle = world->player.angle;
-    world->bullet_array.array[world->bullet_array.len].speed = 2;
+    world->bullet_array.array[world->bullet_array.len].speed = 4;
     world->bullet_array.array[world->bullet_array.len].radius = 0.01;
     bullets_movement(world, time_elapsed*60);
     world->bullet_array.len++;
