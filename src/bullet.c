@@ -33,8 +33,8 @@ void bullets_movement(world_t* world, float time_elapsed) {
 void shoot_bullet(world_t* world, float time_elapsed) {
     if (world->bullet_array.len >= world->bullet_array.capacity - 1)
         increase_arr_bullets_capacity(world);
-    world->bullet_array.array[world->bullet_array.len].angle = world->player.angle;
     world->bullet_array.array[world->bullet_array.len].pos = world->player.pos;
+    world->bullet_array.array[world->bullet_array.len].angle = world->player.angle;
     world->bullet_array.array[world->bullet_array.len].speed = 2;
     world->bullet_array.array[world->bullet_array.len].radius = 0.01;
     bullets_movement(world, time_elapsed*60);

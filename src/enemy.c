@@ -3,6 +3,7 @@
 #include "world_object.h"
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 void increase_arr_enemy_capacity(world_t* world) {
     world->enemy_array.capacity = world->enemy_array.capacity * 2;
@@ -31,19 +32,20 @@ void add_enemy(world_t* world) {
 double get_angle_from_pos_to_angle(point_t pos, point_t target) {
     double delta_x = target.x - pos.x;
     double delta_y = target.y - pos.y;
-    return atan(delta_y / delta_x);
-}
+    double x = atan2(delta_x, delta_y);
+    return x;
+}                
 
 void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
-        world->enemy_array.array[world->enemy_array.len].angle = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->enemy_array.array[i].target);
+        world->enemy_array.array[i].angle = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->enemy_array.array[i].target);
 
         double angle_to_player = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->player.pos);
         double start_enemy_view_angle = world->enemy_array.array[i].angle - world->enemy_array.array[i].angle_of_vision / 2;
         double stop_enemy_view_angle = world->enemy_array.array[i].angle + world->enemy_array.array[i].angle_of_vision / 2;
         double x = world->enemy_array.array[i].pos.x;
         double y = world->enemy_array.array[i].pos.y;
-        double distance_to_player;
+        double distance_to_player = 0;
         double d_distance = 0.01;
         if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
             while (!is_wall(x, y)) {
@@ -56,13 +58,13 @@ void enemy_movement(world_t* world, float time_elapsed) {
             }
         }
 
-        double new_x = world->bullet_array.array[i].pos.x;
-        new_x += time_elapsed * world->bullet_array.array[i].speed * sin(world->bullet_array.array[i].angle);
-        double new_y = world->bullet_array.array[i].pos.y;
-        new_y += time_elapsed * world->bullet_array.array[i].speed * cos(world->bullet_array.array[i].angle);
+        double new_x = world->enemy_array.array[i].pos.x;
+        new_x += time_elapsed * world->enemy_array.array[i].speed * sin(world->enemy_array.array[i].angle);
+        double new_y = world->enemy_array.array[i].pos.y;
+        new_y += time_elapsed * world->enemy_array.array[i].speed * cos(world->enemy_array.array[i].angle);
         if (!is_wall(new_x, new_y)) {
-            world->bullet_array.array[i].pos.x = new_x;
-            world->bullet_array.array[i].pos.y = new_y;
+            world->enemy_array.array[i].pos.x = new_x;
+            world->enemy_array.array[i].pos.y = new_y;
         }
         else {
             do {

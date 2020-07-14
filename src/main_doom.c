@@ -3,6 +3,7 @@
 #include "render.h"
 #include "logging.h"
 #include "bullet.h"
+#include "enemy.h"
 
 #include<time.h> 
 #include <windows.h>
@@ -88,12 +89,22 @@ int update(float time_elapsed) {
 	}
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
-    for (int i = 0; i < get_world()->bullet_array.len; i++) {
-        add_watch("bullet xx", (double)get_world()->bullet_array.len);
-        add_watch("bullet x", get_world()->bullet_array.array[i].pos.x);
-        add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
+    if (get_world()->enemy_array.len == 0) {
+        add_enemy(get_world());
+    }
+    for (int i = 0; i < get_world()->enemy_array.len; i++) {
+        add_watch("enemy", (double)get_world()->enemy_array.len);
+        add_watch("enemy x", get_world()->enemy_array.array[i].pos.x);
+        add_watch("enemy y", get_world()->enemy_array.array[i].pos.y);
+        add_watch("target x", get_world()->enemy_array.array[i].target.x);
+        add_watch("target y", get_world()->enemy_array.array[i].target.y);
+        add_watch("angle en", get_world()->enemy_array.array[i].angle);
+        add_watch("player x", get_world()->player.pos.x);
+        add_watch("player y", get_world()->player.pos.y);
+        add_watch("angle pl", get_world()->player.angle);
     }
     bullets_movement(get_world(), time_elapsed);
+    enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     display_watch();
 	return 1;
