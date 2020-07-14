@@ -16,7 +16,7 @@ PRIVATE
 add_executable(ascii_doom)
 target_sources(ascii_doom
 PRIVATE
-	src/main_doom.c
+	src/sprite_editor.c
     src/world_object.h 
     src/world_object.c 
 	src/sprite.h
