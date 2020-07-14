@@ -10,12 +10,18 @@
 
 #include <math.h>
 
+#include "logging.h"
+
+#include "bullet.h"
+
 
 int width =  200;
-int height =  150;
+int height = 150;
 int glyph_size =  8;
 
 int stop = 0;
+
+double time_from_last_shot = 0;
 
 void move_player(int forward, int right, float time_elapsed) {
     world_t* world = get_world();
@@ -63,7 +69,15 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_player(0, 1, time_elapsed);
     }
+    time_from_last_shot += time_elapsed;
+    if (olc_get_key(VK_SPACE).pressed) {
+        if (time_from_last_shot >= 0.5) {
+            time_from_last_shot = 0;
+            shoot_bullet(get_world(), time_elapsed);
+        }
+    }
 }
+
 
 void handle_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
@@ -78,8 +92,15 @@ int update(float time_elapsed) {
 		return 0;
 	}
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
-    display_watch();
+
+    for (int i = 0; i < get_world()->bullet_array.len; i++) {
+        add_watch("bullet xx", (double)get_world()->bullet_array.len);
+        add_watch("bullet x", get_world()->bullet_array.array[i].pos.x);
+        add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
+    }
+    bullets_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
+    display_watch();
 	return 1;
 }
 

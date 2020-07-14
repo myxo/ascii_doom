@@ -5,7 +5,13 @@
 
 #include <math.h>
 
-world_t * world_global = NULL;
+world_t* world_global = NULL;
+
+void init_bullet_array(world_t* world, int capacity) {
+    world_global->bullet_array.capacity = capacity;
+    world_global->bullet_array.len = 0;
+    world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
+}
 
 void init_world_object() {
     world_global = malloc(sizeof(world_t));
@@ -31,6 +37,7 @@ void init_world_object() {
     strcpy(world_global->map[13], "#  ######     #");
     strcpy(world_global->map[14], "#          ####");
     strcpy(world_global->map[15], "###############");
+    init_bullet_array(world_global, 5);
 }
 
 void deinit_world_object() {
@@ -43,4 +50,16 @@ world_t* get_world() {
 
 int is_wall(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_bullet(double x, double y) {
+    for (int i = 0; i < world_global->bullet_array.len; i++) {
+        double ox_vec = x - world_global->bullet_array.array[i].pos.x;
+        double oy_vec = y - world_global->bullet_array.array[i].pos.y;
+        double r = world_global->bullet_array.array[i].radius;
+        if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)){
+            return 1;
+}
+    }
+    return 0;
 }
