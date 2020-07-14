@@ -31,7 +31,8 @@ void init_world_object() {
     strcpy(world_global->map[13], "#  ######     ##");
     strcpy(world_global->map[14], "#          #####");
     strcpy(world_global->map[15], "################");
-    world_global->map_length = 16;
+    world_global->map_width = 16;
+    world_global->map_height = 16;
 }
 
 void deinit_world_object() {

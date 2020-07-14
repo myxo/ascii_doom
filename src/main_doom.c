@@ -79,6 +79,7 @@ int update(float time_elapsed) {
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
 	draw_screen(get_world());
+    draw_minimap(get_world());
 
 	return 1;
 }
