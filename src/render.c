@@ -121,4 +121,7 @@ void draw_minimap(world_t* world) {
         }
     }
     olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
+    for (int i = 0; i < world->enemy_array.len; i++) {
+        olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
+    }
 }
