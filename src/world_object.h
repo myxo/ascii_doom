@@ -13,6 +13,7 @@ typedef struct {
     double angle;
     double speed;
     double angular_speed;
+    double radius;
 } player_t;
 
 typedef struct {
@@ -35,7 +36,6 @@ typedef struct {
     double angle_of_vision;
     double angle;
     double speed;
-    double angular_speed;
 } enemy_t;
 
 typedef struct {
@@ -47,6 +47,7 @@ typedef struct {
 typedef struct {
     player_t player;
     bullet_array_t bullet_array;
+    enemy_array_t enemy_array;
     char map[16][16];
 } world_t;
 
@@ -56,5 +57,6 @@ void deinit_world_object();
 world_t* get_world();
 int is_wall(double x, double y);
 int is_bullet(double x, double y);
+int is_player(double x, double y);
 
 #endif

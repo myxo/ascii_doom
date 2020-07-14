@@ -1,18 +1,13 @@
 #include "olc/olc.h"
-
 #include "world_object.h"
-
 #include "render.h"
-
-#include <windows.h>
-
-#include <stdio.h>
-
-#include <math.h>
-
 #include "logging.h"
-
 #include "bullet.h"
+
+#include<time.h> 
+#include <windows.h>
+#include <stdio.h>
+#include <math.h>
 
 
 int width =  200;
@@ -105,6 +100,7 @@ int update(float time_elapsed) {
 }
 
 int main() {
+    srand(time(0));
 	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;
