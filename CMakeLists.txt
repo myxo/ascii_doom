@@ -14,11 +14,13 @@ PRIVATE
 )
 
 add_executable(ascii_doom)
-target_sources(ascii_doom 
+target_sources(ascii_doom
 PRIVATE
 	src/main_doom.c
     src/world_object.h 
     src/world_object.c 
+	src/sprite.h
+	src/sprite.c
 )
 
 target_link_libraries(ascii_doom olcConsoleGameEngine)
