@@ -27,7 +27,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.len++;
 }
 
-double get_angle_fromt_pos_to_angle(point_t pos, point_t target) {
+double get_angle_from_pos_to_angle(point_t pos, point_t target) {
     double delta_x = target.x - pos.x;
     double delta_y = target.y - pos.y;
     return atan(delta_y / delta_x);
@@ -35,7 +35,7 @@ double get_angle_fromt_pos_to_angle(point_t pos, point_t target) {
 
 void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
-        world->enemy_array.array[world->enemy_array.len].angle = get_angle_fromt_pos_to_angle(world->enemy_array.array[i].angle.pos, world->enemy_array.array[i].angle.target);
+        world->enemy_array.array[world->enemy_array.len].angle = get_angle_from_pos_to_angle(world->enemy_array.array[i].angle.pos, world->enemy_array.array[i].angle.target);
 
         double angle_to_player = get_angle_fromt_pos_to_angle(world->enemy_array.array[i].angle.pos, world->player.pos);
         double start_enemy_view_angle = world->enemy_array.array[i].angle - world->enemy_array.array[i].angle_of_vision / 2;
@@ -70,4 +70,11 @@ void enemy_movement(world_t* world, float time_elapsed) {
             } while (is_wall(world->enemy_array.array[world->enemy_array.len].target.x, world->enemy_array.array[world->enemy_array.len].target.y));
         }
     }
+}
+
+void enemy_destruct(world_t* world, int index) {
+    for (int i = index; i < world->enemy_array.len - 1; i++) {
+        world->enemy_array.array[i] = world->enemy_array.array[i + 1];
+    }
+    world->enemy_array.len--;
 }
