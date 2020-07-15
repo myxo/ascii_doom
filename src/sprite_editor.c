@@ -5,7 +5,6 @@
 #include <Windows.h>
 
 typedef struct {
-    int canvas[4];
     int size;
     int pos_x;
     int pos_y;
@@ -26,7 +25,6 @@ int width = 50;
 int height = 30;
 int glyph_size = 20;
 brush_t brush;
-FILE* file;
 
 int stop = 0;
 
@@ -49,16 +47,16 @@ void init_brush(int x1, int x2, int y1, int y2) {
     brush.col_fg = FG_WHITE;
     brush.col_bg = BG_BLACK;
     brush.glyph = '*';
-};
+}
 
 void preview(int x, int y) {
     for (int i = y; i < y + sprite.height; i++) {
         for (int j = x; j < x + sprite.width; j++) {
             olc_draw(j, i, get_sprite_glyph(j - x, i - y, &sprite), get_sprite_color(j - x, i - y, &sprite));
-            olc_draw(j, i, '#', get_sprite_color(j - x, i - y, &sprite));
         }
     }
 }
+
 int CheckBorder(int a, int b) {
     if (a >= b) {
         a = 0;
@@ -82,9 +80,6 @@ void show_brush() {
 void draw_menu() {
     if (menu.menu_num == START_MENU) {
         olc_draw_string(width / 2 - 6, 1, "SPRITE EDITOR", FG_RED);
-void draw_menu() {
-    if (menu.menu_num == START_MEN) {
-        olc_draw_string(width / 2 - 7, 1, "SPRITE EDITOR", FG_RED);
         if (menu.select < 0) {
             menu.select = 2;
         }
@@ -118,9 +113,6 @@ void draw_menu() {
     else if (menu.menu_num == EDITOR) {
         brush.pos_x = CheckBorder(brush.pos_x, sprite.width);
         brush.pos_y = CheckBorder(brush.pos_y, sprite.height);
-        menu.menu_num = 2;
-    }
-    else if (menu.menu_num == EDITOR) {
         olc_draw(0, 0, 'X', FG_WHITE);
         olc_draw(0, 1 + sprite.height, 'X', FG_WHITE);
         olc_draw(1 + sprite.width, 0, 'X', FG_WHITE);
@@ -212,9 +204,6 @@ void press_button() {
         }
         else if (menu.select == 1) {
             menu.menu_num = LOAD_FILE;
-    if (menu.menu_num == 0) {
-        if (menu.select == 0) {
-            menu.menu_num = 1;
         }
         else if (menu.select == 2) {
             exit(0);
@@ -261,6 +250,7 @@ void handle_input(float time_elapsed) {
         press_button();
     }
     if (menu.menu_num != EDITOR) {
+
         if (olc_get_key(VK_UP).pressed) {
             menu.select--;
         }
@@ -355,17 +345,6 @@ void handle_input(float time_elapsed) {
         if (olc_get_key(VK_LEFT).pressed) {
             brush.pos_x--;
         }
-    if (olc_get_key(0x1B).held) { // Esc
-        stop = 1;
-    }
-    if (olc_get_key(VK_SPACE).pressed) {
-        press_button();
-    }
-    if (olc_get_key(VK_UP).pressed) {
-        menu.select--;
-    }
-    if (olc_get_key(VK_DOWN).pressed) {
-        menu.select++;
     }
 }
 

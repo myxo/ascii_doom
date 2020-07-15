@@ -1,6 +1,5 @@
 #ifndef SPRITE_H_
 #define SPRITE_H_
-#include "olc/olc.h"
 
 typedef struct {
     int width;
