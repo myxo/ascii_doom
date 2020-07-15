@@ -97,26 +97,20 @@ int is_bullet(double x, double y) {
 int is_in_circle(point_t pos, point_t circle_center, double radius) {
     double dx = pos.x - circle_center.x;
     double dy = pos.y - circle_center.y;
-    if (pow(dx, 2) + pow(dy, 2) <= pow(radius, 2)) {
-        return 1;
-    }
-    return 0;
+    return pow(dx, 2) + pow(dy, 2) <= pow(radius, 2);
 }
 
 int is_player(double x, double y) {
-    point_t pos;
-    pos.x = x;
-    pos.y = y;
+    point_t pos = {x , y};
     return is_in_circle(pos, world_global->player.pos, world_global->player.radius);
 }
 
 int is_enemy(double x, double y, int* enemy_index) {
     for (int i = 0; i < world_global->enemy_array.len; i++) {
-        point_t pos;
-        pos.x = x;
-        pos.y = y;
+        point_t pos = {x, y};
         if (is_in_circle(pos, world_global->enemy_array.array[i].pos, world_global->enemy_array.array[i].radius)) {
-            *enemy_index = i;
+            if (enemy_index != NULL)
+                *enemy_index = i;
             return 1;
         }
     }
@@ -125,8 +119,10 @@ int is_enemy(double x, double y, int* enemy_index) {
 
 point_t get_rand_pos_on_floor(world_t* world) {
     point_t pos;
-    pos.x = rand() % world->map_width;
-    pos.y = rand() % world->map_height;
+    do {
+        pos.x = rand() % world->map_width;
+        pos.y = rand() % world->map_height;
+    } while (is_wall(pos.x, pos.y));
     return pos;
 }
 

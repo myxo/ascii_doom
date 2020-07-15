@@ -75,9 +75,8 @@ void enemy_movement(world_t* world, float time_elapsed) {
             }
         }
         if (update_position) {
-            int temp;
             point_t new_pos = get_new_forward_pos(world->enemy_array.array[i].pos, world->enemy_array.array[i].angle, time_elapsed, world->enemy_array.array[i].speed);
-            if (!is_wall(new_pos.x, new_pos.y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y, &temp)) {
+            if (!is_wall(new_pos.x, new_pos.y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y, NULL)) {
                 world->enemy_array.array[i].pos = new_pos;
             }
             else {

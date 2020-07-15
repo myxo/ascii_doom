@@ -67,8 +67,7 @@ void draw_screen(world_t* world) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
-            int temp;
-            if (is_enemy(x, y, &temp)) {
+            if (is_enemy(x, y, NULL)) {
                 draw_enemies(row, distance);
             }
         }
