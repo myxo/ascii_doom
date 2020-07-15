@@ -14,6 +14,8 @@
 
 #include "bullet.h"
 
+#include "UI.h"
+
 
 int width =  200;
 int height = 150;
@@ -52,6 +54,15 @@ int create() {
     return 1;
 }
 
+//void main_menu_handler(float time_elapsed) {
+//    if (olc_get_key(VK_LEFT).held) {
+//        
+//    }
+//    if (olc_get_key(VK_RIGHT).held) {
+//        turn_player(1, time_elapsed);
+//    }
+//}
+
 void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
         turn_player(-1, time_elapsed);
@@ -80,7 +91,6 @@ void handle_player_movement(float time_elapsed) {
     }
 }
 
-
 void handle_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
         stop = 1;
@@ -88,12 +98,12 @@ void handle_input(float time_elapsed) {
     handle_player_movement(time_elapsed);
 }
 
-int update(float time_elapsed) {
-	handle_input(time_elapsed);
-	if (stop) {
-		return 0;
-	}
-	olc_fill(0, 0, width, height, ' ', BG_BLACK);
+int game_update(float time_elapsed) {
+    handle_input(time_elapsed);
+    if (stop) {
+        return 0;
+    }
+    olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
     for (int i = 0; i < get_world()->bullet_array.len; i++) {
         add_watch("bullet xx", (double)get_world()->bullet_array.len);
@@ -101,10 +111,14 @@ int update(float time_elapsed) {
         add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
     }
     bullets_movement(get_world(), time_elapsed);
-	draw_screen(get_world());   
+    draw_screen(get_world());
     draw_minimap(get_world());
     display_watch();
-	return 1;
+    return 1;
+}
+
+int update(float time_elapsed) {
+    return game_update(time_elapsed);
 }
 
 int main() {

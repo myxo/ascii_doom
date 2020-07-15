@@ -4,6 +4,8 @@
 
 #include "render.h"
 
+#include "UI.h"
+
 #include <math.h>
 
 void draw_screen(world_t* world) {
