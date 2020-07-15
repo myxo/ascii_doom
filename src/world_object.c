@@ -32,9 +32,9 @@ int init_world_object() {
     world_global->textures.bullet = malloc(sizeof(sprite_t));
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
-    set_sprite_color(0, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(1, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(2, 0, world_global->textures.wall, FG_RED);
+    set_sprite_color(0, 0, world_global->textures.wall, FG_GREEN);
+    set_sprite_color(1, 0, world_global->textures.wall, FG_BLUE);
+    set_sprite_color(2, 0, world_global->textures.wall, FG_YELLOW);
     set_sprite_color(3, 0, world_global->textures.wall, FG_RED);
     set_sprite_color(4, 0, world_global->textures.wall, FG_RED);
     set_sprite_color(5, 0, world_global->textures.wall, FG_RED);
