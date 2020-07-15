@@ -2,6 +2,8 @@
 
 #include "world_object.h"
 
+#include "sprite.h"
+
 #include "render.h"
 
 #include <windows.h>
@@ -20,6 +22,8 @@ int height = 150;
 int glyph_size =  8;
 
 int stop = 0;
+
+sprite_t* wall_texture_main;
 
 double time_from_last_shot = 0;
 
@@ -99,7 +103,7 @@ int update(float time_elapsed) {
         add_watch("bullet y", get_world()->bullet_array.array[i].pos.y);
     }
     bullets_movement(get_world(), time_elapsed);
-	draw_screen(get_world());   
+	draw_screen(get_world(), wall_texture_main);
     draw_minimap(get_world());
     display_watch();
 	return 1;
@@ -112,11 +116,31 @@ int main() {
 	}
 	olc_register_create(&create);
 	olc_register_update(&update);
+    wall_texture_main = malloc(sizeof(sprite_t));
+    init_sprite(8, 8, wall_texture_main);
+    set_sprite_color(0, 0, wall_texture_main, FG_RED);
+    set_sprite_color(1, 0, wall_texture_main, FG_RED);
+    set_sprite_color(2, 0, wall_texture_main, FG_RED);
+    set_sprite_color(3, 0, wall_texture_main, FG_RED);
+    set_sprite_color(4, 0, wall_texture_main, FG_RED);
+    set_sprite_color(5, 0, wall_texture_main, FG_RED);
+    set_sprite_color(6, 0, wall_texture_main, FG_RED);
+    set_sprite_color(7, 0, wall_texture_main, FG_RED);
+    set_sprite_color(0, 7, wall_texture_main, FG_RED);
+    set_sprite_color(1, 7, wall_texture_main, FG_RED);
+    set_sprite_color(2, 7, wall_texture_main, FG_RED);
+    set_sprite_color(3, 7, wall_texture_main, FG_RED);
+    set_sprite_color(4, 7, wall_texture_main, FG_RED);
+    set_sprite_color(5, 7, wall_texture_main, FG_RED);
+    set_sprite_color(6, 7, wall_texture_main, FG_RED);
+    set_sprite_color(7, 7, wall_texture_main, FG_RED);
 
 	olc_start(); // block until update return 0
 	olc_deinitialize();
     log_deinit();
     deinit_world_object();
+    deinit_sprite(wall_texture_main);
+    free(wall_texture_main);
 
 	return 0;
 }

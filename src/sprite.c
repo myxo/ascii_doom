@@ -18,7 +18,7 @@ void set_sprite_color(int x, int y, sprite_t* sprite, short color) {
 void init_sprite(int width, int height, sprite_t* sprite) {
     sprite->width = width;
     sprite->height = height;
-    sprite->colours = malloc(width * height, sizeof(short));
+    sprite->colours = malloc(width * height * sizeof(short));
     for (int i = 0; i < width * height; i++) {
         sprite->colours[i] = FG_WHITE | BG_BLACK;
     }
