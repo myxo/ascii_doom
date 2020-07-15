@@ -82,6 +82,7 @@ int update(float time_elapsed) {
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
+    draw_sprite(get_world()->textures.wall, 30, 30);
     display_watch();
 	return 1;
 }

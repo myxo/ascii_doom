@@ -147,3 +147,11 @@ void draw_minimap(world_t* world) {
         olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
     }
 }
+
+void draw_sprite(sprite_t* sprite, int x, int y) {
+    for (int i = 0; i < sprite->width; i++) {
+        for (int j = 0; j < sprite->height; j++) {
+            olc_draw(i + x, j + y, '#', get_sprite_color(i, j, sprite));
+        }
+    }
+}
