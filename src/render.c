@@ -8,6 +8,18 @@
 
 #include <math.h>
 
+void draw_enemies(int row, double distance) {
+    int bullet_height = 60 / distance;
+    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
+        olc_draw(row, i, '%', FG_BLUE);
+}
+
+void draw_bullet(int row, double distance) {
+    int bullet_height = 4 / distance;
+    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
+        olc_draw(row, i, '*', FG_RED);
+}
+
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
@@ -46,7 +58,6 @@ void draw_screen(world_t* world) {
         else {
             sprite_x = fabs(x - (int)(x));
         }
-
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
             olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
@@ -60,6 +71,28 @@ void draw_screen(world_t* world) {
             }
             else {
                 olc_draw(row, i, 'X', FG_GREY);
+            }
+        }
+        x = world->player.pos.x;
+        y = world->player.pos.y;
+        distance = 0;
+        while (!is_wall(x, y)) {
+            x += d_distance * ray_sin;
+            y += d_distance * ray_cos;
+            distance += d_distance;
+            if (is_enemy(x, y, NULL)) {
+                draw_enemies(row, distance);
+            }
+        }
+        x = world->player.pos.x;
+        y = world->player.pos.y;
+        distance = 0;
+        while (!is_wall(x, y)) {
+            x += d_distance * ray_sin;
+            y += d_distance * ray_cos;
+            distance += d_distance;
+            if (is_bullet(x, y)) {
+                draw_bullet(row, distance);
             }
         }
         row++;
@@ -110,4 +143,7 @@ void draw_minimap(world_t* world) {
         }
     }
     olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
+    for (int i = 0; i < world->enemy_array.len; i++) {
+        olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
+    }
 }

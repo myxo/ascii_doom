@@ -2,6 +2,9 @@
 #include "world_object.h"
 #include <math.h>
 #include <stdlib.h>
+#include "enemy.h"
+#include "bullet.h"
+#include "player.h"
 
 void increase_arr_bullets_capacity(world_t* world) {
     world->bullet_array.capacity = world->bullet_array.capacity * 2;
@@ -28,16 +31,30 @@ void bullets_movement(world_t* world, float time_elapsed) {
         else {
             bullet_destruct(get_world(), i);
         }
+        int index;
+        if (is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y, &index)) {
+            if (world->bullet_array.array[i].host == kBulletPlayer) {
+                bullet_destruct(get_world(), i);
+                enemy_hit(world, index, 1);
+            }
+        }
+        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
+            if (world->bullet_array.array[i].host == kBulletEnemy) {
+                bullet_destruct(get_world(), i);
+                player_hit(1);
+            }
+        }
     }
 }
 
-void shoot_bullet(world_t* world, float time_elapsed) {
-    if (world->bullet_array.len >= world->bullet_array.capacity - 1)
+void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host) {
+    if (world->bullet_array.len >= world->bullet_array.capacity)
         increase_arr_bullets_capacity(world);
-    world->bullet_array.array[world->bullet_array.len].angle = world->player.angle;
-    world->bullet_array.array[world->bullet_array.len].pos = world->player.pos;
-    world->bullet_array.array[world->bullet_array.len].speed = 2;
+    world->bullet_array.array[world->bullet_array.len].pos = pos;
+    world->bullet_array.array[world->bullet_array.len].angle = angle;
+    world->bullet_array.array[world->bullet_array.len].speed = 4;
     world->bullet_array.array[world->bullet_array.len].radius = 0.01;
-    bullets_movement(world, time_elapsed*60);
+    world->bullet_array.array[world->bullet_array.len].host = host;
     world->bullet_array.len++;
+    bullets_movement(world, 0.1);
 }

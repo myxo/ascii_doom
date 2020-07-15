@@ -1,5 +1,4 @@
 #include "logging.h"
-
 #include "olc/olc.h"
 #include <stdlib.h>
 #include <string.h>
