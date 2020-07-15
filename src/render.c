@@ -42,12 +42,11 @@ void draw_screen(world_t* world) {
         int floor_level = (height + num_of_wall_sym) / 2;
         char sym = '#';
         double ratio = world->textures.wall->height / (double)num_of_wall_sym;
-        double sprite_x = row % world->textures.wall->width;
+        double sprite_x = row / width;
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = i - ceiling_level;
-            sprite_y *= ratio;
-            sprite_y = (int)sprite_y % world->textures.wall->height;
-            olc_draw(row, i, sym, get_sprite_color((int)sprite_x, (int)sprite_y, world->textures.wall));
+            sprite_y = sprite_y / num_of_wall_sym;
+            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
         }
         for (int i = floor_level; i < height; i++) {
             if (i < threshold1) {
@@ -59,17 +58,6 @@ void draw_screen(world_t* world) {
             else {
                 olc_draw(row, i, 'X', FG_GREY);
             }
-        }
-        if (is_bullet_on_screen == 1) {
-            double sprite_x = bullet_row % world->textures.bullet->width;
-            double ratio = world->textures.bullet->height / (double)bullet_height;
-            for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++) {
-                double sprite_y = (i - height / 2 + bullet_height) * ratio;
-                sprite_y = (int)sprite_y % world->textures.bullet->height;
-                olc_draw(row, i, '*', get_sprite_color(sprite_x, sprite_y, world->textures.bullet));
-            }
-            is_bullet_on_screen = 0;
-            bullet_row++;
         }
         row++;
     }
