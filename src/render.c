@@ -41,11 +41,9 @@ void draw_screen(world_t* world) {
         int ceiling_level = (height - num_of_wall_sym) / 2;
         int floor_level = (height + num_of_wall_sym) / 2;
         char sym = '#';
-        double ratio = world->textures.wall->height / (double)num_of_wall_sym;
         double sprite_x = row / width;
         for (int i = ceiling_level; i < floor_level; i++) {
-            double sprite_y = i - ceiling_level;
-            sprite_y = sprite_y / num_of_wall_sym;
+            double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
             olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
         }
         for (int i = floor_level; i < height; i++) {
