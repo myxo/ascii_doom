@@ -12,17 +12,21 @@ void increase_arr_enemy_capacity(world_t* world) {
     world->enemy_array.array = realloc(world->enemy_array.array, world->enemy_array.capacity * sizeof(enemy_t));
 }
 
+point_t get_new_forward_pos(point_t pos, double angle, double time_elapsed, double speed) {
+    pos.x += time_elapsed * speed * sin(angle);
+    pos.y += time_elapsed * speed * cos(angle);
+    return pos;
+}
+
 void add_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
     do {
-        world->enemy_array.array[world->enemy_array.len].target.x = rand() % world->map_width;
-        world->enemy_array.array[world->enemy_array.len].target.y = rand() % world->map_height;
+        world->enemy_array.array[world->enemy_array.len].target = get_rand_pos_on_floor(world);
     } while (is_wall(world->enemy_array.array[world->enemy_array.len].target.x, world->enemy_array.array[world->enemy_array.len].target.y));
     do {
-        world->enemy_array.array[world->enemy_array.len].pos.x = rand() % world->map_width;
-        world->enemy_array.array[world->enemy_array.len].pos.y = rand() % world->map_height;
+        world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world);
     } while (is_wall(world->enemy_array.array[world->enemy_array.len].pos.x, world->enemy_array.array[world->enemy_array.len].pos.y));
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
@@ -50,7 +54,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         double y = world->enemy_array.array[i].pos.y;
         double distance_to_player = 0;
         double d_distance = 0.01;
-        int check_move = 1;
+        int update_position = 1;
         world->enemy_array.array[i].time_from_last_shot += time_elapsed;
         if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
             while (!is_wall(x, y)) {
@@ -60,29 +64,25 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 if (is_player(x, y)) {
                     if (distance_to_player <= 10 && world->enemy_array.array[i].time_from_last_shot >= 2) {
                         world->enemy_array.array[i].time_from_last_shot = 0;
-                        shoot_bullet(world, world->enemy_array.array[i].pos, angle_to_player, time_elapsed, ENEMY_BULLET);
+                        shoot_bullet(world, world->enemy_array.array[i].pos, angle_to_player, time_elapsed, kBulletEnemy);
                     }
                     if (distance_to_player <= 4) {
-                        check_move = 0;
+                        update_position = 0;
                     }
                     world->enemy_array.array[i].target = world->player.pos;
                     break;
                 }
             }
         }
-        if (check_move) {
-            double new_x = world->enemy_array.array[i].pos.x;
-            new_x += time_elapsed * world->enemy_array.array[i].speed * sin(world->enemy_array.array[i].angle);
-            double new_y = world->enemy_array.array[i].pos.y;
-            new_y += time_elapsed * world->enemy_array.array[i].speed * cos(world->enemy_array.array[i].angle);
-            if (!is_wall(new_x, new_y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y)) {
-                world->enemy_array.array[i].pos.x = new_x;
-                world->enemy_array.array[i].pos.y = new_y;
+        if (update_position) {
+            int temp;
+            point_t new_pos = get_new_forward_pos(world->enemy_array.array[i].pos, world->enemy_array.array[i].angle, time_elapsed, world->enemy_array.array[i].speed);
+            if (!is_wall(new_pos.x, new_pos.y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y, &temp)) {
+                world->enemy_array.array[i].pos = new_pos;
             }
             else {
                 do {
-                    world->enemy_array.array[i].target.x = rand() % 16;
-                    world->enemy_array.array[i].target.y = rand() % 16;
+                    world->enemy_array.array[i].target = get_rand_pos_on_floor(world);
                 } while (is_wall(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y));
             }
         }

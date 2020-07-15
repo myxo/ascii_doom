@@ -30,21 +30,21 @@ void bullets_movement(world_t* world, float time_elapsed) {
         else {
             bullet_destruct(get_world(), i);
         }
-        int index_minux_one;
-        if (index_minux_one = is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
-            if (world->bullet_array.array[i].host == PLAYER_BULLET) {
+        int index;
+        if (is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y, &index)) {
+            if (world->bullet_array.array[i].host == kBulletPlayer) {
                 bullet_destruct(get_world(), i);
-                enemy_hit(world, index_minux_one - 1, 1);
+                enemy_hit(world, index, 1);
             }
         }
-        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y) && world->bullet_array.array[i].host == ENEMY_BULLET) {
+        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y) && world->bullet_array.array[i].host == kBulletEnemy) {
             bullet_destruct(get_world(), i);
             player_hit(1);
         }
     }
 }
 
-void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, int host) {
+void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host) {
     if (world->bullet_array.len >= world->bullet_array.capacity)
         increase_arr_bullets_capacity(world);
     world->bullet_array.array[world->bullet_array.len].pos = pos;

@@ -51,7 +51,7 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_SPACE).pressed) {
         if (time_from_last_shot >= 0.5) {
             time_from_last_shot = 0;
-            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, time_elapsed, PLAYER_BULLET);
+            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, time_elapsed, kBulletPlayer);
         }
     }
 }

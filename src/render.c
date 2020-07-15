@@ -6,6 +6,18 @@
 
 #include <math.h>
 
+void draw_enemies(int row, double distance) {
+    int bullet_height = 60 / distance;
+    for (int i = olc_screen_height() / 2 - bullet_height; i < olc_screen_height() / 2 + bullet_height; i++)
+        olc_draw(row, i, '%', FG_BLUE);
+}
+
+void draw_bullet(int row, double distance) {
+    int bullet_height = 4 / distance;
+    for (int i = olc_screen_height() / 2 - bullet_height; i < olc_screen_height() / 2 + bullet_height; i++)
+        olc_draw(row, i, '*', FG_RED);
+}
+
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
@@ -54,10 +66,9 @@ void draw_screen(world_t* world) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
-            if (is_enemy(x, y)) {
-                int bullet_height = 60 / distance;
-                for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
-                    olc_draw(row, i, '%', FG_BLUE);
+            int temp;
+            if (is_enemy(x, y, &temp)) {
+                draw_enemies(row, distance);
             }
         }
         x = world->player.pos.x;
@@ -68,9 +79,7 @@ void draw_screen(world_t* world) {
             y += d_distance * ray_cos;
             distance += d_distance;
             if (is_bullet(x, y)) {
-                int bullet_height = 8 / 2 / distance;
-                for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
-                    olc_draw(row, i, '*', FG_RED);
+                draw_bullet(row, distance);
             }
         }
 		row++;

@@ -62,9 +62,11 @@ int init_world_object();
 void deinit_world_object();
 world_t* get_world();
 int read_map_for_file();
+int is_in_circle(point_t pos, point_t circle_center, double radius);
 int is_wall(double x, double y);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
-int is_enemy(double x, double y);
+int is_enemy(double x, double y, int* enemy_index);
+point_t get_rand_pos_on_floor(world_t* world);
 
 #endif
