@@ -31,7 +31,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
-    world->enemy_array.array[world->enemy_array.len].radius = 0.03;
+    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.len++;
 }         
