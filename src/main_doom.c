@@ -20,20 +20,21 @@ int stop = 0;
 
 double time_from_last_shot = 0;
 
+
 int create() {
     if (init_world_object() == 0) {
         return 0;
     }
     log_init("debug.txt");
-	return 1;
+    return 1;
 }
 
 void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_LEFT).held) {
-        turn_player(-1);
+        turn_player(-1, time_elapsed);
     }
     if (olc_get_key(VK_RIGHT).held) {
-        turn_player(1);
+        turn_player(1, time_elapsed);
     }
     if (olc_get_key('W').held) {
         move_player(1, 0, time_elapsed);
@@ -91,10 +92,10 @@ int main() {
 	olc_register_create(&create);
 	olc_register_update(&update);
 
-	olc_start(); // block until update return 0
-	olc_deinitialize();
+    olc_start(); // block until update return 0
+    olc_deinitialize();
     log_deinit();
     deinit_world_object();
 
-	return 0;
+    return 0;
 }
