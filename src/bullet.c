@@ -37,9 +37,11 @@ void bullets_movement(world_t* world, float time_elapsed) {
                 enemy_hit(world, index, 1);
             }
         }
-        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y) && world->bullet_array.array[i].host == kBulletEnemy) {
-            bullet_destruct(get_world(), i);
-            player_hit(1);
+        if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
+            if (world->bullet_array.array[i].host == kBulletEnemy) {
+                bullet_destruct(get_world(), i);
+                player_hit(1);
+            }
         }
     }
 }

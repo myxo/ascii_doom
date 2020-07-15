@@ -14,25 +14,25 @@ void draw_enemies(world_t* world) {
         double angle_from_player_to_enemy = get_angle_from_pos1_to_pos2(player.pos, enemy.pos);
         double x = world->player.pos.x;
         double y = world->player.pos.y;
-        double d_distance = 0.01;
+        double d_ray = player.angle_of_vision / olc_screen_width();;
         double start_player_view_angle = player.angle - player.angle_of_vision / 2;
         double stop_player_view_angle = player.angle + player.angle_of_vision / 2;
         double start_player_view_angle_floor_PI = start_player_view_angle - ((int)(start_player_view_angle / 2 / M_PI)) * 2 * M_PI;
         double stop_player_view_angle_floor_PI = stop_player_view_angle - ((int)(stop_player_view_angle / 2 / M_PI)) * 2 * M_PI;
         if ((angle_from_player_to_enemy < start_player_view_angle_floor_PI) || (angle_from_player_to_enemy > stop_player_view_angle_floor_PI))
             return;
-        /if (has_w)
         double distance = get_distance_from_pos1_to_pos2(player.pos, enemy.pos);
         double plyer_to_enemy_width_angle = atan2(enemy.radius, distance);
         double angle_from_player_to_enemy_left = angle_from_player_to_enemy - plyer_to_enemy_width_angle;
         double angle_from_player_to_enemy_right = angle_from_player_to_enemy + plyer_to_enemy_width_angle;
-        for (double i = angle_from_player_to_enemy_left; i < angle_from_player_to_enemy_right; i = i + d_distance)
-        int row_left = olc_screen_width() * (angle_from_player_to_enemy_left - start_player_view_angle_floor_PI) / player.angle_of_vision + 0.5;
-        int row_right = olc_screen_width() * (angle_from_player_to_enemy_right - start_player_view_angle_floor_PI) / player.angle_of_vision + 0.5;
-        int bullet_height = 50 / distance;
-        for (int i = row_left; i <= row_right; i++)
-            for (int j = olc_screen_height() / 2 - bullet_height + 0.5; j < olc_screen_height() / 2 + bullet_height + 0.5; j++)
-                olc_draw(i, j, '%', FG_BLUE);
+        for (double ray = angle_from_player_to_enemy_left; ray < angle_from_player_to_enemy_right; ray = ray + d_ray) {
+            if (!has_wall_between_by_angle(player.pos, enemy.pos, ray, 0.1)) {
+                int row = olc_screen_width() * (ray - start_player_view_angle_floor_PI) / player.angle_of_vision + 0.5;
+                int bullet_height = 50 / distance;
+                for (int j = olc_screen_height() / 2 - bullet_height + 0.5; j < olc_screen_height() / 2 + bullet_height + 0.5; j++)
+                    olc_draw(row, j, '%', FG_BLUE);
+            }
+        }
     }
 }
 
