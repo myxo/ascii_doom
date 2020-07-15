@@ -30,10 +30,6 @@ void draw_screen(world_t* world) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
-            if (is_bullet(x, y)) {
-                bullet_height = 1 / distance;
-                is_bullet_on_screen = 1;
-            }
         }
         int num_of_wall_sym = height * (1 / (distance));
         if (num_of_wall_sym > height)
@@ -41,7 +37,16 @@ void draw_screen(world_t* world) {
         int ceiling_level = (height - num_of_wall_sym) / 2;
         int floor_level = (height + num_of_wall_sym) / 2;
         char sym = '#';
-        double sprite_x = row / (double)width;
+        double dx = fabs(x - round(x));
+        double dy = fabs(y - round(y));
+        double sprite_x;
+        if (dy > dx) {
+            sprite_x = fabs(y - (int)(y));
+        }
+        else {
+            sprite_x = fabs(x - (int)(x));
+        }
+
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
             olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));

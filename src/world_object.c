@@ -35,10 +35,10 @@ int init_world_object() {
     set_sprite_color(0, 0, world_global->textures.wall, FG_GREEN);
     set_sprite_color(1, 0, world_global->textures.wall, FG_BLUE);
     set_sprite_color(2, 0, world_global->textures.wall, FG_YELLOW);
-    set_sprite_color(3, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(4, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(5, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(6, 0, world_global->textures.wall, FG_RED);
+    set_sprite_color(3, 0, world_global->textures.wall, FG_GREY);
+    set_sprite_color(4, 0, world_global->textures.wall, FG_CYAN);
+    set_sprite_color(5, 0, world_global->textures.wall, FG_DARK_BLUE);
+    set_sprite_color(6, 0, world_global->textures.wall, FG_DARK_RED);
     set_sprite_color(7, 0, world_global->textures.wall, FG_RED);
     set_sprite_color(0, 7, world_global->textures.wall, FG_RED);
     set_sprite_color(1, 7, world_global->textures.wall, FG_RED);
