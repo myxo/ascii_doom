@@ -2,6 +2,7 @@
 
 #include "sprite.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -35,6 +36,16 @@ short get_sprite_color(int x, int y, sprite_t* sprite) {
     assert(x < sprite->width);
     assert(y < sprite->height);
     return sprite->colours[(sprite->width * y) + x];
+}
+
+short sample_sprite_color(double x, double y, sprite_t* texture) {
+    assert(x >= 0);
+    assert(y >= 0);
+    assert(y <= 1);
+    assert(x <= 1);
+    int sprite_x = round(x * (texture->width - 1));
+    int sprite_y = round(y * (texture->height - 1));
+    return get_sprite_color(sprite_x, sprite_y, texture);
 }
 
 void load_sprite_from_file(const char* filename, sprite_t* sprite) {

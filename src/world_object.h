@@ -32,6 +32,11 @@ typedef struct {
 } bullet_array_t;
 
 typedef struct {
+    sprite_t* wall;
+    sprite_t* bullet;
+} game_textures_t;
+
+typedef struct {
     int health;
     point_t pos;
     point_t target;
@@ -55,6 +60,7 @@ typedef struct {
     enemy_array_t enemy_array;
     int map_width;
     int map_height;
+    game_textures_t textures;
 } world_t;
 
 

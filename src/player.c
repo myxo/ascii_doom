@@ -1,3 +1,4 @@
+#include "sprite.h"
 #include "world_object.h"
 #include <math.h>
 
