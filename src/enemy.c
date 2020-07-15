@@ -31,23 +31,16 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
-    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].radius = 0.03;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.len++;
-}
-
-double get_angle_from_pos_to_angle(point_t pos, point_t target) {
-    double delta_x = target.x - pos.x;
-    double delta_y = target.y - pos.y;
-    double x = atan2(delta_x, delta_y);
-    return x;
-}                
+}         
 
 void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
-        world->enemy_array.array[i].angle = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->enemy_array.array[i].target);
+        world->enemy_array.array[i].angle = get_angle_from_pos1_to_pos2(world->enemy_array.array[i].pos, world->enemy_array.array[i].target);
 
-        double angle_to_player = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->player.pos);
+        double angle_to_player = get_angle_from_pos1_to_pos2(world->enemy_array.array[i].pos, world->player.pos);
         double start_enemy_view_angle = world->enemy_array.array[i].angle - world->enemy_array.array[i].angle_of_vision / 2;
         double stop_enemy_view_angle = world->enemy_array.array[i].angle + world->enemy_array.array[i].angle_of_vision / 2;
         double x = world->enemy_array.array[i].pos.x;

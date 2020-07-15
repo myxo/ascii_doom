@@ -25,7 +25,7 @@ void init_enemy_array(world_t* world, int capacity) {
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
-    world_global->player.health = 3;
+    world_global->player.health = 300000000;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
@@ -124,5 +124,16 @@ point_t get_rand_pos_on_floor(world_t* world) {
         pos.y = rand() % world->map_height;
     } while (is_wall(pos.x, pos.y));
     return pos;
+}
+
+double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2) {
+    double delta_x = pos2.x - pos1.x;
+    double delta_y = pos2.y - pos1.y;
+    double x = atan2(delta_x, delta_y);
+    return x;
+}
+
+double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
+    return sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2));
 }
 
