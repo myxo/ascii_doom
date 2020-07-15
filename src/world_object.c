@@ -66,6 +66,9 @@ world_t* get_world() {
 }
 
 int is_wall(double x, double y) {
+    if (x < 0 || y < 0) {
+        return 1;
+    }
     return world_global->map[(int)x][(int)y] == '#';
 }
 

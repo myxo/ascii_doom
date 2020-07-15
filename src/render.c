@@ -17,16 +17,23 @@ void draw_screen(world_t* world) {
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = 0.01;
     int row = 0;
+    int bullet_row = 0;
     for (; ray_angle < world->player.angle + world->player.angle_of_vision / 2; ray_angle += d_angle) {
         double x = world->player.pos.x;
         double y = world->player.pos.y;
         double distance = 0;
         double ray_sin = sin(ray_angle);
         double ray_cos = cos(ray_angle);
+        int is_bullet_on_screen = 0;
+        int bullet_height = 0;
         while (!is_wall(x, y)) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
+            if (is_bullet(x, y)) {
+                bullet_height = 1 / distance;
+                is_bullet_on_screen = 1;
+            }
         }
         int num_of_wall_sym = height * (1 / (distance));
         if (num_of_wall_sym > height)
@@ -35,9 +42,9 @@ void draw_screen(world_t* world) {
         int floor_level = (height + num_of_wall_sym) / 2;
         char sym = '#';
         double ratio = world->textures.wall->height / (double)num_of_wall_sym;
+        double sprite_x = row % world->textures.wall->width;
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = i - ceiling_level;
-            double sprite_x = row % world->textures.wall->width;
             sprite_y *= ratio;
             sprite_y = (int)sprite_y % world->textures.wall->height;
             olc_draw(row, i, sym, get_sprite_color((int)sprite_x, (int)sprite_y, world->textures.wall));
@@ -53,19 +60,16 @@ void draw_screen(world_t* world) {
                 olc_draw(row, i, 'X', FG_GREY);
             }
         }
-
-        x = world->player.pos.x;
-        y = world->player.pos.y;
-        distance = 0;
-        while (!is_wall(x, y)) {
-            x += d_distance * ray_sin;
-            y += d_distance * ray_cos;
-            distance += d_distance;
-            if (is_bullet(x, y)) {
-                int bullet_height = 1/distance;
-                for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++)
-                    olc_draw(row, i, '*', FG_RED);
+        if (is_bullet_on_screen == 1) {
+            double sprite_x = bullet_row % world->textures.bullet->width;
+            double ratio = world->textures.bullet->height / (double)bullet_height;
+            for (int i = height / 2 - bullet_height; i < height / 2 + bullet_height; i++) {
+                double sprite_y = (i - height / 2 + bullet_height) * ratio;
+                sprite_y = (int)sprite_y % world->textures.bullet->height;
+                olc_draw(row, i, '*', get_sprite_color(sprite_x, sprite_y, world->textures.bullet));
             }
+            is_bullet_on_screen = 0;
+            bullet_row++;
         }
         row++;
     }
