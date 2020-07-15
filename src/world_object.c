@@ -126,3 +126,28 @@ point_t get_rand_pos_on_floor(world_t* world) {
     return pos;
 }
 
+double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2) {
+    double delta_x = pos2.x - pos1.x;
+    double delta_y = pos2.y - pos1.y;
+    return atan2(delta_x, delta_y);
+}
+
+double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
+    return sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2));
+}
+
+int has_wall_between(point_t pos1, point_t pos2) {
+    double x = pos1.x;
+    double y = pos1.y;
+    double angle = get_angle_from_pos1_to_pos2(pos1, pos2);
+    double d_distance = 0.01;
+    while (!is_wall(x, y)) {
+        x += d_distance * sin(angle);
+        y += d_distance * cos(angle);
+        point_t pos = { x, y };
+        if (is_in_circle(pos, pos2, 0.1)) {
+            return 0;
+        }
+    }
+    return 1;
+}

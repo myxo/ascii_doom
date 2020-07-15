@@ -22,67 +22,59 @@ void add_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
+    point_t pos = world->enemy_array.array[world->enemy_array.len].pos;
+    point_t target = world->enemy_array.array[world->enemy_array.len].target;
     do {
-        world->enemy_array.array[world->enemy_array.len].target = get_rand_pos_on_floor(world);
-    } while (is_wall(world->enemy_array.array[world->enemy_array.len].target.x, world->enemy_array.array[world->enemy_array.len].target.y));
+        target = get_rand_pos_on_floor(world);
+    } while (is_wall(target.x, target.y));
     do {
-        world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world);
-    } while (is_wall(world->enemy_array.array[world->enemy_array.len].pos.x, world->enemy_array.array[world->enemy_array.len].pos.y));
+        pos = get_rand_pos_on_floor(world);
+    } while (is_wall(pos.x, pos.y));
+    world->enemy_array.array[world->enemy_array.len].target = target;
+    world->enemy_array.array[world->enemy_array.len].pos = pos;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.len++;
-}
-
-double get_angle_from_pos_to_angle(point_t pos, point_t target) {
-    double delta_x = target.x - pos.x;
-    double delta_y = target.y - pos.y;
-    double x = atan2(delta_x, delta_y);
-    return x;
-}                
+}         
 
 void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
-        world->enemy_array.array[i].angle = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->enemy_array.array[i].target);
+        enemy_t* enemy = &world->enemy_array.array[i];
+        enemy->angle = get_angle_from_pos1_to_pos2(enemy->pos, enemy->target);
 
-        double angle_to_player = get_angle_from_pos_to_angle(world->enemy_array.array[i].pos, world->player.pos);
-        double start_enemy_view_angle = world->enemy_array.array[i].angle - world->enemy_array.array[i].angle_of_vision / 2;
-        double stop_enemy_view_angle = world->enemy_array.array[i].angle + world->enemy_array.array[i].angle_of_vision / 2;
-        double x = world->enemy_array.array[i].pos.x;
-        double y = world->enemy_array.array[i].pos.y;
-        double distance_to_player = 0;
+        double angle_to_player = get_angle_from_pos1_to_pos2(enemy->pos, world->player.pos);
+        double start_enemy_view_angle = enemy->angle - enemy->angle_of_vision / 2;
+        double stop_enemy_view_angle = enemy->angle + enemy->angle_of_vision / 2;
+        double x = enemy->pos.x;
+        double y = enemy->pos.y;
         double d_distance = 0.01;
         int update_position = 1;
-        world->enemy_array.array[i].time_from_last_shot += time_elapsed;
+        enemy->time_from_last_shot += time_elapsed;
         if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
-            while (!is_wall(x, y)) {
-                x += d_distance * sin(angle_to_player);
-                y += d_distance * cos(angle_to_player);
-                distance_to_player += d_distance;
-                if (is_player(x, y)) {
-                    if (distance_to_player <= 10 && world->enemy_array.array[i].time_from_last_shot >= 2) {
-                        world->enemy_array.array[i].time_from_last_shot = 0;
-                        shoot_bullet(world, world->enemy_array.array[i].pos, angle_to_player, time_elapsed, kBulletEnemy);
-                    }
-                    if (distance_to_player <= 4) {
-                        update_position = 0;
-                    }
-                    world->enemy_array.array[i].target = world->player.pos;
-                    break;
+            double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
+            if (!has_wall_between(enemy->pos, world->player.pos)) {
+                if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
+                    enemy->time_from_last_shot = 0;
+                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy);
                 }
+                if (distance_to_player <= 4) {
+                    update_position = 0;
+                }
+                enemy->target = world->player.pos;
             }
         }
         if (update_position) {
-            point_t new_pos = get_new_forward_pos(world->enemy_array.array[i].pos, world->enemy_array.array[i].angle, time_elapsed, world->enemy_array.array[i].speed);
-            if (!is_wall(new_pos.x, new_pos.y) && !is_enemy(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y, NULL)) {
-                world->enemy_array.array[i].pos = new_pos;
+            point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
+            if (!is_wall(new_pos.x, new_pos.y) && !is_enemy(enemy->target.x, enemy->target.y, NULL)) {
+                enemy->pos = new_pos;
             }
             else {
                 do {
-                    world->enemy_array.array[i].target = get_rand_pos_on_floor(world);
-                } while (is_wall(world->enemy_array.array[i].target.x, world->enemy_array.array[i].target.y));
+                    enemy->target = get_rand_pos_on_floor(world);
+                } while (is_wall(enemy->target.x, enemy->target.y));
             }
         }
     }
