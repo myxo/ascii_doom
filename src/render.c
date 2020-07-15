@@ -8,13 +8,13 @@
 
 void draw_enemies(int row, double distance) {
     int bullet_height = 60 / distance;
-    for (int i = olc_screen_height() / 2 - bullet_height; i < olc_screen_height() / 2 + bullet_height; i++)
+    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
         olc_draw(row, i, '%', FG_BLUE);
 }
 
 void draw_bullet(int row, double distance) {
     int bullet_height = 4 / distance;
-    for (int i = olc_screen_height() / 2 - bullet_height; i < olc_screen_height() / 2 + bullet_height; i++)
+    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
         olc_draw(row, i, '*', FG_RED);
 }
 
