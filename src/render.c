@@ -1,14 +1,14 @@
 #include "../third_party/olc/olc.h"
 
-#include "world_object.h"
-
 #include "sprite.h"
+
+#include "world_object.h"
 
 #include "render.h"
 
 #include <math.h>
 
-void draw_screen(world_t* world, sprite_t* wall_texture) {
+void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
     int threshold1 = 125;
@@ -34,15 +34,13 @@ void draw_screen(world_t* world, sprite_t* wall_texture) {
         int ceiling_level = (height - num_of_wall_sym) / 2;
         int floor_level = (height + num_of_wall_sym) / 2;
         char sym = '#';
-        double ratio = wall_texture->height / (double)num_of_wall_sym;
+        double ratio = world->textures.wall->height / (double)num_of_wall_sym;
         for (int i = ceiling_level; i < floor_level; i++) {
-            if (ratio < 1) {
-                double sprite_y = i - ceiling_level;
-                double sprite_x = row % wall_texture->width;
-                sprite_y *= ratio;
-                sprite_y = (int)sprite_y % wall_texture->height;
-                olc_draw(row, i, sym, get_sprite_color((int)sprite_x, (int)sprite_y, wall_texture));
-            }
+            double sprite_y = i - ceiling_level;
+            double sprite_x = row % world->textures.wall->width;
+            sprite_y *= ratio;
+            sprite_y = (int)sprite_y % world->textures.wall->height;
+            olc_draw(row, i, sym, get_sprite_color((int)sprite_x, (int)sprite_y, world->textures.wall));
         }
         for (int i = floor_level; i < height; i++) {
             if (i < threshold1) {

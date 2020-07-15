@@ -30,11 +30,17 @@ typedef struct {
 } bullet_array_t;
 
 typedef struct {
+    sprite_t* wall;
+    sprite_t* bullet;
+} game_textures_t;
+
+typedef struct {
     player_t player;
     char** map;
-    bullet_array_t bullet_array;
     int map_width;
     int map_height;
+    bullet_array_t bullet_array;
+    game_textures_t textures;
 } world_t;
 
 
