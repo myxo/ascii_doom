@@ -26,8 +26,12 @@ PRIVATE
 	src/render.c
 	src/bullet.h
 	src/bullet.c
+	src/enemy.h
+	src/enemy.c
 	src/sprite.h
 	src/sprite.c
+	src/player.h
+	src/player.c
 )
 configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/res/map.txt
 				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
