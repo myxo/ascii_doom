@@ -1,23 +1,19 @@
 #include "olc/olc.h"
+#include "config.h"
+#include "world_object.h"
+#include "render.h"
 
 #include <string.h>
 #include <stdio.h>
-#include "config.h"
-#include "world_object.h"
-
-#include "render.h"
-
 #include <windows.h>
-
 #include <stdio.h>
-
 #include <math.h>
 
 
 int width =  200;
 int height =  150;
 int glyph_size =  8;
-const char str[50] = "C:/Users/lev/Documents/ascii_doom/cfg.txt";
+const char file_name[50] = "cfg.txt";
 int stop = 0;
 
 void move_player(int forward, int right, float time_elapsed) {
@@ -42,7 +38,7 @@ void turn_player(int dir) {
 }
 
 int create() {
-    read_config_from_file(str);
+    read_config_from_file(file_name);
     init_world_object();
     log_init("debug.txt");
 	return 1;
@@ -78,12 +74,14 @@ void handle_input(float time_elapsed) {
 
 int update(float time_elapsed) {
 	handle_input(time_elapsed);
+    update_config(time_elapsed);
 	if (stop) {
 		return 0;
 	}
 	olc_fill(0, 0, width, height, ' ', BG_BLACK);
     display_watch();
 	draw_screen(get_world());
+    draw_config();
 	return 1;
 }
 

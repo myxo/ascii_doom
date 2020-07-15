@@ -1,2 +1,0 @@
-player_speed 5
-view_angle 3.1415

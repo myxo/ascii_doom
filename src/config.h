@@ -8,5 +8,6 @@ typedef enum  {
 
 double get_config_value(config_item_t item);
 void read_config_from_file(const char* filename);
-
+void draw_config();
+void update_config(float time_elapsed);
 #endif
