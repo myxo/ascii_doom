@@ -3,37 +3,35 @@
 
 #include <stdlib.h>
 
+#include <stdio.h>
+
 #include <math.h>
 
-world_t * world_global = NULL;
+world_t* world_global = NULL;
 
-void init_world_object() {
+void init_bullet_array(world_t* world, int capacity) {
+    world_global->bullet_array.capacity = capacity;
+    world_global->bullet_array.len = 0;
+    world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
+}
+
+int init_world_object() {
     world_global = malloc(sizeof(world_t));
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
-    world_global->player.angle = 0;
-    world_global->player.speed = 1.5;
+    world_global->player.angle = M_PI_4;
+    world_global->player.speed = 2.5;
     world_global->player.angle_of_vision = M_PI_4;
-    world_global->player.angular_speed = 0.02;
-    strcpy(world_global->map[0], "###############");
-    strcpy(world_global->map[1], "# #######     #");
-    strcpy(world_global->map[2], "#  ######     #");
-    strcpy(world_global->map[3], "#  ########  ##");
-    strcpy(world_global->map[4], "#    #####  ###");
-    strcpy(world_global->map[5], "###  ####  ####");
-    strcpy(world_global->map[6], "####  ##  #####");
-    strcpy(world_global->map[7], "#####    ######");
-    strcpy(world_global->map[8], "######  #######");
-    strcpy(world_global->map[9], "#####  ########");
-    strcpy(world_global->map[10], "####  #########");
-    strcpy(world_global->map[11], "###  ##########");
-    strcpy(world_global->map[12], "##  ###########");
-    strcpy(world_global->map[13], "#  ######     #");
-    strcpy(world_global->map[14], "#          ####");
-    strcpy(world_global->map[15], "###############");
+    world_global->player.angular_speed = 1.5;
+    init_bullet_array(world_global, 5);
+    return read_map_for_file();
 }
 
 void deinit_world_object() {
+    for (int i = 0; i < world_global->map_height; i++) {
+        free(world_global->map[i]);
+    }
+    free(world_global->map);
     free(world_global);
 }
 
@@ -43,4 +41,40 @@ world_t* get_world() {
 
 int is_wall(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int read_map_for_file() {
+    FILE* fmap;
+    fmap = fopen("map.txt", "r");
+    if (fmap == NULL) {
+        return 0;
+    }
+    char tmp;
+    fscanf(fmap, "%d %d", &world_global->map_width, &world_global->map_height);
+    world_global->map = malloc(world_global->map_height * sizeof(char*));
+    for (int i = 0; i < world_global->map_height; i++) {
+        world_global->map[i] = malloc((world_global->map_width + 1) * sizeof(char));
+    }
+    fgetc(fmap);
+    for (int i = 0; i < world_global->map_height; i++) {
+        for (int j = 0; j < world_global->map_width; j++) {
+            world_global->map[i][j] = fgetc(fmap);
+        }
+        world_global->map[i][world_global->map_width] = 0;
+        fgetc(fmap);
+    }
+    fclose(fmap);
+    return 1;
+}
+
+int is_bullet(double x, double y) {
+    for (int i = 0; i < world_global->bullet_array.len; i++) {
+        double ox_vec = x - world_global->bullet_array.array[i].pos.x;
+        double oy_vec = y - world_global->bullet_array.array[i].pos.y;
+        double r = world_global->bullet_array.array[i].radius;
+        if (pow(ox_vec, 2) + pow(oy_vec, 2) <= pow(r, 2)){
+            return 1;
+}
+    }
+    return 0;
 }
