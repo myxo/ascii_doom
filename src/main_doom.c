@@ -108,6 +108,9 @@ int update(float time_elapsed) {
 }
 
 int main() {
+    HANDLE m_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(m_hConsole, &csbi);
     if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
         fprintf(stderr, "Cannot initialize olc");
         return 0;
