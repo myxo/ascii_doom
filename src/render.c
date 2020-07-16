@@ -1,4 +1,5 @@
 #include "../third_party/olc/olc.h"
+#define _USE_MATH_DEFINES
 
 #include "sprite.h"
 
@@ -8,16 +9,48 @@
 
 #include <math.h>
 
-void draw_enemies(int row, double distance) {
-    int bullet_height = 60 / distance;
-    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
-        olc_draw(row, i, '%', FG_BLUE);
+void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
+    double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
+    if (angle_from_player_to_obj < 0)
+        angle_from_player_to_obj += 2 * M_PI;
+    double x = player->pos.x;
+    double y = player->pos.y;
+
+    double start_player_view_angle = player->angle - player->angle_of_vision / 2;
+    double stop_player_view_angle = player->angle + player->angle_of_vision / 2;
+    if ((player->angle < start_player_view_angle) || (player->angle > stop_player_view_angle))
+        return;
+    double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
+    double player_to_obj_width_angle = atan2(obj_radis, distance);
+    double angle_from_player_to_obj_left = angle_from_player_to_obj - player_to_obj_width_angle;
+    double angle_from_player_to_obj_right = angle_from_player_to_obj + player_to_obj_width_angle;
+
+    double player_angle_floor_PI = player->angle - ((int)(player->angle / 2 / M_PI)) * 2 * M_PI;
+    double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
+    if (start_player_view_angle_floor_PI < 0)
+        start_player_view_angle_floor_PI += 2 * M_PI;
+    int row_left = olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    int row_right = olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    obj_height = obj_height / distance;
+    for (int i = row_left; i <= row_right; i++)
+        for (int j = olc_screen_height() / 2 - obj_height + 0.5; j < olc_screen_height() / 2 + obj_height + 0.5; j++)
+            olc_draw(i, j, ch, col);
 }
 
-void draw_bullet(int row, double distance) {
-    int bullet_height = 4 / distance;
-    for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
-        olc_draw(row, i, '*', FG_RED);
+void draw_enemies(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->enemy_array.len; i++) {
+        enemy_t* enemy = &world->enemy_array.array[i];
+        draw_object(player, enemy->pos, enemy->radius, '%', FG_BLUE, 50);
+    }
+}
+
+void draw_bullets(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->bullet_array.len; i++) {
+        bullet_t* bullet = &world->bullet_array.array[i];
+        draw_object(player, bullet->pos, bullet->radius, '*', FG_RED, 4);
+    }
 }
 
 void draw_screen(world_t* world) {
@@ -79,30 +112,10 @@ void draw_screen(world_t* world) {
                 olc_draw(row, i, 'X', FG_GREY);
             }
         }
-        x = world->player.pos.x;
-        y = world->player.pos.y;
-        distance = 0;
-        while (!is_wall(x, y)) {
-            x += d_distance * ray_sin;
-            y += d_distance * ray_cos;
-            distance += d_distance;
-            if (is_enemy(x, y, NULL)) {
-                draw_enemies(row, distance);
-            }
-        }
-        x = world->player.pos.x;
-        y = world->player.pos.y;
-        distance = 0;
-        while (!is_wall(x, y)) {
-            x += d_distance * ray_sin;
-            y += d_distance * ray_cos;
-            distance += d_distance;
-            if (is_bullet(x, y)) {
-                draw_bullet(row, distance);
-            }
-        }
         row++;
     }
+    draw_enemies(world);
+    draw_bullets(world);
 }
 
 void draw_minimap(world_t* world) {
