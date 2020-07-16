@@ -11,6 +11,9 @@
 
 #include <math.h>
 
+#include <windows.h>
+#include "bullet.h"
+
 world_t* world_global = NULL;
 
 void init_bullet_array(world_t* world, int capacity) {
@@ -36,31 +39,18 @@ int init_world_object() {
     world_global->player.speed = 2.5;
     world_global->player.angle_of_vision = M_PI_4;
     world_global->player.radius = 0.2;
-    world_global->player.angular_speed = 0.06;
+    world_global->player.angular_speed = 1.2;
+    world_global->player.time_from_last_shot = 0;
+    world_global->stop = 0;
     init_bullet_array(world_global, 5);
     world_global->textures.wall = malloc(sizeof(sprite_t));
-    world_global->textures.bullet = malloc(sizeof(sprite_t));
-    init_sprite(8, 8, world_global->textures.wall);
-    init_sprite(8, 8, world_global->textures.bullet);
-    set_sprite_color(0, 0, world_global->textures.wall, FG_GREEN);
-    set_sprite_color(1, 0, world_global->textures.wall, FG_BLUE);
-    set_sprite_color(2, 0, world_global->textures.wall, FG_YELLOW);
-    set_sprite_color(3, 0, world_global->textures.wall, FG_GREY);
-    set_sprite_color(4, 0, world_global->textures.wall, FG_CYAN);
-    set_sprite_color(5, 0, world_global->textures.wall, FG_DARK_BLUE);
-    set_sprite_color(6, 0, world_global->textures.wall, FG_DARK_RED);
-    set_sprite_color(7, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(0, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(1, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(2, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(3, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(4, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(5, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(6, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(7, 7, world_global->textures.wall, FG_RED);
+    init_sprite(1, 1, world_global->textures.wall);
+    load_sprite_from_file("wall1.spr", world_global->textures.wall);
     init_enemy_array(world_global, 5);
-    world_global->game_layouts.main_menu = init_canvas();
-    world_global->game_layouts.game = init_canvas();
+    world_global->game_layouts.main_menu = init_canvas(update_main_menu);
+    init_main_menu(world_global->game_layouts.main_menu);
+    world_global->game_layouts.game = init_canvas(game_update);
+    world_global->game_layouts.main_menu->is_active = 1;
     return read_map_for_file();
 }
 
@@ -70,7 +60,6 @@ void deinit_world_object() {
     }
     free(world_global->map);
     deinit_sprite(world_global->textures.wall);
-    deinit_sprite(world_global->textures.bullet);
     deinit_canvas(world_global->game_layouts.main_menu);
     deinit_canvas(world_global->game_layouts.game);
     free(world_global);
@@ -81,7 +70,7 @@ world_t* get_world() {
 }
 
 int is_wall(double x, double y) {
-    if (x < 0 || y < 0)
+    if ((int)x < 0 || (int)y < 0)
         return 1;
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
@@ -179,5 +168,88 @@ int has_wall_between(point_t pos1, point_t pos2) {
             return 0;
         }
     }
+    return 1;
+}
+
+void handle_player_movement(float time_elapsed) {
+    if (olc_get_key(VK_LEFT).held) {
+        turn_player(-1, time_elapsed);
+    }
+    if (olc_get_key(VK_RIGHT).held) {
+        turn_player(1, time_elapsed);
+    }
+    if (olc_get_key('W').held) {
+        move_player(1, 0, time_elapsed);
+    }
+    if (olc_get_key('A').held) {
+        move_player(0, -1, time_elapsed);
+    }
+    if (olc_get_key('S').held) {
+        move_player(-1, 0, time_elapsed);
+    }
+    if (olc_get_key('D').held) {
+        move_player(0, 1, time_elapsed);
+    }
+    get_world()->player.time_from_last_shot += time_elapsed;
+    if (olc_get_key(VK_SPACE).pressed) {
+        if (get_world()->player.time_from_last_shot >= 0.5) {
+            get_world()->player.time_from_last_shot = 0;
+            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, time_elapsed, kBulletPlayer);
+        }
+    }
+}
+
+void handle_input_game(float time_elapsed) {
+    if (olc_get_key(VK_ESCAPE).held) {
+        get_world()->stop = 1;
+    }
+    handle_player_movement(time_elapsed);
+}
+
+int game_update(float time_elapsed) {
+    handle_input_game(time_elapsed);
+    if (get_world()->stop) {
+        return 0;
+    }
+    olc_fill(0, 0, olc_screen_width(), olc_screen_height(), ' ', BG_BLACK);
+
+    if (get_world()->enemy_array.len == 0) {
+        add_enemy(get_world());
+    }
+    bullets_movement(get_world(), time_elapsed);
+    enemy_movement(get_world(), time_elapsed);
+    draw_screen(get_world());
+    draw_minimap(get_world());
+    display_watch();
+    return 1;
+}
+
+void handle_menu_input(float time_elapsed) {
+    if (olc_get_key(VK_ESCAPE).held) {
+        get_world()->stop = 1;
+    }
+    if (olc_get_key(VK_SPACE).pressed) {
+        get_active_button(get_world()->game_layouts.main_menu)->action();
+    }
+}
+
+void init_main_menu(canvas_t* menu_canvas) {
+    add_button(menu_canvas, olc_screen_width()/2 - 10, olc_screen_height() / 2 - 5 , 10, 5, "Play", action_to_game);
+    menu_canvas->buttons[0].is_active = 1;
+}
+
+int update_main_menu(float time_elapsed) {
+    handle_menu_input(time_elapsed);
+    if (get_world()->stop == 1) {
+        return 0;
+    }
+    //olc_fill(0, 0, olc_screen_width(), olc_screen_height(), ' ', BG_BLACK);
+    draw_canvas(get_world()->game_layouts.main_menu);
+    return 1;
+}
+
+int action_to_game() {
+    get_world()->game_layouts.main_menu->is_active = 0;
+    get_world()->game_layouts.game->is_active = 1;
     return 1;
 }

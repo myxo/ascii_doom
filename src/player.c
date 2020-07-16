@@ -3,7 +3,7 @@
 #include "world_object.h"
 #include <math.h>
 
-void move_player(int forward, int right, float time_elapsed) {
+void move_player(int forward, int right, double time_elapsed) {
     world_t* world = get_world();
 
     double new_x = world->player.pos.x;
@@ -19,9 +19,9 @@ void move_player(int forward, int right, float time_elapsed) {
         world->player.pos.y = new_y;
 }
 
-void turn_player(int dir) {
+void turn_player(int dir, double time_elapsed) {
     world_t* world = get_world();
-    world->player.angle += dir * world->player.angular_speed;
+    world->player.angle += dir * time_elapsed * world->player.angular_speed;
 }
 
 void player_hit(int damage) {

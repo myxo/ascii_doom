@@ -22,8 +22,6 @@ int glyph_size =  8;
 
 int stop = 0;
 
-double time_from_last_shot = 0;
-
 
 int create() {
     if (init_world_object() == 0) {
@@ -42,61 +40,12 @@ int create() {
 //    }
 //}
 
-void handle_player_movement(float time_elapsed) {
-    if (olc_get_key(VK_LEFT).held) {
-        turn_player(-1, time_elapsed);
-    }
-    if (olc_get_key(VK_RIGHT).held) {
-        turn_player(1, time_elapsed);
-    }
-    if (olc_get_key('W').held) {
-        move_player(1, 0, time_elapsed);
-    }
-    if (olc_get_key('A').held) {
-        move_player(0, -1, time_elapsed);
-    }
-    if (olc_get_key('S').held) {
-        move_player(-1, 0, time_elapsed);
-    }
-    if (olc_get_key('D').held) {
-        move_player(0, 1, time_elapsed);
-    }
-    time_from_last_shot += time_elapsed;
-    if (olc_get_key(VK_SPACE).pressed) {
-        if (time_from_last_shot >= 0.5) {
-            time_from_last_shot = 0;
-            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, time_elapsed, kBulletPlayer);
-        }
-    }
-}
-
-void handle_input(float time_elapsed) {
-    if (olc_get_key(VK_ESCAPE).held) {
-        stop = 1;
-    }
-    handle_player_movement(time_elapsed);
-}
-
-int game_update(float time_elapsed) {
-    handle_input(time_elapsed);
-    if (stop) {
-        return 0;
-    }
-    olc_fill(0, 0, width, height, ' ', BG_BLACK);
-
-    if (get_world()->enemy_array.len == 0) {
-        add_enemy(get_world());
-    }
-    bullets_movement(get_world(), time_elapsed);
-    enemy_movement(get_world(), time_elapsed);
-	draw_screen(get_world());
-    draw_minimap(get_world());
-    display_watch();
-    return 1;
-}
-
 int update(float time_elapsed) {
-    return game_update(time_elapsed);
+    if (get_world()->game_layouts.game->is_active) {
+        return get_world()->game_layouts.game->update(time_elapsed);
+    }else if (get_world()->game_layouts.main_menu->is_active) {
+        return get_world()->game_layouts.main_menu->update(time_elapsed);
+    }
 }
 
 int main() {

@@ -15,6 +15,7 @@ typedef struct {
     double speed;
     double angular_speed;
     double radius;
+    double time_from_last_shot;
 } player_t;
 
 typedef struct {
@@ -65,6 +66,7 @@ typedef struct {
     enemy_array_t enemy_array;
     int map_width;
     int map_height;
+    int stop;
     game_textures_t textures;
     game_layouts_t game_layouts;
 } world_t;
@@ -83,6 +85,19 @@ point_t get_rand_pos_on_floor(world_t* world);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
+
+void handle_player_movement(float time_elapsed);
+void handle_input_game(float time_elapsed);
+
+int game_update(float time_elapsed);
+
+void handle_menu_input(float time_elapsed);
+
+void init_main_menu(canvas_t* menu_canvas);
+
+int update_main_menu(float time_elapsed);
+
+int action_to_game();
 
 
 #endif
