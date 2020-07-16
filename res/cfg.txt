@@ -1,2 +1,3 @@
-player_speed 5
-view_angle 3.1415
+player_speed 2.5
+bullet_speed 2
+bullet_radius 0.01

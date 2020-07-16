@@ -14,10 +14,10 @@
 #include "bullet.h"
 
 
-int width =  150;
-int height = 100;
+int width =  200;
+int height = 150;
 int glyph_size =  8;
-const char file_name[50] = "cfg.txt";
+const char config_filename[50] = "cfg.txt";
 int stop = 0;
 
 double time_from_last_shot = 0;
@@ -44,8 +44,7 @@ void turn_player(int dir, double time_elapsed) {
 }
 
 int create() {
-    read_config_from_file(file_name);
-    init_world_object();
+    read_config_from_file(config_filename);
     if (init_world_object() == 0) {
         return 0;
     }
@@ -91,7 +90,7 @@ void handle_input(float time_elapsed) {
 
 int update(float time_elapsed) {
 	handle_input(time_elapsed);
-    update_config(time_elapsed);
+    handle_config_ui_keypress();
 	if (stop) {
 		return 0;
 	}
@@ -106,7 +105,7 @@ int update(float time_elapsed) {
 	draw_screen(get_world());   
     draw_minimap(get_world());
     display_watch();
-    draw_config();
+    draw_config_ui();
 	return 1;
 }
 
