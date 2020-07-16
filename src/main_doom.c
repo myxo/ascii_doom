@@ -33,6 +33,7 @@ int create() {
 }
 
 void handle_player_movement(float time_elapsed) {
+    point_t move_vec = {0, 0};
     if (olc_get_key(VK_LEFT).held) {
         turn_player(-1, time_elapsed);
     }
@@ -40,17 +41,18 @@ void handle_player_movement(float time_elapsed) {
         turn_player(1, time_elapsed);
     }
     if (olc_get_key('W').held) {
-        move_player(1, 0, time_elapsed);
+        move_vec.x += 1;
     }
     if (olc_get_key('A').held) {
-        move_player(0, -1, time_elapsed);
+        move_vec.y -= 1;
     }
     if (olc_get_key('S').held) {
-        move_player(-1, 0, time_elapsed);
+        move_vec.x -= 1;
     }
     if (olc_get_key('D').held) {
-        move_player(0, 1, time_elapsed);
+        move_vec.y += 1;
     }
+    move_player(move_vec.x, move_vec.y, time_elapsed);
     time_from_last_shot += time_elapsed;
     if (olc_get_key(VK_SPACE).pressed) {
         if (time_from_last_shot >= 0.5) {
