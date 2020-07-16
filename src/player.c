@@ -8,13 +8,13 @@ void move_player(int forward, int right, double time_elapsed) {
     double new_x = world->player.pos.x;
     new_x += forward * time_elapsed * world->player.speed * sin(world->player.angle);
     new_x += right * time_elapsed * world->player.speed * cos(world->player.angle);
-    if (!is_wall(new_x, world->player.pos.y))
+    if (!is_wall(new_x, world->player.pos.y) && fabs(new_x - world->player.pos.x) > 0.015)
         world->player.pos.x = new_x;
 
     double new_y = world->player.pos.y;
     new_y += forward * time_elapsed * world->player.speed * cos(world->player.angle);
     new_y -= right * time_elapsed * world->player.speed * sin(world->player.angle);
-    if (!is_wall(world->player.pos.x, new_y))
+    if (!is_wall(world->player.pos.x, new_y) && fabs(new_y - world->player.pos.y) > 0.015)
         world->player.pos.y = new_y;
 }
 
