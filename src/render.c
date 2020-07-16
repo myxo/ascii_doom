@@ -54,9 +54,15 @@ void draw_screen(world_t* world) {
         double sprite_x;
         if (dy > dx) {
             sprite_x = fabs(y - (int)(y));
+            if (is_wall(x - 0.2, y)) {
+                sprite_x = 1 - sprite_x;
+            }
         }
         else {
             sprite_x = fabs(x - (int)(x));
+            if (is_wall(x, y - 0.2)) {
+                sprite_x = 1 - sprite_x;
+            }
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
