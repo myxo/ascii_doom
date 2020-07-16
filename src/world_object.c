@@ -42,22 +42,7 @@ int init_world_object() {
     world_global->textures.bullet = malloc(sizeof(sprite_t));
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
-    set_sprite_color(0, 0, world_global->textures.wall, FG_GREEN);
-    set_sprite_color(1, 0, world_global->textures.wall, FG_BLUE);
-    set_sprite_color(2, 0, world_global->textures.wall, FG_YELLOW);
-    set_sprite_color(3, 0, world_global->textures.wall, FG_GREY);
-    set_sprite_color(4, 0, world_global->textures.wall, FG_CYAN);
-    set_sprite_color(5, 0, world_global->textures.wall, FG_DARK_BLUE);
-    set_sprite_color(6, 0, world_global->textures.wall, FG_DARK_RED);
-    set_sprite_color(7, 0, world_global->textures.wall, FG_RED);
-    set_sprite_color(0, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(1, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(2, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(3, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(4, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(5, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(6, 7, world_global->textures.wall, FG_RED);
-    set_sprite_color(7, 7, world_global->textures.wall, FG_RED);
+    load_sprite_from_file("wall1.spr", world_global->textures.wall);
     init_enemy_array(world_global, 5);
     return read_map_for_file();
 }
