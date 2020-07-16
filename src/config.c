@@ -31,7 +31,6 @@ void read_config_from_file(const char* filename) {
     FILE* cfg = fopen(filename,"r");
     char name_value[256];
     double value;
-    int counter = 0;
     while (1) {
         
         if (fscanf(cfg, "%s%lf", name_value, &value) == EOF) {
