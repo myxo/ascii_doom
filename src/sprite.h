@@ -15,6 +15,7 @@ void init_sprite(int width, int height, sprite_t* sprite);
 void deinit_sprite(sprite_t* sprite);
 
 short get_sprite_color(int x, int y, sprite_t* sprite);
+short sample_sprite_color(double x, double y, sprite_t* texture);
 void set_sprite_color(int x, int y, sprite_t* sprite, short color);
 
 void load_sprite_from_file(const char* filename, sprite_t* sprite);
