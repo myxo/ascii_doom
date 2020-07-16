@@ -1,6 +1,8 @@
 #ifndef WORLD_OBJECT_H_
 #define WORLD_OBJECT_H_
 
+#include "sprite.h"
+
 typedef struct {
     double x;
     double y;
@@ -78,5 +80,6 @@ double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle);
+void update_world_from_config();
 
 #endif

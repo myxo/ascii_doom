@@ -1,12 +1,11 @@
-#include "../third_party/olc/olc.h"
-#define _USE_MATH_DEFINES
+#include "olc/olc.h"
 
 #include "sprite.h"
-
 #include "world_object.h"
-
 #include "render.h"
+#include "config.h"
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
@@ -60,7 +59,7 @@ void draw_screen(world_t* world) {
     int threshold2 = 140;
     double d_angle = world->player.angle_of_vision / width;
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
-    double d_distance = 0.01;
+    double d_distance = get_config_value(kRayTraceStep);
     int row = 0;
     int bullet_row = 0;
     for (; ray_angle < world->player.angle + world->player.angle_of_vision / 2; ray_angle += d_angle) {
@@ -69,7 +68,6 @@ void draw_screen(world_t* world) {
         double distance = 0;
         double ray_sin = sin(ray_angle);
         double ray_cos = cos(ray_angle);
-        int is_bullet_on_screen = 0;
         int bullet_height = 0;
         while (!is_wall(x, y)) {
             x += d_distance * ray_sin;
@@ -90,8 +88,7 @@ void draw_screen(world_t* world) {
             if (is_wall(x - 0.2, y)) {
                 sprite_x = 1 - sprite_x;
             }
-        }
-        else {
+        } else {
             sprite_x = fabs(x - (int)(x));
             if (is_wall(x, y + 0.2)) {
                 sprite_x = 1 - sprite_x;
