@@ -8,6 +8,8 @@
 
 #include <math.h>
 
+#include <stdlib.h>
+
 void draw_enemies(int row, double distance) {
     int bullet_height = 60 / distance;
     for (int i = olc_screen_height() / 2 - bullet_height + 0.5; i < olc_screen_height() / 2 + bullet_height + 0.5; i++)
@@ -61,6 +63,7 @@ void draw_screen(world_t* world) {
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
             olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
+            world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
             if (i < threshold1) {
@@ -72,6 +75,7 @@ void draw_screen(world_t* world) {
             else {
                 olc_draw(row, i, 'X', FG_GREY);
             }
+            world->z_buffer[row][i] = MAX_BUFF;
         }
         x = world->player.pos.x;
         y = world->player.pos.y;
@@ -148,12 +152,13 @@ void draw_minimap(world_t* world) {
     }
 }
 
-void draw_sprite(sprite_t* sprite, int x, int y) {
+void draw_sprite(sprite_t* sprite, int x, int y, double distance) {
     for (int i = 0; i < sprite->width; i++) {
         for (int j = 0; j < sprite->height; j++) {
             char sym = get_sprite_glyph(i, j, sprite);
-            if (sym != ' ') {
+            if (sym != ' ' && distance < get_world()->z_buffer[i + x][j + y]) {
                 olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite));
+                get_world()->z_buffer[i + x][j + y] = distance;
             }
         }
     }
