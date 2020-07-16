@@ -2,6 +2,7 @@
 #define UI_H_
 
 typedef int (*update_t)(float);
+typedef int (*action_t)();
 
 typedef struct {
     int x;
@@ -10,6 +11,7 @@ typedef struct {
     int height;
     int is_active;
     char* label;
+    action_t action;
 } button_t;
 
 typedef struct {
@@ -18,9 +20,9 @@ typedef struct {
     update_t update;
 } canvas_t;
 
-void add_button(canvas_t* canvas, int x, int y, int width, int height, char* label);
 void deinit_canvas(canvas_t* canvas);
-canvas_t* init_canvas(update_t update);
+void add_button(canvas_t* canvas, int x, int y, int width, int height, char* label, action_t action);
+canvas_t* init_canvas();
 void draw_canvas(canvas_t* canvas);
 int get_active_button_id(canvas_t* canvas);
 void set_active_button_by_id(canvas_t* canvas, int index);

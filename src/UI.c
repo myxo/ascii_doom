@@ -1,11 +1,13 @@
 #include "../third_party/olc/olc.h"
 #include "UI.h"
 
-canvas_t* init_canvas(update_t update) {
+#include <cassert>
+#include <stdlib.h>
+
+canvas_t* init_canvas() {
     canvas_t* canvas = malloc(sizeof(canvas_t));
     canvas->buttons = malloc(sizeof(button_t));
     canvas->num_of_buttons = 0;
-    canvas->update = update;
     return canvas;
 }
 
@@ -14,7 +16,7 @@ void deinit_canvas(canvas_t* canvas) {
     free(canvas);
 }
 
-void add_button(canvas_t* canvas, int x, int y, int width, int height, char* label) {
+void add_button(canvas_t* canvas, int x, int y, int width, int height, char* label, action_t action) {
     canvas->buttons = realloc(canvas->buttons, ++canvas->num_of_buttons * sizeof(button_t));
     button_t button;
     button.x = x;
@@ -23,6 +25,7 @@ void add_button(canvas_t* canvas, int x, int y, int width, int height, char* lab
     button.height = height;
     button.label = label;
     button.is_active = 0;
+    button.action = action;
     canvas->buttons[canvas->num_of_buttons - 1] = button;
 }
 
@@ -38,7 +41,16 @@ void set_active_button_by_id(canvas_t* canvas, int index) {
     int prev = get_active_button_id(canvas);
     canvas->buttons[prev].is_active = 0;
     canvas->buttons[index].is_active = 1;
+
 }
+
+//void set_active_button_by_id(canvas_t* canvas, int index) {
+//    assert(index < canvas->num_of_buttons);
+//    assert(index >= 0);
+//    int prev = get_active_button_id(canvas);
+//    canvas->buttons[prev].is_active = 0;
+//    canvas->buttons[index].is_active = 1;
+//}
 
 void draw_canvas(canvas_t* canvas) {
     for (int i = 0; i < canvas->num_of_buttons; i++) {
