@@ -10,9 +10,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#include<time.h> 
+#include <time.h> 
 #include <windows.h>
-#include <stdio.h>
 #include <math.h>
 
 
@@ -73,8 +72,10 @@ void handle_input(float time_elapsed) {
 }
 
 int update(float time_elapsed) {
-	handle_input(time_elapsed);
     handle_config_ui_keypress();
+    update_world_from_config();
+
+	handle_input(time_elapsed);
 	if (stop) {
 		return 0;
 	}

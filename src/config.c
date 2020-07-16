@@ -20,8 +20,11 @@ typedef struct {
 
 config_description_t config_description[kConfigItemCount] = {
     {kPlayerSpeed, "player_speed"},
+    {kPlayerAngularSpeed, "player_angular_speed"},
     {kBulletSpeed, "bullet_speed"},
-    {kBulletRadius, "bullet_radius"}
+    {kBulletRadius, "bullet_radius"},
+    {kAngleOfView, "angle_of_view"},
+    {kRayTraceStep, "ray_trace_step"}
 };
 
 void read_config_from_file(const char* filename) {
@@ -63,16 +66,12 @@ double get_config_value(config_item_t item) {
 
 void draw_config_ui() {
     if (cfg_draw){
+        int x_start = olc_screen_width() / 6; // с небольшим отступом от левого края
         for (int i = 0; i < kConfigItemCount; i++) {
             char val[256];
             sprintf(val, "%s %lf", config_description[i].name, config_description[i].value);
-            if (i == number_value) {
-                olc_draw_string(0, i , val,FG_RED | BG_GREEN);
-            }
-            else {
-                olc_draw_string(0, i, val, FG_RED | BG_GREY);
-            }
-            
+            short color = FG_RED | ((i == number_value) ? BG_GREEN : BG_GREY);
+            olc_draw_string(x_start, i , val, color);
         }
     }
 }
