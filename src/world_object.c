@@ -224,6 +224,16 @@ int game_update(float time_elapsed) {
     return 1;
 }
 
+void move_active_button(canvas_t* canvas, int shift) {
+    int index = get_active_button_id(canvas);
+    index += shift;
+    index = index % canvas->num_of_buttons;
+    if (index < 0) {
+        index += canvas->num_of_buttons;
+    }
+    set_active_button_by_id(get_world()->game_layouts.main_menu, index);
+}
+
 void handle_menu_input(float time_elapsed) {
     if (olc_get_key(VK_ESCAPE).held) {
         get_world()->stop = 1;
@@ -231,10 +241,17 @@ void handle_menu_input(float time_elapsed) {
     if (olc_get_key(VK_SPACE).pressed) {
         get_active_button(get_world()->game_layouts.main_menu)->action();
     }
+    if (olc_get_key(VK_UP).pressed) {
+        move_active_button(get_world()->game_layouts.main_menu, 1);
+    }
+    if (olc_get_key(VK_DOWN).pressed) {
+        move_active_button(get_world()->game_layouts.main_menu, -1);
+    }
 }
 
 void init_main_menu(canvas_t* menu_canvas) {
     add_button(menu_canvas, olc_screen_width()/2 - 10, olc_screen_height() / 2 - 5 , 10, 5, "Play", action_to_game);
+    add_button(menu_canvas, olc_screen_width()/2 - 10, olc_screen_height() / 2 + 1, 10, 5, "Play", action_to_game);
     menu_canvas->buttons[0].is_active = 1;
 }
 

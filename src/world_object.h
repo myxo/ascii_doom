@@ -91,6 +91,8 @@ void handle_input_game(float time_elapsed);
 
 int game_update(float time_elapsed);
 
+void move_active_button();
+
 void handle_menu_input(float time_elapsed);
 
 void init_main_menu(canvas_t* menu_canvas);
