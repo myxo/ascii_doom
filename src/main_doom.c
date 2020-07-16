@@ -1,4 +1,7 @@
 #include "olc/olc.h"
+
+#include "sprite.h"
+
 #include "world_object.h"
 #include "render.h"
 #include "logging.h"
@@ -90,7 +93,7 @@ int main() {
 		return 0;
 	}
 	olc_register_create(&create);
-	olc_register_update(&update);
+    olc_register_update(&update);
 
     olc_start(); // block until update return 0
     olc_deinitialize();

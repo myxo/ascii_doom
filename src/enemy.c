@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 
+#include "sprite.h"
 #include "world_object.h"
 #include "bullet.h"
 
