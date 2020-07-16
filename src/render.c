@@ -151,7 +151,10 @@ void draw_minimap(world_t* world) {
 void draw_sprite(sprite_t* sprite, int x, int y) {
     for (int i = 0; i < sprite->width; i++) {
         for (int j = 0; j < sprite->height; j++) {
-            olc_draw(i + x, j + y, '#', get_sprite_color(i, j, sprite));
+            char sym = get_sprite_glyph(i, j, sprite);
+            if (sym != ' ') {
+                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite));
+            }
         }
     }
 }
