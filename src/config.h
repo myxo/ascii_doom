@@ -4,7 +4,8 @@
 typedef enum  {
     kPlayerSpeed,
     kBulletSpeed,
-    kBulletRadius
+    kBulletRadius,
+    kConfigItemCount
 }config_item_t;
 
 double get_config_value(config_item_t item);
