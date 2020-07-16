@@ -43,7 +43,6 @@ int init_world_object() {
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
     load_sprite_from_file("wall1.spr", world_global->textures.wall);
-    set_sprite_color(2, 3, world_global->textures.wall, FG_RED);
     init_enemy_array(world_global, 5);
     return read_map_for_file();
 }

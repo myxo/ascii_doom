@@ -60,7 +60,7 @@ void draw_screen(world_t* world) {
         }
         else {
             sprite_x = fabs(x - (int)(x));
-            if (is_wall(x, y - 0.2)) {
+            if (is_wall(x, y + 0.2)) {
                 sprite_x = 1 - sprite_x;
             }
         }
