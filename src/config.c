@@ -18,7 +18,7 @@ typedef struct {
     double value;
 } config_description_t;
 
-config_description_t config_description[3] = {
+config_description_t config_description[kConfigItemCount] = {
     {kPlayerSpeed, "player_speed"},
     {kBulletSpeed, "bullet_speed"},
     {kBulletRadius, "bullet_radius"}
