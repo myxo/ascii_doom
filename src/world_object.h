@@ -1,11 +1,18 @@
 #ifndef WORLD_OBJECT_H_
 #define WORLD_OBJECT_H_
 
+#include "sprite.h"
+
 typedef struct {
     double x;
     double y;
 } point_t;
 
+typedef struct {
+    point_t* array;
+    int len;
+    int capacity;
+} point_array_t;
 
 typedef struct {
     int health;
@@ -39,7 +46,9 @@ typedef struct {
 typedef struct {
     int health;
     point_t pos;
-    point_t target;
+    point_t global_target;
+    point_array_t path;
+    int local_target_id;
     double angle_of_vision;
     double angle;
     double speed;
@@ -78,5 +87,7 @@ double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle);
+point_array_t init_point_array(int capacity);
+void increase_arr_point_capacity(point_array_t* point_array);
 
 #endif

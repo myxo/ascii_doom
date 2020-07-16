@@ -26,6 +26,18 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+point_array_t init_point_array(int capacity) {
+    point_array_t array;
+    array.capacity = capacity;
+    array.len = 0;
+    array.array = malloc(array.capacity * sizeof(point_t));
+    return array;
+}
+
+void increase_arr_point_capacity(point_array_t* point_array) {
+    point_array->capacity = point_array->capacity * 2;
+    point_array->array = realloc(point_array->array, point_array->capacity * sizeof(point_t));
+}
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
@@ -62,11 +74,9 @@ world_t* get_world() {
 }
 
 int is_wall(double x, double y) {
-    if (x < 0 || y < 0)
-        return 1;
-    if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
-        return 1;
-    return world_global->map[(int)x][(int)y] == '#';
+    if (x > 0 && y > 0 && (int)x < get_world()->map_height && (int)y < get_world()->map_width)
+        return world_global->map[(int)x][(int)y] == '#';
+    return 1;
 }
 
 int read_map_for_file() {

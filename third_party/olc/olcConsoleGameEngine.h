@@ -450,7 +450,7 @@ public:
 	void DrawString(int x, int y, std::wstring c, short col = 0x000F)
 	{
 		for (size_t i = 0; i < c.size(); i++)
-		{
+		{ 
 			m_bufScreen[y * m_nScreenWidth + x + i].Char.UnicodeChar = c[i];
 			m_bufScreen[y * m_nScreenWidth + x + i].Attributes = col;
 		}
