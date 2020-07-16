@@ -5,7 +5,11 @@ typedef struct {
     int width;
     int height;
     short* colours;
+    char* glyphs;
 } sprite_t;
+
+char get_sprite_glyph(int x, int y, sprite_t* sprite);
+void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph);
 
 void init_sprite(int width, int height, sprite_t* sprite);
 void deinit_sprite(sprite_t* sprite);
