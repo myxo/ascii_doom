@@ -26,6 +26,7 @@ PRIVATE
     src/sprite.c
     src/player.c
     src/structs_of_data.c
+    src/config.c 
 )
 
 add_executable(sprite_editor)
@@ -36,6 +37,8 @@ PRIVATE
 	src/sprite.c
 )
 
+configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/res/cfg.txt
+				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(GLOB resource_files "res/*")
 file(COPY ${resource_files} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

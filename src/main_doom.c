@@ -1,7 +1,6 @@
 #include "olc/olc.h"
-
+#include "config.h"
 #include "sprite.h"
-
 #include "world_object.h"
 #include "render.h"
 #include "logging.h"
@@ -9,22 +8,24 @@
 #include "enemy.h"
 #include "player.h"
 
-#include<time.h> 
-#include <windows.h>
+#include <string.h>
 #include <stdio.h>
+#include <time.h> 
+#include <windows.h>
 #include <math.h>
 
 
 int width =  200;
-int height = 100;
+int height = 150;
 int glyph_size =  8;
-
+const char config_filename[50] = "cfg.txt";
 int stop = 0;
 
 double time_from_last_shot = 0;
 
 
 int create() {
+    read_config_from_file(config_filename);
     if (init_world_object() == 0) {
         return 0;
     }
@@ -71,6 +72,9 @@ void handle_input(float time_elapsed) {
 }
 
 int update(float time_elapsed) {
+    handle_config_ui_keypress();
+    update_world_from_config();
+
 	handle_input(time_elapsed);
 	if (stop) {
 		return 0;
@@ -85,6 +89,7 @@ int update(float time_elapsed) {
 	draw_screen(get_world());
     draw_minimap(get_world());
     display_watch();
+    draw_config_ui();
 	return 1;
 }
 
