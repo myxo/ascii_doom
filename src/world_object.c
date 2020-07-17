@@ -1,14 +1,13 @@
 #define _USE_MATH_DEFINES
-#include "sprite.h"
 
 #include "olc/olc.h"
 
 #include "world_object.h"
+#include "sprite.h"
+#include "config.h"
 
 #include <stdlib.h>
-
 #include <stdio.h>
-
 #include <math.h>
 
 world_t* world_global = NULL;
@@ -29,21 +28,22 @@ void init_enemy_array(world_t* world, int capacity) {
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
+    update_world_from_config();
+
     world_global->player.health = 3;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
-    world_global->player.speed = 2.5;
-    world_global->player.angle_of_vision = M_PI_4;
     world_global->player.radius = 0.2;
-    world_global->player.angular_speed = 1.2;
-    init_bullet_array(world_global, 5);
+
     world_global->textures.wall = malloc(sizeof(sprite_t));
     world_global->textures.bullet = malloc(sizeof(sprite_t));
     init_z_buffer();
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
     load_sprite_from_file("wall1.spr", world_global->textures.wall);
+
+    init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
     return read_map_for_file();
 }
@@ -167,11 +167,9 @@ double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
     return sqrt(pow(pos2.x - pos1.x, 2) + pow(pos2.y - pos1.y, 2));
 }
 
-int has_wall_between(point_t pos1, point_t pos2) {
+int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance) {
     double x = pos1.x;
     double y = pos1.y;
-    double angle = get_angle_from_pos1_to_pos2(pos1, pos2);
-    double d_distance = 0.01;
     while (!is_wall(x, y)) {
         x += d_distance * sin(angle);
         y += d_distance * cos(angle);
@@ -181,4 +179,15 @@ int has_wall_between(point_t pos1, point_t pos2) {
         }
     }
     return 1;
+}
+
+
+int has_wall_between(point_t pos1, point_t pos2) {
+    return has_wall_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);
+}
+
+void update_world_from_config() {
+    world_global->player.speed = get_config_value(kPlayerSpeed);
+    world_global->player.angle_of_vision = get_config_value(kAngleOfView);
+    world_global->player.angular_speed = get_config_value(kPlayerAngularSpeed);
 }

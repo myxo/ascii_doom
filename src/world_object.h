@@ -2,6 +2,8 @@
 #define WORLD_OBJECT_H_
 #define MAX_BUFF 2500
 
+#include "sprite.h"
+
 typedef struct {
     double x;
     double y;
@@ -80,6 +82,7 @@ point_t get_rand_pos_on_floor(world_t* world);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
-
+int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle);
+void update_world_from_config();
 
 #endif

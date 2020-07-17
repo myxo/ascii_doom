@@ -1,7 +1,6 @@
 #include "olc/olc.h"
-
+#include "config.h"
 #include "sprite.h"
-
 #include "world_object.h"
 #include "render.h"
 #include "logging.h"
@@ -9,22 +8,24 @@
 #include "enemy.h"
 #include "player.h"
 
-#include<time.h> 
-#include <windows.h>
+#include <string.h>
 #include <stdio.h>
+#include <time.h> 
+#include <windows.h>
 #include <math.h>
 
 
 int width =  200;
 int height = 150;
 int glyph_size =  8;
-
+const char config_filename[50] = "cfg.txt";
 int stop = 0;
 
 double time_from_last_shot = 0;
 
 
 int create() {
+    read_config_from_file(config_filename);
     if (init_world_object() == 0) {
         return 0;
     }
@@ -33,6 +34,7 @@ int create() {
 }
 
 void handle_player_movement(float time_elapsed) {
+    point_t move_vec = {0, 0};
     if (olc_get_key(VK_LEFT).held) {
         turn_player(-1, time_elapsed);
     }
@@ -40,17 +42,18 @@ void handle_player_movement(float time_elapsed) {
         turn_player(1, time_elapsed);
     }
     if (olc_get_key('W').held) {
-        move_player(1, 0, time_elapsed);
+        move_vec.x += 1;
     }
     if (olc_get_key('A').held) {
-        move_player(0, -1, time_elapsed);
+        move_vec.y -= 1;
     }
     if (olc_get_key('S').held) {
-        move_player(-1, 0, time_elapsed);
+        move_vec.x -= 1;
     }
     if (olc_get_key('D').held) {
-        move_player(0, 1, time_elapsed);
+        move_vec.y += 1;
     }
+    move_player(move_vec.x, move_vec.y, time_elapsed);
     time_from_last_shot += time_elapsed;
     if (olc_get_key(VK_SPACE).pressed) {
         if (time_from_last_shot >= 0.5) {
@@ -69,6 +72,9 @@ void handle_input(float time_elapsed) {
 }
 
 int update(float time_elapsed) {
+    handle_config_ui_keypress();
+    update_world_from_config();
+
 	handle_input(time_elapsed);
 	if (stop) {
 		return 0;
@@ -84,6 +90,7 @@ int update(float time_elapsed) {
     draw_minimap(get_world());
     draw_sprite(get_world()->textures.wall, 50, 90, 1);
     display_watch();
+    draw_config_ui();
 	return 1;
 }
 

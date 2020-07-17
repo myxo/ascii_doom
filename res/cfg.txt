@@ -1,0 +1,6 @@
+player_speed 2.5
+player_angular_speed 1.2
+bullet_speed 2
+bullet_radius 0.01
+angle_of_view 1.25
+ray_trace_step 0.01
