@@ -3,6 +3,7 @@
 #include "olc/olc.h"
 
 #include "world_object.h"
+#include "weapon.h"
 #include "sprite.h"
 #include "config.h"
 
@@ -38,6 +39,8 @@ int init_world_object() {
 
     world_global->textures.wall = malloc(sizeof(sprite_t));
     world_global->textures.bullet = malloc(sizeof(sprite_t));
+    world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
+    init_std_weapon_list(world_global->weapon_list);
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
     load_sprite_from_file("wall1.spr", world_global->textures.wall);

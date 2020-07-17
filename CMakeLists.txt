@@ -12,7 +12,7 @@ PUBLIC
 PRIVATE
     third_party/olc/lib.cpp
     third_party/olc/olcConsoleGameEngine.h
-)
+ "src/weapon.h")
 
 add_executable(ascii_doom)
 target_sources(ascii_doom
@@ -26,7 +26,8 @@ PRIVATE
     src/sprite.c
     src/player.c
     src/config.c 
-)
+    src/weapon.c
+ "src/weapon.h")
 
 add_executable(sprite_editor)
 target_sources(sprite_editor
@@ -34,7 +35,7 @@ PRIVATE
 	src/sprite_editor.c
 	src/sprite.h
 	src/sprite.c
-)
+ "src/weapon.h")
 
 configure_file(	${CMAKE_CURRENT_SOURCE_DIR}/res/cfg.txt
 				${CMAKE_CURRENT_BINARY_DIR} COPYONLY)

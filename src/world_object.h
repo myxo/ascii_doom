@@ -8,7 +8,6 @@ typedef struct {
     double y;
 } point_t;
 
-
 typedef struct {
     int health;
     point_t pos;
@@ -18,20 +17,6 @@ typedef struct {
     double angular_speed;
     double radius;
 } player_t;
-
-typedef struct {
-    point_t pos;
-    double angle;
-    double speed;
-    double radius;
-    int host;
-} bullet_t;
-
-typedef struct {
-    bullet_t* array;
-    int len;
-    int capacity;
-} bullet_array_t;
 
 typedef struct {
     sprite_t* wall;
@@ -54,17 +39,55 @@ typedef struct {
     int len;
     int capacity;
 } enemy_array_t;
+typedef enum bullet_host {
+    kBulletPlayer,
+    kBulletEnemy
+} bullet_host_t;
+
+typedef struct {
+    sprite_t sprite;
+    bullet_host_t host;
+    int is_active;
+    int is_burst_fire;
+    int burst_size;
+    int shot_made_in_burst;
+    double fire_rate_in_burst;
+    double fire_rate;
+    double damage;
+    double time_since_last_shoot;
+    double shot_delay;
+} weapon_t;
+
+typedef struct {
+    weapon_t* pistol;
+    weapon_t* rifle;
+} std_weapon_list_t;
+
+typedef struct {
+    point_t pos;
+    double angle;
+    double speed;
+    double radius;
+    int host;
+    double damage;
+} bullet_t;
+
+typedef struct {
+    bullet_t* array;
+    int len;
+    int capacity;
+} bullet_array_t;
 
 typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
     enemy_array_t enemy_array;
+    std_weapon_list_t* weapon_list;
     int map_width;
     int map_height;
     game_textures_t textures;
 } world_t;
-
 
 int init_world_object();
 void deinit_world_object();
