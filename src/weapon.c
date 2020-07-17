@@ -15,6 +15,7 @@ void shoot_from_weapon(weapon_t* weapon) {
         double time_delay;
         if (weapon->time_since_last_shoot > 1 / weapon->fire_rate_in_burst + 0.1) {
             weapon->shot_delay = 1 / weapon->fire_rate;
+            weapon->shot_made_in_burst = 0;
         }
         if (weapon->time_since_last_shoot >= weapon->shot_delay) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
