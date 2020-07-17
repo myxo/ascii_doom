@@ -88,7 +88,7 @@ void enemy_destruct(world_t* world, int index) {
     world->enemy_array.len--;
 }
 
-void enemy_hit(world_t* world, int index, int damage) {
+void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);

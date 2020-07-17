@@ -1,5 +1,6 @@
 #ifndef WORLD_OBJECT_H_
 #define WORLD_OBJECT_H_
+#define MAX_BUFF 2500
 
 #include "sprite.h"
 
@@ -86,11 +87,13 @@ typedef struct {
     std_weapon_list_t* weapon_list;
     int map_width;
     int map_height;
+    double** z_buffer;
     game_textures_t textures;
 } world_t;
 
 int init_world_object();
 void deinit_world_object();
+void init_z_buffer();
 world_t* get_world();
 int read_map_for_file();
 int is_in_circle(point_t pos, point_t circle_center, double radius);

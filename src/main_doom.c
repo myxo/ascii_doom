@@ -90,6 +90,7 @@ int update(float time_elapsed) {
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
+    draw_sprite(get_world()->textures.wall, 50, 90, 1);
     display_watch();
     draw_config_ui();
 	return 1;
