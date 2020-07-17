@@ -45,7 +45,7 @@ int init_world_object() {
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
-    world_global->player.speed = 2.5;
+    world_global->player.speed = 5;
     world_global->player.angle_of_vision = M_PI_4;
     world_global->player.radius = 0.2;
     world_global->player.angular_speed = 1.2;

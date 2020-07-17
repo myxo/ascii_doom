@@ -80,14 +80,6 @@ int update(float time_elapsed) {
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
-    //add_watch("tar x", get_world()->enemy_array.array[0].global_target.x);
-    //add_watch("tar y", get_world()->enemy_array.array[0].global_target.y);
-    //add_watch("pos en x", get_world()->enemy_array.array[0].pos.x);
-    //add_watch("pos en y", get_world()->enemy_array.array[0].pos.y);
-    //add_watch("path[l] x", get_world()->enemy_array.array[0].path.array[get_world()->enemy_array.array[0].local_target_id].x);
-    //add_watch("path[l] y", get_world()->enemy_array.array[0].path.array[get_world()->enemy_array.array[0].local_target_id].y);
-    //add_watch("pl en x", get_world()->player.pos.x);
-    //add_watch("pl en y", get_world()->player.pos.y);
     bullets_movement(get_world(), time_elapsed);
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());

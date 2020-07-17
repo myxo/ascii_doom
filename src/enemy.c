@@ -22,8 +22,11 @@ point_t get_new_forward_pos(point_t pos, double angle, double time_elapsed, doub
 }
 
 point_array_t build_path(enemy_t* enemy) {
+    point_t temp;
+    temp.x = (int)enemy->pos.x;
+    temp.y = (int)enemy->pos.y;
     point_queue_t q = point_queue_init();
-    point_queue_push_back(&q, enemy->pos);
+    point_queue_push_back(&q, temp);
     int** used = malloc(get_world()->map_width * sizeof(int*));
     for (int i = 0; i < get_world()->map_width; i++) {
         used[i] = malloc(get_world()->map_height * sizeof(int));
@@ -73,8 +76,8 @@ point_array_t build_path(enemy_t* enemy) {
     point_array_t path = init_point_array(reverse_path.len);
     for (int i = 0; i < reverse_path.len; i++) {
         point_t temp = reverse_path.array[reverse_path.len - 1 - i];
-        //temp.x = temp.x + 0.5;
-        //temp.y = temp.y + 0.5;
+        temp.x = temp.x + 0.5;
+        temp.y = temp.y + 0.5;
         path.array[i] = temp;
         path.len++;
     }
@@ -129,6 +132,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 }
                 enemy->global_target = world->player.pos;
                 enemy->path = build_path(enemy);
+                enemy->local_target_id = 0;
             }
         }
         if (update_position) {
@@ -136,7 +140,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->pos = new_pos;
             }
-            if (!is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
+            if (is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->local_target_id++;
             }
         }
