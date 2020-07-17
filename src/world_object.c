@@ -41,7 +41,7 @@ int init_world_object() {
     init_z_buffer();
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
-    load_sprite_from_file("wall1.spr", world_global->textures.wall);
+    load_sprite_from_file("wall1.spr", world_global->textures.wall, 0);
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);

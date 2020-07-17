@@ -118,7 +118,7 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
+            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
@@ -188,12 +188,12 @@ void draw_minimap(world_t* world) {
     }
 }
 
-void draw_sprite(sprite_t* sprite, int x, int y, double distance) {
-    for (int i = 0; i < sprite->width; i++) {
-        for (int j = 0; j < sprite->height; j++) {
-            char sym = get_sprite_glyph(i, j, sprite);
+void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {
+    for (int i = 0; i < sprite->texture[texture_index].width; i++) {
+        for (int j = 0; j < sprite->texture[texture_index].height; j++) {
+            char sym = get_sprite_glyph(i, j, sprite, texture_index);
             if (sym != ' ' && distance < get_world()->z_buffer[i + x][j + y]) {
-                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite));
+                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite, texture_index));
                 get_world()->z_buffer[i + x][j + y] = distance;
             }
         }

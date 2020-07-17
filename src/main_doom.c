@@ -16,7 +16,7 @@
 
 
 int width =  200;
-int height = 150;
+int height = 80;
 int glyph_size =  8;
 const char config_filename[50] = "cfg.txt";
 int stop = 0;
@@ -88,7 +88,7 @@ int update(float time_elapsed) {
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
-    draw_sprite(get_world()->textures.wall, 50, 90, 1);
+    draw_sprite(get_world()->textures.wall, 50, 90, 1, 0);
     display_watch();
     draw_config_ui();
 	return 1;
