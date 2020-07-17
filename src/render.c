@@ -30,11 +30,25 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     if (start_player_view_angle_floor_PI < 0)
         start_player_view_angle_floor_PI += 2 * M_PI;
     int row_left = olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    if (row_left < 0)
+        row_left = 0;
+    if (row_left > olc_screen_width())
+        row_left = olc_screen_width();
     int row_right = olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    if (row_right > olc_screen_width())
+        row_right = olc_screen_width();
+    if (row_right < 0)
+        row_right = 0;
     obj_height = obj_height / distance;
     for (int i = row_left; i <= row_right; i++)
-        for (int j = olc_screen_height() / 2 - obj_height + 0.5; j < olc_screen_height() / 2 + obj_height + 0.5; j++)
-            olc_draw(i, j, ch, col);
+        for (int j = olc_screen_height() / 2 - obj_height + 0.5; j < olc_screen_height() / 2 + obj_height + 0.5; j++) {
+            if (j > olc_screen_height())
+                j = olc_screen_height();
+            if (j < 0)
+                j = olc_screen_height() / 2 - obj_height + 0.5;
+            if (distance < get_world()->z_buffer[i][j])
+                olc_draw(i, j, ch, col);
+        }
 }
 
 void draw_enemies(world_t* world) {
@@ -94,6 +108,9 @@ void draw_screen(world_t* world) {
             if (is_wall(x, y + 0.2)) {
                 sprite_x = 1 - sprite_x;
             }
+        }
+        for (int i = 0; i < ceiling_level; i++) {
+            world->z_buffer[row][i] = MAX_BUFF;
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
