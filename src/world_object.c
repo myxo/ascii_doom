@@ -38,6 +38,7 @@ int init_world_object() {
 
     world_global->textures.wall = malloc(sizeof(sprite_t));
     world_global->textures.bullet = malloc(sizeof(sprite_t));
+    init_z_buffer();
     init_sprite(8, 8, world_global->textures.wall);
     init_sprite(8, 8, world_global->textures.bullet);
     load_sprite_from_file("wall1.spr", world_global->textures.wall);
@@ -55,6 +56,25 @@ void deinit_world_object() {
     deinit_sprite(world_global->textures.wall);
     deinit_sprite(world_global->textures.bullet);
     free(world_global);
+}
+
+void init_z_buffer() {
+    world_global->z_buffer = calloc(olc_screen_width(), (olc_screen_width() + 1) * sizeof(double*));
+    for (int i = 0; i <= olc_screen_width(); i++) {
+        world_global->z_buffer[i] = calloc(olc_screen_height(), (olc_screen_height() + 1) * sizeof(double));
+    }
+    for (int i = 0; i < olc_screen_width(); i++) {
+        for (int j = 0; j < olc_screen_height(); j++) {
+            world_global->z_buffer[i][j] = MAX_BUFF;
+        }
+    }
+}
+
+void deinit_z_buffer() {
+    for (int i = 0; i < olc_screen_width; i++) {
+        free(world_global->z_buffer[i]);
+    }
+    free(world_global->z_buffer);
 }
 
 world_t* get_world() {
