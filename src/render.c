@@ -48,8 +48,10 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
         draw_start = 0;
     for (int i = row_left; i <= row_right; i++)
         for (int j = draw_start; j < draw_end; j++) {
-            if (distance < get_world()->z_buffer[i][j])
+            if (distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, ch, col);
+                get_world()->z_buffer[i][j] = distance;
+            }
         }
 }
 
