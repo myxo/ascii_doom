@@ -40,12 +40,14 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     if (row_right < 0)
         row_right = 0;
     obj_height = obj_height / distance;
+    int draw_start = olc_screen_height() / 2 - obj_height + 0.5;
+    int draw_end = olc_screen_height() / 2 + obj_height + 0.5;
+    if (draw_end > olc_screen_height())
+        draw_end = olc_screen_height();
+    if (draw_start < 0)
+        draw_start = 0;
     for (int i = row_left; i <= row_right; i++)
-        for (int j = olc_screen_height() / 2 - obj_height + 0.5; j < olc_screen_height() / 2 + obj_height + 0.5; j++) {
-            if (j > olc_screen_height())
-                j = olc_screen_height();
-            if (j < 0)
-                j = olc_screen_height() / 2 - obj_height + 0.5;
+        for (int j = draw_start; j < draw_end; j++) {
             if (distance < get_world()->z_buffer[i][j])
                 olc_draw(i, j, ch, col);
         }
