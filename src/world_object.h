@@ -12,6 +12,7 @@ typedef struct {
 
 typedef struct {
     int health;
+    int maxhealth;
     point_t pos;
     double angle_of_vision;
     double angle;

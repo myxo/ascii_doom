@@ -95,29 +95,22 @@ void save_texture_to_file(const char* filename, texture_t* texture) {
     fclose(file);
 }
 
-void init_sprite(int width, int height, sprite_t* sprite) {
-    texture_t texture;
-    init_texture(width, height, &texture);
+void init_sprite(sprite_t* sprite) {
     sprite->capacity = 1;
-    sprite->texture_count = 1;
-    int len = height * width;
-    sprite->texture_size = sizeof(int) * 2 + sizeof(short) * len + sizeof(char) * len;
-    sprite->texture = malloc(sprite->texture_size * sprite->capacity);
-    sprite->texture[0] = texture;
-    deinit_texture(&texture);
+    sprite->texture_count = 0;
+    sprite->texture = calloc(sizeof(texture_t), sprite->capacity);
 }
 
 void deinit_sprite(sprite_t* sprite) {
     free(sprite->texture);
     sprite->capacity = 0;
     sprite->texture_count = 0;
-    sprite->texture_size = 0;
 }
 
 void attach_texture_to_sprite(sprite_t* sprite, texture_t texture) {
     if (sprite->texture_count >= sprite->capacity) {
         sprite->capacity *= 2;
-        sprite->texture = realloc(sprite->texture, sprite->texture_size * sprite->capacity);
+        sprite->texture = realloc(sprite->texture, sizeof(texture_t) * sprite->capacity);
     }
     sprite->texture[sprite->texture_count] = texture;
     sprite->texture_count++;

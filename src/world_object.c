@@ -31,6 +31,7 @@ int init_world_object() {
     update_world_from_config();
 
     world_global->player.health = 3;
+    world_global->player.maxhealth = world_global->player.health;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
@@ -39,9 +40,9 @@ int init_world_object() {
     world_global->textures.wall = malloc(sizeof(sprite_t));
     world_global->textures.bullet = malloc(sizeof(sprite_t));
     init_z_buffer();
-    init_sprite(8, 8, world_global->textures.wall);
-    init_sprite(8, 8, world_global->textures.bullet);
-    load_sprite_from_file("wall1.spr", world_global->textures.wall, 0);
+    init_sprite(world_global->textures.wall);
+    init_sprite(world_global->textures.bullet);
+    load_sprite_from_file("wall1.spr", world_global->textures.wall, -1);
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);

@@ -9,7 +9,6 @@ typedef struct {
 } texture_t;
 
 typedef struct {
-    int texture_size;
     int texture_count;
     int capacity;
     texture_t* texture;
@@ -28,7 +27,7 @@ void set_texture_color(int x, int y, texture_t* texture, short color);
 void load_texture_from_file(const char* filename, texture_t* texture);
 void save_texture_to_file(const char* filename, texture_t* texture);
 
-void init_sprite(int width, int height, sprite_t* sprite);
+void init_sprite(sprite_t* sprite);
 void deinit_sprite(sprite_t* sprite);
 void attach_texture_to_sprite(sprite_t* sprite, texture_t texture);
 

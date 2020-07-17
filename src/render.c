@@ -188,6 +188,15 @@ void draw_minimap(world_t* world) {
     }
 }
 
+void draw_hp(world_t* world) {
+    int height = olc_screen_height() / 8;
+    int width = olc_screen_width() / 3;
+    world->player.health;
+    double hp1 = (world->player.health * width) / world->player.maxhealth;
+    olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), '@', BG_RED);
+    olc_fill(0, olc_screen_height() - height, round(hp1), olc_screen_height(), '#', BG_GREEN + FG_WHITE);
+}
+
 void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {
     for (int i = 0; i < sprite->texture[texture_index].width; i++) {
         for (int j = 0; j < sprite->texture[texture_index].height; j++) {
