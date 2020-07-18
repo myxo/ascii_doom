@@ -7,6 +7,7 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "player.h"
+#include "map_generator.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -16,7 +17,7 @@
 
 
 int width =  200;
-int height = 150;
+int height = 100;
 int glyph_size =  8;
 const char config_filename[50] = "cfg.txt";
 int stop = 0;
@@ -30,6 +31,7 @@ int create() {
         return 0;
     }
     log_init("debug.txt");
+    init_graph_of_rooms();
     return 1;
 }
 

@@ -27,6 +27,7 @@ PRIVATE
     src/player.c
     src/structs_of_data.c
     src/config.c 
+    src/map_generator.c
 )
 
 add_executable(sprite_editor)
