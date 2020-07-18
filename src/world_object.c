@@ -61,6 +61,7 @@ void deinit_world_object() {
     deinit_sprite(world_global->sprites.wall);
     //deinit_sprite(world_global->sprites.bullet);
     deinit_texture(&world_global->textures.wall);
+    deinit_z_buffer();
     free(world_global);
 }
 
@@ -77,7 +78,7 @@ void init_z_buffer() {
 }
 
 void deinit_z_buffer() {
-    for (int i = 0; i < olc_screen_width; i++) {
+    for (int i = 0; i < olc_screen_width(); i++) {
         free(world_global->z_buffer[i]);
     }
     free(world_global->z_buffer);
