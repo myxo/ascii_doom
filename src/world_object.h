@@ -36,9 +36,15 @@ typedef struct {
 } bullet_array_t;
 
 typedef struct {
+    texture_t wall;
+    texture_t bullet;
+} game_textures_t;
+
+typedef struct {
     sprite_t* wall;
     sprite_t* bullet;
-} game_textures_t;
+} game_sprites_t;
+
 
 typedef struct {
     int health;
@@ -66,6 +72,7 @@ typedef struct {
     int map_height;
     double** z_buffer;
     game_textures_t textures;
+    game_sprites_t sprites;
 } world_t;
 
 
