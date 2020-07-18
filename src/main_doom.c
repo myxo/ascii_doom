@@ -89,9 +89,6 @@ int update(float time_elapsed) {
 	draw_screen(get_world());
     draw_minimap(get_world());
     draw_hp(get_world());
-    if (get_world()->textures.wall->texture_count != 0) {
-        draw_sprite(get_world()->textures.wall, 50, 90, 1, 0);
-    }
     display_watch();
     draw_config_ui();
 	return 1;

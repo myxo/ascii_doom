@@ -5,5 +5,6 @@ void draw_screen(world_t* world);
 void draw_minimap(world_t* world);
 
 void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index);
+void draw_hp(world_t* world);
 
 #endif // !RENDER

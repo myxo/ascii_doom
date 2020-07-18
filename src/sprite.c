@@ -136,19 +136,3 @@ void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph, int texture_in
     assert(texture_index < sprite->texture_count);
     set_texture_glyph(x, y, &sprite->texture[texture_index], glyph, texture_index);
 }
-void load_sprite_from_file(const char* filename, sprite_t* sprite, int texture_index) {
-    assert(texture_index < sprite->texture_count);
-    texture_t texture;
-    load_texture_from_file(filename, &texture);
-    if (texture_index == -1) {
-        attach_texture_to_sprite(sprite, texture);
-    }
-    else {
-        sprite->texture[texture_index] = texture;
-    }
-}
-void save_sprite_to_file(const char* filename, sprite_t* sprite, int texture_index) {
-    assert(texture_index < sprite->texture_count);
-    save_texture_to_file(filename, &sprite->texture[texture_index]);
-}
-

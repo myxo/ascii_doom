@@ -36,6 +36,5 @@ short sample_sprite_color(double x, double y, sprite_t* sprite, int texture_inde
 void set_sprite_color(int x, int y, sprite_t* sprite, short color, int texture_index);
 char get_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index);
 void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph, int texture_index);
-void load_sprite_from_file(const char* filename, sprite_t* sprite, int texture_index);
-void save_sprite_to_file(const char* filename, sprite_t* sprite, int texture_index);
+
 #endif

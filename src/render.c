@@ -118,7 +118,7 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall, 0));
+            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
@@ -193,8 +193,8 @@ void draw_hp(world_t* world) {
     int width = olc_screen_width() / 3;
     world->player.health;
     double hp1 = (world->player.health * width) / world->player.maxhealth;
-    olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), '@', BG_RED);
-    olc_fill(0, olc_screen_height() - height, round(hp1), olc_screen_height(), '#', BG_GREEN + FG_WHITE);
+    olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
+    olc_fill(0, olc_screen_height() - height, round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
 
 void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {
