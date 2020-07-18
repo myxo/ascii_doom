@@ -1198,7 +1198,10 @@ protected: // Audio Engine =====================================================
 	// Static wrapper for sound card handler
 	static void CALLBACK waveOutProcWrap(HWAVEOUT hWaveOut, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 	{
-		((olcConsoleGameEngine*)dwInstance)->waveOutProc(hWaveOut, uMsg, dwParam1, dwParam2);
+#pragma warning(push)
+#pragma warning(disable: 4312) // conversion from 'DWORD' to 'olc::olcConsoleGameEngine *' of greater size
+		(reinterpret_cast<olcConsoleGameEngine*>(dwInstance))->waveOutProc(hWaveOut, uMsg, dwParam1, dwParam2);
+#pragma warning(pop)
 	}
 
 	// Audio thread. This loop responds to requests from the soundcard to fill 'blocks'

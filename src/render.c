@@ -8,7 +8,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
@@ -29,19 +28,19 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
     if (start_player_view_angle_floor_PI < 0)
         start_player_view_angle_floor_PI += 2 * M_PI;
-    int row_left = olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    int row_left = (int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (row_left < 0)
         row_left = 0;
     if (row_left > olc_screen_width())
         row_left = olc_screen_width();
-    int row_right = olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    int row_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (row_right > olc_screen_width())
         row_right = olc_screen_width();
     if (row_right < 0)
         row_right = 0;
-    obj_height = obj_height / distance;
-    int draw_start = olc_screen_height() / 2 - obj_height + 0.5;
-    int draw_end = olc_screen_height() / 2 + obj_height + 0.5;
+    obj_height = (int)(obj_height / distance);
+    int draw_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
+    int draw_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
     if (draw_end > olc_screen_height())
         draw_end = olc_screen_height();
     if (draw_start < 0)
@@ -93,7 +92,7 @@ void draw_screen(world_t* world) {
             y += d_distance * ray_cos;
             distance += d_distance;
         }
-        int num_of_wall_sym = height * (1 / (distance));
+        int num_of_wall_sym = (int)(height * (1 / (distance)));
         if (num_of_wall_sym > height)
             num_of_wall_sym = height;
         int ceiling_level = (height - num_of_wall_sym) / 2;
@@ -194,7 +193,7 @@ void draw_hp(world_t* world) {
     world->player.health;
     double hp1 = (world->player.health * width) / world->player.maxhealth;
     olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
-    olc_fill(0, olc_screen_height() - height, round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
+    olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
 
 void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {

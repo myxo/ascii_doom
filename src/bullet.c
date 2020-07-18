@@ -56,5 +56,5 @@ void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed,
     world->bullet_array.array[world->bullet_array.len].radius = 0.01;
     world->bullet_array.array[world->bullet_array.len].host = host;
     world->bullet_array.len++;
-    bullets_movement(world, 0.1);
+    bullets_movement(world, 0.1f);
 }

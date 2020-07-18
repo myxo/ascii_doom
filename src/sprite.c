@@ -64,8 +64,8 @@ short sample_texture_color(double x, double y, texture_t* texture) {
     assert(y >= 0);
     assert(y <= 1);
     assert(x <= 1);
-    int sprite_x = round(x * (double)(texture->width - 1));
-    int sprite_y = round(y * (double)(texture->height - 1));
+    int sprite_x = (int)round(x * (double)(texture->width - 1));
+    int sprite_y = (int)round(y * (double)(texture->height - 1));
     return get_texture_color(sprite_x, sprite_y, texture);
 }
 
@@ -126,7 +126,7 @@ short sample_sprite_color(double x, double y, sprite_t* sprite, int texture_inde
 }
 void set_sprite_color(int x, int y, sprite_t* sprite, short color, int texture_index) {
     assert(texture_index < sprite->texture_count);
-    set_texture_color(x, y, &sprite->texture[texture_index], color, texture_index);
+    set_texture_color(x, y, &sprite->texture[texture_index], color);
 }
 char get_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index) {
     assert(texture_index < sprite->texture_count);
@@ -134,5 +134,5 @@ char get_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index) {
 }
 void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph, int texture_index) {
     assert(texture_index < sprite->texture_count);
-    set_texture_glyph(x, y, &sprite->texture[texture_index], glyph, texture_index);
+    set_texture_glyph(x, y, &sprite->texture[texture_index], glyph);
 }
