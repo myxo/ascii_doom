@@ -1,8 +1,11 @@
+#define _USE_MATH_DEFINES
+
 #include "map_generator.h"
 #include "logging.h"
 #include "world_object.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 point_t* create_point_t_4cube() {
     point_t temp;
@@ -89,15 +92,22 @@ type_of_room_t read_room_for_file(char* str) {
     return type_of_room;
 }
 
-int intersection_line_with_circle(double A, double B, double C, double r) {
+point_t get_random_point_on_circle(double start_angle, double stop_angle, point_t center, double r) {
+    double random_num = rand();
+    double angle = start_angle + random_num - (int)(random_num / (stop_angle - start_angle)) * (stop_angle - start_angle);
+    point_t random_point = { center.x + r * cos(angle), center.y + r * sin(angle) };
+    return random_point;
+}
+
+int is_intersection_line_with_circle(double A, double B, double C, double r) {
     double x0 = -A * C / (A * A + B * B), y0 = -B * C / (A * A + B * B);
     return C * C <= r * r * (A * A + B * B);
 }
 
-int intersection_circle_with_circle(point_t center1, point_t center2, double r1, double r2) {
+int is_intersection_circle_with_circle(point_t center1, point_t center2, double r1, double r2) {
     double x2 = center2.x - center1.x;
     double y2 = center2.y - center1.y;
-    return intersection_line_with_circle(-2*x2, -2*y2, x2*x2 + y2*y2 + r1*r1 - r2*r2, r1);
+    return is_intersection_line_with_circle(-2*x2, -2*y2, x2*x2 + y2*y2 + r1*r1 - r2*r2, r1);
 }
 
 void init_graph_of_rooms() {
@@ -117,6 +127,7 @@ void init_graph_of_rooms() {
     for (int i = 0; i < 16; i++) {
         fprintf(log_file(), "%s\n", im[i]);
     }
-    point_t tempc1 = { 2, 3 };
+    point_t tempc1 = { 0, 0 };
     point_t tempc2 = { 6, 3 };
+    point_t x = get_random_point_on_circle(0, 2 * M_PI, tempc1, 2);
 }

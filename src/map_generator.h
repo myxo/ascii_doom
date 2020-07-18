@@ -3,8 +3,6 @@
 
 #include "world_object.h"
 
-
-
 typedef struct{
     int width, height;
     point_array_t shape;
