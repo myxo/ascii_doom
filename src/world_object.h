@@ -55,7 +55,6 @@ typedef enum bullet_host {
 typedef struct {
     sprite_t sprite;
     bullet_host_t host;
-    int is_active;
     double fire_rate;
     double damage;
     double time_since_last_shoot;
@@ -65,6 +64,7 @@ typedef struct {
 typedef struct {
     weapon_t* pistol;
     weapon_t* rifle;
+    enum GUN active_weapon;
 } std_weapon_list_t;
 
 typedef struct {

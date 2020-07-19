@@ -50,6 +50,8 @@ void bullets_movement(world_t* world, float time_elapsed) {
 void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host, double damage) {
     if (world->bullet_array.len >= world->bullet_array.capacity)
     increase_arr_bullets_capacity(world);
+    pos.x += 0.4 * sin(angle);
+    pos.y += 0.4 * cos(angle);
     world->bullet_array.array[world->bullet_array.len].pos = pos;
     world->bullet_array.array[world->bullet_array.len].angle = angle;
     world->bullet_array.array[world->bullet_array.len].speed = 4;
@@ -57,5 +59,4 @@ void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed,
     world->bullet_array.array[world->bullet_array.len].host = host;
     world->bullet_array.array[world->bullet_array.len].damage = damage;
     world->bullet_array.len++;
-    bullets_movement(world, 0.1f);
 }

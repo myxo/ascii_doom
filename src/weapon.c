@@ -35,6 +35,7 @@ void shoot_from_weapon(weapon_t* weapon) {
 void init_std_weapon_list(std_weapon_list_t* weapon_list) {
     weapon_list->pistol = malloc(sizeof(weapon_t));
     weapon_list->rifle = malloc(sizeof(weapon_t));
+    weapon_list->active_weapon = PISTOL;
     init_pistol(weapon_list->pistol);
     init_rifle(weapon_list->rifle);
 }
@@ -50,7 +51,6 @@ void init_pistol(weapon_t* pistol) {
     pistol->fire_rate = 1;
     pistol->host = kBulletPlayer;
     pistol->time_since_last_shoot = 0;
-    pistol->is_active = 1;
     pistol->shot_delay = 0;
 }
 
@@ -59,39 +59,27 @@ void init_rifle(weapon_t* rifle) {
     rifle->fire_rate = 5;
     rifle->host = kBulletPlayer;
     rifle->time_since_last_shoot = 0;
-    rifle->is_active = 0;
     rifle->shot_delay = 0;
 }
 
 void shoot_from_active_weapon(world_t* world) {
-    if (world->weapon_list->pistol->is_active) {
+    if (world->weapon_list->active_weapon == PISTOL) {
         shoot_from_weapon(world->weapon_list->pistol);
     }
-    else if (world->weapon_list->rifle->is_active) {
+    else if (world->weapon_list->active_weapon == RIFLE) {
         shoot_from_weapon(world->weapon_list->rifle);
     }
 }
 
 void update_time_since_last_shot(world_t* world, float time_elapsed) {
-    if (world->weapon_list->pistol->is_active) {
+    if (world->weapon_list->active_weapon == PISTOL) {
         world->weapon_list->pistol->time_since_last_shoot += time_elapsed;
     }
-    else if (world->weapon_list->rifle->is_active) {
+    else if (world->weapon_list->active_weapon == RIFLE) {
         world->weapon_list->rifle->time_since_last_shoot += time_elapsed;
     }
 }
 
-void turn_off_all_weapons(world_t* world) {
-    world->weapon_list->pistol->is_active = 0;
-    world->weapon_list->rifle->is_active = 0;
-}
-
 void set_active_weapon(world_t* world, enum GUN weapon) {
-    turn_off_all_weapons(world);
-    if (weapon == PISTOL) {
-        world->weapon_list->pistol->is_active = 1;
-    }
-    else if (weapon == RIFLE) {
-        world->weapon_list->rifle->is_active = 1;
-    }
+    world->weapon_list->active_weapon = weapon;
 }
