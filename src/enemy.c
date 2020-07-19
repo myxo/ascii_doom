@@ -52,11 +52,11 @@ point_array_t build_path(enemy_t* enemy) {
             int y = (int)cur.y + y_move[i];
             if (!is_wall(x, y)) {
                 point_t to = { x, y };
-                if (!used[(int)to.x][(int)to.y]) {
-                    used[(int)to.x][(int)to.y] = 1;
+                if (!used[x][y]) {
+                    used[x][y] = 1;
                     point_queue_push_back(&q, to);
-                    pred[(int)to.x][(int)to.y] = cur;
-                    if (to.x == (int)enemy->global_target.x && to.y == (int)enemy->global_target.y) {
+                    pred[x][y] = cur;
+                    if (x == (int)enemy->global_target.x && y == (int)enemy->global_target.y) {
                         global_target_found = 1;
                         break;
                     }
@@ -111,6 +111,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
+    world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
     world->enemy_array.len++;
 }
 
@@ -144,9 +145,13 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 if (distance_to_player <= 4) {
                     update_position = 0;
                 }
-                enemy->global_target = world->player.pos;
-                enemy->path = build_path(enemy);
-                enemy->local_target_id = 0;
+                double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
+                if (delta >= 0.5) {
+                    enemy->global_target = world->player.pos;
+                    enemy->path = build_path(enemy);
+                    enemy->local_target_id = 0;
+                    enemy->last_player_pos = world->player.pos;
+                }
             }
         }
         if (update_position) {

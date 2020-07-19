@@ -62,6 +62,7 @@ typedef struct {
     double speed;
     double radius;
     double time_from_last_shot;
+    point_t last_player_pos;
 } enemy_t;
 
 typedef struct {
