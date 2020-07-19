@@ -12,6 +12,7 @@ typedef struct {
     short col_bg;
     short col_fg;
     char glyph;
+    short editor_col;
 } brush_t;
 
 typedef struct {
@@ -37,6 +38,7 @@ enum menu_nums
     SAVE_FILE = 4,
     LOAD_FILE = 5,
     CHOOSE_GLYPH = 6,
+    HOTKEYS = 7,
 };
 
 void init_brush(int x1, int x2, int y1, int y2) {
@@ -47,6 +49,7 @@ void init_brush(int x1, int x2, int y1, int y2) {
     brush.col_fg = FG_WHITE;
     brush.col_bg = BG_BLACK;
     brush.glyph = '*';
+    brush.editor_col = BG_BLACK;
 }
 
 void preview(int x, int y) {
@@ -115,6 +118,7 @@ void draw_menu() {
         olc_draw(1 + texture.width, 1 + texture.height, 'X', FG_WHITE);
         preview(1, 1);
         show_brush();
+        olc_draw_string(height - 8, 0, "press H to open hotkey list", FG_WHITE);
     }
     else if (menu.menu_num == LOAD_FILE) {
         system("cls");
@@ -171,6 +175,23 @@ void draw_menu() {
         {
             brush.glyph = getc(stdin);
         }
+        menu.menu_num = EDITOR;
+    }
+    else if (menu.menu_num == HOTKEYS) {
+        system("cls");
+        printf("HOTKEYS: \n");
+        printf("Q/E : change glyph of brush \n");
+        printf("W/S : change FG colour of brush \n");
+        printf("A/D : change BG colour of brush \n");
+        printf("R: get colour and glyph to brush \n");
+        printf("-/+ : change size of brush \n");
+        printf("LShift: set glyph of brush \n");
+        printf("Tab: set null as a glyph of brush\n");
+        printf("Spacebar: draw\n");
+        printf("F set BG colour of brush as BG colour of editor\n");
+        printf("H: show hotkeys list\n");
+        printf("Esc: open menu\n");
+        system("pause");
         menu.menu_num = EDITOR;
     }
 }
@@ -254,9 +275,6 @@ void handle_input(float time_elapsed) {
         }
         if (olc_get_key(VK_TAB).pressed) {
             brush.glyph = '\0';
-            brush.col_fg = FG_WHITE;
-            brush.col_bg = FG_WHITE;
-            brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
         if (olc_get_key('W').pressed) { //W key
             if (brush.col_fg >= 15) {
@@ -316,6 +334,12 @@ void handle_input(float time_elapsed) {
                 brush.glyph--;
             }
         }
+        if (olc_get_key('F').pressed) {
+            brush.editor_col = brush.col_bg * 16;
+        }
+        if (olc_get_key('H').pressed) {
+            menu.menu_num = HOTKEYS;
+        }
         if (olc_get_key(VK_LSHIFT).pressed) {
             menu.menu_num = CHOOSE_GLYPH;
         }
@@ -339,7 +363,12 @@ int update(float time_elapsed) {
     if (stop) {
         return 0;
     }
-    olc_fill(0, 0, width, height, ' ', FG_BLACK);
+    if (menu.menu_num == EDITOR) {
+        olc_fill(0, 0, width, height, ' ', brush.editor_col);
+    }
+    else {
+        olc_fill(0, 0, width, height, ' ', FG_BLACK);
+    }
     draw_menu();
     return 1;
 }
