@@ -1,9 +1,14 @@
 #ifndef WEAPON_H_
 #define WEAPON_H_
 
-void shoot_from_weapon(weapon_t* weapon);
+enum GUN {
+    PISTOL,
+    RIFLE
+};
 
 void init_std_weapon_list(std_weapon_list_t* weapon_list);
+
+void deinit_std_weapon_list(std_weapon_list_t* weapon_list);
 
 void init_pistol(weapon_t* pistol);
 

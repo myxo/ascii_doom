@@ -4,14 +4,14 @@
 #include <stdlib.h>
 
 void shoot_from_weapon(weapon_t* weapon) {
-    if (!weapon->is_burst_fire) {
+   /* if (!weapon->is_burst_fire) {*/
         if (weapon->time_since_last_shoot >= weapon->shot_delay) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
             weapon->time_since_last_shoot = 0;
             weapon->shot_delay = 1 / weapon->fire_rate;
         }
-    }
-    else {
+    //}
+    /*else {
         double time_delay;
         if (weapon->time_since_last_shoot > 1 / weapon->fire_rate_in_burst + 0.1) {
             weapon->shot_delay = 1 / weapon->fire_rate;
@@ -29,7 +29,7 @@ void shoot_from_weapon(weapon_t* weapon) {
                 weapon->shot_delay = 1 / weapon->fire_rate_in_burst;
             }
         }
-    }
+    }*/
 }
 
 void init_std_weapon_list(std_weapon_list_t* weapon_list) {
@@ -39,8 +39,13 @@ void init_std_weapon_list(std_weapon_list_t* weapon_list) {
     init_rifle(weapon_list->rifle);
 }
 
+void deinit_std_weapon_list(std_weapon_list_t* weapon_list) {
+    free(weapon_list->pistol);
+    free(weapon_list->rifle);
+    free(weapon_list);
+}
+
 void init_pistol(weapon_t* pistol) {
-    pistol->is_burst_fire = 0;
     pistol->damage = 1;
     pistol->fire_rate = 1;
     pistol->host = kBulletPlayer;
@@ -50,14 +55,10 @@ void init_pistol(weapon_t* pistol) {
 }
 
 void init_rifle(weapon_t* rifle) {
-    rifle->is_burst_fire = 1;
     rifle->damage = 0.5;
-    rifle->burst_size = 3;
-    rifle->fire_rate_in_burst = 6;
-    rifle->fire_rate = 0.5;
+    rifle->fire_rate = 5;
     rifle->host = kBulletPlayer;
     rifle->time_since_last_shoot = 0;
-    rifle->shot_made_in_burst = 0;
     rifle->is_active = 0;
     rifle->shot_delay = 0;
 }
@@ -85,12 +86,12 @@ void turn_off_all_weapons(world_t* world) {
     world->weapon_list->rifle->is_active = 0;
 }
 
-void set_active_weapon(world_t* world, char* weapon) {
+void set_active_weapon(world_t* world, enum GUN weapon) {
     turn_off_all_weapons(world);
-    if (strcmp(weapon, "pistol") == 0) {
+    if (weapon == PISTOL) {
         world->weapon_list->pistol->is_active = 1;
     }
-    else if (strcmp(weapon, "rifle") == 0) {
+    else if (weapon == RIFLE) {
         world->weapon_list->rifle->is_active = 1;
     }
 }

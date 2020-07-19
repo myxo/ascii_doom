@@ -53,10 +53,10 @@ void handle_player_movement(float time_elapsed) {
         move_vec.y += 1;
     }
     if (olc_get_key('1').pressed) {
-        set_active_weapon(get_world(), "pistol");
+        set_active_weapon(get_world(), PISTOL);
     }
     if (olc_get_key('2').pressed) {
-        set_active_weapon(get_world(), "rifle");
+        set_active_weapon(get_world(), RIFLE);
     }
     move_player(move_vec.x, move_vec.y, time_elapsed);
     if (olc_get_key(VK_SPACE).held) {

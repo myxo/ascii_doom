@@ -58,6 +58,7 @@ void deinit_world_object() {
     free(world_global->map);
     deinit_sprite(world_global->textures.wall);
     deinit_sprite(world_global->textures.bullet);
+    deinit_std_weapon_list(world_global->weapon_list);
     free(world_global);
 }
 

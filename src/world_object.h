@@ -49,10 +49,6 @@ typedef struct {
     sprite_t sprite;
     bullet_host_t host;
     int is_active;
-    int is_burst_fire;
-    int burst_size;
-    int shot_made_in_burst;
-    double fire_rate_in_burst;
     double fire_rate;
     double damage;
     double time_since_last_shoot;
