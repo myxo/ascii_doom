@@ -16,7 +16,7 @@
 
 
 int width =  200;
-int height = 100;
+int height = 150;
 int glyph_size =  8;
 const char config_filename[50] = "cfg.txt";
 int stop = 0;
@@ -53,7 +53,7 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_vec.y += 1;
     }
-    move_player(move_vec.x, move_vec.y, time_elapsed);
+    move_player((int)move_vec.x, (int)move_vec.y, time_elapsed);
     time_from_last_shot += time_elapsed;
     if (olc_get_key(VK_SPACE).pressed) {
         if (time_from_last_shot >= 0.5) {
@@ -88,6 +88,7 @@ int update(float time_elapsed) {
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
+    draw_hp(get_world());
     display_watch();
     draw_config_ui();
 	return 1;
@@ -105,7 +106,6 @@ int main() {
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();
-    deinit_world_object();
 
     return 0;
 }

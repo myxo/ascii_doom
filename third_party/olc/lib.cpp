@@ -28,8 +28,8 @@ private:
 		return update_fn_(fElapsedTime);
 	}
 
-	create_fn create_fn_;
-	update_fn update_fn_;
+	create_fn create_fn_{nullptr};
+	update_fn update_fn_{nullptr};
 };
 
 std::unique_ptr<olcConsoleGameEngineImpl> g_engine = nullptr;
