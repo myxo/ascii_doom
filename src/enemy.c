@@ -4,6 +4,7 @@
 #include "world_object.h"
 #include "bullet.h"
 #include "olc/olc.h"
+#include "enemy.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -47,19 +48,17 @@ point_array_t build_path(enemy_t* enemy) {
         int x_move[4] = { -1, 0,  0, 1 };
         int y_move[4] = { 0, 1, -1, 0 };
         for (int i = 0; i < 4; i++) {
-            int x = cur.x + x_move[i];
-            int y = cur.y + y_move[i];
-            if (abs(x) == abs(y))
-                continue;
-            if (!is_wall(cur.x + x, cur.y + y)) {
-                point_t to = { cur.x + x, cur.y + y };
+            int x = (int)cur.x + x_move[i];
+            int y = (int)cur.y + y_move[i];
+            if (!is_wall(x, y)) {
+                point_t to = { x, y };
                 if (!used[(int)to.x][(int)to.y]) {
                     used[(int)to.x][(int)to.y] = 1;
                     point_queue_push_back(&q, to);
                     pred[(int)to.x][(int)to.y] = cur;
-                    if (to.x == enemy->global_target.x && to.y == enemy->global_target.y) {
-                        break;
+                    if (to.x == (int)enemy->global_target.x && to.y == (int)enemy->global_target.y) {
                         global_target_found = 1;
+                        break;
                     }
                 }
             }
@@ -68,6 +67,8 @@ point_array_t build_path(enemy_t* enemy) {
             break;
     }
     point_array_t path = init_point_array(8);
+    point_t temp_point = { enemy->pos.x, enemy->pos.y };
+    path.array[path.len++] = temp_point;
     if (!global_target_found)
         return path;
     point_array_t reverse_path = init_point_array(8);
