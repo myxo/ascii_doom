@@ -55,8 +55,10 @@ type_of_room_t read_room_for_file(char* name_file) {
         fgetc(fmap);
     }
     fclose(fmap);
-
-    type_of_room.radius = sqrt(pow(width / 2 + 1, 2) + pow(height / 2 + 1, 2));
+    if (width > height)
+        type_of_room.radius = width / 2;
+    else
+        type_of_room.radius = height / 2;
     type_of_room.center.x = width / 2;
     type_of_room.center.y = height / 2;
     return type_of_room;
@@ -126,12 +128,12 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
 void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room_t* node) {
     double external_r = node->type_of_room.radius;
     while (1) {
-        point_t random_point_to_set = get_random_point_on_circle(0, 2 * M_PI, parent->center_on_map, parent->type_of_room.radius + external_r + 1);
+        point_t random_point_to_set = get_random_point_on_circle(0, 2 * M_PI, parent->center_on_map, parent->type_of_room.radius + external_r);
         int count_of_check = 0;
         int is_intersection = 0;
         for (int i = 0; i < graph->n_nodes; i++) {
             if (graph->is_exist[i] && graph->array_of_rooms[i] != node) {
-                is_intersection = is_intersection_circle_with_circle(parent->center_on_map, random_point_to_set, parent->type_of_room.radius, node->type_of_room.radius);
+                is_intersection = is_intersection_circle_with_circle(graph->array_of_rooms[i]->center_on_map, random_point_to_set, parent->type_of_room.radius, node->type_of_room.radius);
                 if (is_intersection)
                     break;
             }
@@ -197,12 +199,15 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
         map[i][*width] = '\0';
     }
     for (int node_room_index = 0; node_room_index < graph->n_nodes; node_room_index++) {
+        if (!graph->is_exist[node_room_index])
+            continue;
         node_of_room_t node_room = *(graph->array_of_rooms[node_room_index]);
         for (int i = 0; i < node_room.type_of_room.shape.len; i++) {
             int y = node_room.center_on_map.y + node_room.type_of_room.shape.array[i].y - node_room.type_of_room.center.y + shift_y;
             int x = node_room.center_on_map.x + node_room.type_of_room.shape.array[i].x - node_room.type_of_room.center.x + shift_x;
             map[y][x] = '#';
         }
+        map[(int)node_room.center_on_map.y + shift_y][(int)(node_room.center_on_map.x + shift_x)] = '0' + node_room_index;
     }
     return map;
 }

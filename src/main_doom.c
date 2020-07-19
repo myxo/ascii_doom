@@ -26,6 +26,7 @@ double time_from_last_shot = 0;
 
 
 int create() {
+    srand(time(NULL));
     read_config_from_file(config_filename);
     if (init_world_object() == 0) {
         return 0;
@@ -96,7 +97,6 @@ int update(float time_elapsed) {
 }
 
 int main() {
-    srand(time(NULL));
 	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;
