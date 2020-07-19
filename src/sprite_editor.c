@@ -248,9 +248,15 @@ void handle_input(float time_elapsed) {
                 brush.size++;
             }
         }
-        if (olc_get_key(VK_ESCAPE).held) { // Esc
+        if (olc_get_key(VK_ESCAPE).held) {
             menu.menu_num = MAIN_MENU;
             menu.select = 0;
+        }
+        if (olc_get_key(VK_TAB).pressed) {
+            brush.glyph = '\0';
+            brush.col_fg = FG_WHITE;
+            brush.col_bg = FG_WHITE;
+            brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
         if (olc_get_key('W').pressed) { //W key
             if (brush.col_fg >= 15) {
