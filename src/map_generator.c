@@ -49,10 +49,24 @@ point_t* create_point_t_4cube() {
     return cube;
 }
 
-type_of_room_t read_room_for_file(char* str) {
+void increase_arr_next_nodes_capacity(node_of_room_t* node) {
+    node->capacity_nexts = node->capacity_nexts * 2;
+    node->next_nodes = realloc(node->next_nodes, node->capacity_nexts * sizeof(node_of_room_t));
+}
+
+node_of_room_t init_next_nodes_array(int capacity) {
+    node_of_room_t node;
+    node.capacity_nexts = capacity;
+    node.len_nexts = 0;
+    node.next_nodes = malloc(node.capacity_nexts * sizeof(node_of_room_t));
+    return node;
+}
+
+
+type_of_room_t read_room_for_file(char* name_file) {
     FILE* fmap;
     int width, height;
-    fmap = fopen(str, "r");
+    fmap = fopen(name_file, "r");
     if (fmap == NULL) {
         return;
     }
@@ -108,6 +122,23 @@ int is_intersection_circle_with_circle(point_t center1, point_t center2, double 
     double x2 = center2.x - center1.x;
     double y2 = center2.y - center1.y;
     return is_intersection_line_with_circle(-2*x2, -2*y2, x2*x2 + y2*y2 + r1*r1 - r2*r2, r1);
+}
+
+graph_of_rooms_t read_graph_from_file(char* name_file) {
+    FILE* fgraph = fopen(name_file, "r");
+    int n;
+    fscanf(fgraph, "%d", &n);
+    node_of_room_t* array_of_rooms = malloc(n * sizeof(node_of_room_t));
+    int pred_id, next_id;
+    fscanf(fgraph, "%d %d", &pred_id, &next_id);
+    node_of_room_t temp_node = init_next_nodes_array(3);
+    node_of_room_t temp_node_second = init_next_nodes_array(3);
+    temp_node.next_nodes[0] = temp_node_second;
+    array_of_rooms[pred_id] = temp_node;
+    array_of_rooms[next_id] = temp_node_second;
+    for (int i = 0; i  < n; i++) {
+
+    }
 }
 
 void init_graph_of_rooms() {

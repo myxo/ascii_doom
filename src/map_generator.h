@@ -12,7 +12,9 @@ typedef struct{
 
 typedef struct node_of_room {
     type_of_room_t type_of_room;
-    struct node_of_room** next_nodes;
+    struct node_of_room* next_nodes;
+    int len_nexts;
+    int capacity_nexts;
 } node_of_room_t;
 
 typedef struct graph_of_rooms {
