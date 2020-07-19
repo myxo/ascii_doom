@@ -12,7 +12,6 @@ typedef struct {
     short col_bg;
     short col_fg;
     char glyph;
-    short editor_col;
 } brush_t;
 
 typedef struct {
@@ -26,6 +25,7 @@ int width = 50;
 int height = 30;
 int glyph_size = 20;
 brush_t brush;
+short editor_bg;
 
 int stop = 0;
 
@@ -49,13 +49,15 @@ void init_brush(int x1, int x2, int y1, int y2) {
     brush.col_fg = FG_WHITE;
     brush.col_bg = BG_BLACK;
     brush.glyph = '*';
-    brush.editor_col = BG_BLACK;
 }
 
 void preview(int x, int y) {
     for (int i = y; i < y + texture.height; i++) {
         for (int j = x; j < x + texture.width; j++) {
-            olc_draw(j, i, get_texture_glyph(j - x, i - y, &texture), get_texture_color(j - x, i - y, &texture));
+            char sym = get_texture_glyph(j - x, i - y, &texture);
+            if (sym != '\0') {
+                olc_draw(j, i, get_texture_glyph(j - x, i - y, &texture), get_texture_color(j - x, i - y, &texture));
+            }
         }
     }
 }
@@ -188,7 +190,7 @@ void draw_menu() {
         printf("LShift: set glyph of brush \n");
         printf("Tab: set null as a glyph of brush\n");
         printf("Spacebar: draw\n");
-        printf("F set BG colour of brush as BG colour of editor\n");
+        printf("F/G change BG colour to BG_BLACK/BG_WHITE\n");
         printf("H: show hotkeys list\n");
         printf("Esc: open menu\n");
         system("pause");
@@ -334,9 +336,6 @@ void handle_input(float time_elapsed) {
                 brush.glyph--;
             }
         }
-        if (olc_get_key('F').pressed) {
-            brush.editor_col = brush.col_bg * 16;
-        }
         if (olc_get_key('H').pressed) {
             menu.menu_num = HOTKEYS;
         }
@@ -355,6 +354,12 @@ void handle_input(float time_elapsed) {
         if (olc_get_key(VK_LEFT).pressed) {
             brush.pos_x--;
         }
+        if (olc_get_key('F').pressed) {
+            editor_bg = BG_BLACK;
+        }
+        if (olc_get_key('G').pressed) {
+            editor_bg = BG_WHITE;
+        }
     }
 }
 
@@ -363,17 +368,13 @@ int update(float time_elapsed) {
     if (stop) {
         return 0;
     }
-    if (menu.menu_num == EDITOR) {
-        olc_fill(0, 0, width, height, ' ', brush.editor_col);
-    }
-    else {
-        olc_fill(0, 0, width, height, ' ', FG_BLACK);
-    }
+    olc_fill(0, 0, width, height, ' ', editor_bg);
     draw_menu();
     return 1;
 }
 
 int main() {
+    editor_bg = BG_BLACK;
     menu.select = 0;
     menu.menu_num = 0;
     if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
