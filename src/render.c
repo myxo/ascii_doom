@@ -4,11 +4,13 @@
 #include "world_object.h"
 #include "render.h"
 #include "config.h"
+#include "logging.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <stdlib.h>
 
-void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
+double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height, int* row_left, int* row_right, int* line_start, int* line_end) {
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
         angle_from_player_to_obj += 2 * M_PI;
@@ -28,23 +30,36 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
     if (start_player_view_angle_floor_PI < 0)
         start_player_view_angle_floor_PI += 2 * M_PI;
-    int row_left = (int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
-    if (row_left < 0)
-        row_left = 0;
-    if (row_left > olc_screen_width())
-        row_left = olc_screen_width();
-    int row_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
-    if (row_right > olc_screen_width())
-        row_right = olc_screen_width();
-    if (row_right < 0)
-        row_right = 0;
-    obj_height = (int)(obj_height / distance);
-    int draw_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
-    int draw_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
-    if (draw_end > olc_screen_height())
-        draw_end = olc_screen_height();
-    if (draw_start < 0)
-        draw_start = 0;
+    int lrow_left = ((int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5));
+    if (lrow_left < 0)
+        lrow_left = 0;
+    if (lrow_left > olc_screen_width())
+        lrow_left = olc_screen_width();
+    int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
+    if (lrow_right > olc_screen_width())
+        lrow_right = olc_screen_width();
+    if (lrow_right < 0)
+        lrow_right = 0;
+    obj_height = (obj_height / distance);
+    int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
+    int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    if (lline_end > olc_screen_height())
+        lline_end = olc_screen_height();
+    if (lline_start < 0)
+        lline_start = 0;
+    *row_left = lrow_left;
+    *row_right = lrow_right;
+    *line_start = lline_start;
+    *line_end = lline_end;
+    return distance;
+}
+
+void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
+    int row_left = 0;
+    int row_right = 0;
+    int draw_start = 0;
+    int draw_end = 0;
+    double distance = 0;/* get_object_on_screen(player, obj_pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);*/
     for (int i = row_left; i <= row_right; i++)
         for (int j = draw_start; j < draw_end; j++) {
             if (distance < get_world()->z_buffer[i][j]) {
@@ -68,10 +83,7 @@ void draw_bullets(world_t* world) {
     int tex_height = world->sprites.bullet->texture[0].height;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        double distance = get_distance_from_pos1_to_pos2(player->pos, bullet->pos);
-        double sprite_width = tex_width / distance;
-        double sprite_height = tex_height / distance;
-        draw_sprite(world->sprites.bullet, (olc_screen_width() - sprite_width) / 2, (olc_screen_height() - sprite_height) / 2, distance, 0, sprite_width, sprite_height);
+        draw_sprite(world->sprites.bullet, 0, bullet->pos, bullet->radius, 150 * bullet->radius);
     }
 }
 
@@ -84,7 +96,6 @@ void draw_screen(world_t* world) {
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = get_config_value(kRayTraceStep);
     int row = 0;
-    int bullet_row = 0;
     for (; ray_angle < world->player.angle + world->player.angle_of_vision / 2; ray_angle += d_angle) {
         double x = world->player.pos.x;
         double y = world->player.pos.y;
@@ -200,15 +211,23 @@ void draw_hp(world_t* world) {
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
 
-void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index, int width, int height) {
-    for (int i = 0; i <= width; i++) {
-        for (int j = 0; j <= height; j++) {
-            double i_d = (double)i / width;
-            double j_d = (double)j / height;
-            char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-            if (sym != 0 && distance < get_world()->z_buffer[i + x][j + y]) {
-                olc_draw(i + x, j + y, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
-                get_world()->z_buffer[i + x][j + y] = distance;
+void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
+    int row_left = 0;
+    int row_right = 0;
+    int draw_start = 0;
+    int draw_end = 0;
+    player_t player = get_world()->player;
+    double distance = get_object_on_screen(&player, pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);
+    if ((draw_end - draw_start) != 0 && (row_right - row_left) != 0) {
+        for (int i = row_left; i <= row_right; i++) {
+            double i_d = (double)(i - row_left) / (row_right - row_left);
+            for (int j = draw_start; j <= draw_end; j++) {
+                double j_d = (double)(j - draw_start) / (draw_end - draw_start);
+                char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
+                if (sym != 0 && distance < get_world()->z_buffer[i][j]) {
+                    olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
+                    get_world()->z_buffer[i][j] = distance;
+                }
             }
         }
     }
