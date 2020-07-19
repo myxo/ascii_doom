@@ -26,6 +26,7 @@ PRIVATE
     src/enemy.c
     src/sprite.c
     src/player.c
+    src/structs_of_data.c
     src/config.c 
 )
 
