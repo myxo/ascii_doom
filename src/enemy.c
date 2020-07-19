@@ -138,9 +138,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (!has_wall_between(enemy->pos, world->player.pos)) {
                 if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
-
-
-                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy);
+                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 1);
                 }
                 if (distance_to_player <= 4) {
                     update_position = 0;
@@ -173,7 +171,7 @@ void enemy_destruct(world_t* world, int index) {
     world->enemy_array.len--;
 }
 
-void enemy_hit(world_t* world, int index, int damage) {
+void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);

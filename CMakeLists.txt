@@ -28,15 +28,14 @@ PRIVATE
     src/player.c
     src/structs_of_data.c
     src/config.c 
-)
+    src/weapon.c)
 
 add_executable(sprite_editor)
 target_sources(sprite_editor
 PRIVATE
 	src/sprite_editor.c
 	src/sprite.h
-	src/sprite.c
-)
+	src/sprite.c)
 
 file(GLOB resource_files "res/*")
 file(COPY ${resource_files} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
