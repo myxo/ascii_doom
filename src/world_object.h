@@ -99,7 +99,6 @@ point_t get_rand_pos_on_floor(world_t* world);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
-int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle);
 point_array_t init_point_array(int capacity);
 void increase_arr_point_capacity(point_array_t* point_array);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance);
