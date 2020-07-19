@@ -56,7 +56,7 @@ void preview(int x, int y) {
         for (int j = x; j < x + texture.width; j++) {
             char sym = get_texture_glyph(j - x, i - y, &texture);
             if (sym != '\0') {
-                olc_draw(j, i, get_texture_glyph(j - x, i - y, &texture), get_texture_color(j - x, i - y, &texture));
+                olc_draw(j, i, sym, get_texture_color(j - x, i - y, &texture));
             }
         }
     }
