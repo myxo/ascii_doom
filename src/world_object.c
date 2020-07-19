@@ -26,25 +26,30 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+void init_sprites(world_t* world) {
+    world_global->sprites.wall = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet = malloc(sizeof(sprite_t));
+    init_sprite(world_global->sprites.wall);
+    init_sprite(world_global->sprites.bullet);
+    load_texture_from_file("wall1.tex", &world->textures.wall);
+    attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
+}
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
     update_world_from_config();
 
     world_global->player.health = 3;
+    world_global->player.maxhealth = world_global->player.health;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
     world_global->player.radius = 0.2;
 
-    world_global->textures.wall = malloc(sizeof(sprite_t));
-    world_global->textures.bullet = malloc(sizeof(sprite_t)); 
     world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
     init_std_weapon_list(world_global->weapon_list);
     init_z_buffer();
-    init_sprite(8, 8, world_global->textures.wall);
-    init_sprite(8, 8, world_global->textures.bullet);
-    load_sprite_from_file("wall1.spr", world_global->textures.wall);
+    init_sprites(world_global);
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
@@ -56,9 +61,11 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
-    deinit_sprite(world_global->textures.wall);
-    deinit_sprite(world_global->textures.bullet);
     deinit_std_weapon_list(world_global->weapon_list);
+    deinit_sprite(world_global->sprites.wall);
+    //deinit_sprite(world_global->sprites.bullet);
+    deinit_texture(&world_global->textures.wall);
+    deinit_z_buffer();
     free(world_global);
 }
 
@@ -75,7 +82,7 @@ void init_z_buffer() {
 }
 
 void deinit_z_buffer() {
-    for (int i = 0; i < olc_screen_width; i++) {
+    for (int i = 0; i < olc_screen_width(); i++) {
         free(world_global->z_buffer[i]);
     }
     free(world_global->z_buffer);

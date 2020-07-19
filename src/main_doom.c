@@ -85,12 +85,13 @@ int update(float time_elapsed) {
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
+    add_watch("angle", get_world()->player.angle);
     update_time_since_last_shot(get_world(), time_elapsed);
     bullets_movement(get_world(), time_elapsed);
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
-    draw_sprite(get_world()->textures.wall, 50, 90, 1);
+    draw_hp(get_world());
     display_watch();
     draw_config_ui();
 	return 1;
@@ -108,7 +109,6 @@ int main() {
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();
-    deinit_world_object();
 
     return 0;
 }

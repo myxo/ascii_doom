@@ -8,7 +8,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
@@ -29,19 +28,19 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
     if (start_player_view_angle_floor_PI < 0)
         start_player_view_angle_floor_PI += 2 * M_PI;
-    int row_left = olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    int row_left = (int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (row_left < 0)
         row_left = 0;
     if (row_left > olc_screen_width())
         row_left = olc_screen_width();
-    int row_right = olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5;
+    int row_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (row_right > olc_screen_width())
         row_right = olc_screen_width();
     if (row_right < 0)
         row_right = 0;
-    obj_height = obj_height / distance;
-    int draw_start = olc_screen_height() / 2 - obj_height + 0.5;
-    int draw_end = olc_screen_height() / 2 + obj_height + 0.5;
+    obj_height = (int)(obj_height / distance);
+    int draw_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
+    int draw_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
     if (draw_end > olc_screen_height())
         draw_end = olc_screen_height();
     if (draw_start < 0)
@@ -93,7 +92,7 @@ void draw_screen(world_t* world) {
             y += d_distance * ray_cos;
             distance += d_distance;
         }
-        int num_of_wall_sym = height * (1 / (distance));
+        int num_of_wall_sym = (int)(height * (1 / (distance)));
         if (num_of_wall_sym > height)
             num_of_wall_sym = height;
         int ceiling_level = (height - num_of_wall_sym) / 2;
@@ -118,7 +117,7 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->textures.wall));
+            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
@@ -188,12 +187,21 @@ void draw_minimap(world_t* world) {
     }
 }
 
-void draw_sprite(sprite_t* sprite, int x, int y, double distance) {
-    for (int i = 0; i < sprite->width; i++) {
-        for (int j = 0; j < sprite->height; j++) {
-            char sym = get_sprite_glyph(i, j, sprite);
+void draw_hp(world_t* world) {
+    int height = olc_screen_height() / 8;
+    int width = olc_screen_width() / 3;
+    world->player.health;
+    double hp1 = (world->player.health * width) / world->player.maxhealth;
+    olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
+    olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
+}
+
+void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {
+    for (int i = 0; i < sprite->texture[texture_index].width; i++) {
+        for (int j = 0; j < sprite->texture[texture_index].height; j++) {
+            char sym = get_sprite_glyph(i, j, sprite, texture_index);
             if (sym != ' ' && distance < get_world()->z_buffer[i + x][j + y]) {
-                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite));
+                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite, texture_index));
                 get_world()->z_buffer[i + x][j + y] = distance;
             }
         }
