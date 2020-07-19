@@ -33,7 +33,7 @@ void init_texture(int width, int height, texture_t* texture) {
         texture->colours[i] = FG_WHITE | BG_BLACK;
     }
     for (int i = 0; i < width * height; i++) {
-        texture->glyphs[i] = '#';
+        texture->glyphs[i] = '\0';
     }
 }
 void deinit_texture(texture_t* texture) {
