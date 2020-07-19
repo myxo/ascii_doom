@@ -10,7 +10,13 @@ typedef struct {
 } point_t;
 
 typedef struct {
-    int health;
+    point_t* array;
+    int len;
+    int capacity;
+} point_array_t;
+
+typedef struct {
+    double health;
     int maxhealth;
     point_t pos;
     double angle_of_vision;
@@ -32,14 +38,17 @@ typedef struct {
 
 
 typedef struct {
-    int health;
+    double health;
     point_t pos;
-    point_t target;
+    point_t global_target;
+    point_array_t path;
+    int local_target_id;
     double angle_of_vision;
     double angle;
     double speed;
     double radius;
     double time_from_last_shot;
+    point_t last_player_pos;
 } enemy_t;
 
 typedef struct {
@@ -110,6 +119,8 @@ point_t get_rand_pos_on_floor(world_t* world);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
+point_array_t init_point_array(int capacity);
+void increase_arr_point_capacity(point_array_t* point_array);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance);
 void update_world_from_config();
 

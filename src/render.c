@@ -200,7 +200,7 @@ void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_in
     for (int i = 0; i < sprite->texture[texture_index].width; i++) {
         for (int j = 0; j < sprite->texture[texture_index].height; j++) {
             char sym = get_sprite_glyph(i, j, sprite, texture_index);
-            if (sym != ' ' && distance < get_world()->z_buffer[i + x][j + y]) {
+            if (sym != '\0' && distance < get_world()->z_buffer[i + x][j + y]) {
                 olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite, texture_index));
                 get_world()->z_buffer[i + x][j + y] = distance;
             }

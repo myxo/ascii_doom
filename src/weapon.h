@@ -18,8 +18,8 @@ void shoot_from_active_weapon(world_t* world);
 
 void update_time_since_last_shot(world_t* world, float time_elapsed);
 
-void turn_off_all_weapons(world_t* world);
+void set_active_weapon(world_t* world, enum GUN weapon);
 
-void set_active_weapon(world_t* world, char* weapon);
+void turn_off_all_weapons(world_t* world);
 
 #endif // !WEAPON_H_

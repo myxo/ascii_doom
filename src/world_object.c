@@ -26,6 +26,18 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+point_array_t init_point_array(int capacity) {
+    point_array_t array;
+    array.capacity = capacity;
+    array.len = 0;
+    array.array = malloc(array.capacity * sizeof(point_t));
+    return array;
+}
+
+void increase_arr_point_capacity(point_array_t* point_array) {
+    point_array->capacity = point_array->capacity * 2;
+    point_array->array = realloc(point_array->array, point_array->capacity * sizeof(point_t));
+}
 void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
@@ -40,7 +52,7 @@ int init_world_object() {
     update_world_from_config();
 
     world_global->player.health = 3;
-    world_global->player.maxhealth = world_global->player.health;
+    world_global->player.maxhealth = 3;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
