@@ -206,7 +206,7 @@ void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_in
             double i_d = (double)i / width;
             double j_d = (double)j / height;
             char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-            if (/*sym != ' ' && */distance < get_world()->z_buffer[i + x][j + y]) {
+            if (sym != 0 && distance < get_world()->z_buffer[i + x][j + y]) {
                 olc_draw(i + x, j + y, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
                 get_world()->z_buffer[i + x][j + y] = distance;
             }
