@@ -3,7 +3,7 @@
 #include "sprite.h"
 #include "world_object.h"
 #include "bullet.h"
-#include "../third_party/olc/olc.h"
+#include "olc/olc.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -41,46 +41,59 @@ point_array_t build_path(enemy_t* enemy) {
     }
     point_t null = { -1, -1 };
     pred[(int)enemy->pos.x][(int)enemy->pos.y] = null;
+    int global_target_found = 0;
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
-        point_array_t point_near = init_point_array(8);
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                //if (x == 0 && y == 0)
-                //    continue;
-                if (abs(x) == abs(y))
-                    continue;
-                if (!is_wall(cur.x + x, cur.y + y)) {
-                    point_t temp = { cur.x + x, cur.y + y };
-                    point_near.array[point_near.len++] = temp;
+        int x_move[4] = { -1, 0,  0, 1 };
+        int y_move[4] = { 0, 1, -1, 0 };
+        for (int i = 0; i < 4; i++) {
+            int x = cur.x + x_move[i];
+            int y = cur.y + y_move[i];
+            if (abs(x) == abs(y))
+                continue;
+            if (!is_wall(cur.x + x, cur.y + y)) {
+                point_t to = { cur.x + x, cur.y + y };
+                if (!used[(int)to.x][(int)to.y]) {
+                    used[(int)to.x][(int)to.y] = 1;
+                    point_queue_push_back(&q, to);
+                    pred[(int)to.x][(int)to.y] = cur;
+                    if (to.x == enemy->global_target.x && to.y == enemy->global_target.y) {
+                        break;
+                        global_target_found = 1;
+                    }
                 }
             }
         }
-        for (int i = 0; i < point_near.len; ++i) {
-            point_t to = point_near.array[i];
-            if (!used[(int)to.x][(int)to.y]) {
-                used[(int)to.x][(int)to.y] = 1;
-                point_queue_push_back(&q, to);
-                pred[(int)to.x][(int)to.y] = cur;
-                //if (to.x == enemy->global_target.x && to.y == enemy->global_target.y)
-                //    i++;
-            }
-        }
+        if (global_target_found)
+            break;
     }
+    point_array_t path = init_point_array(8);
+    if (!global_target_found)
+        return path;
     point_array_t reverse_path = init_point_array(8);
     for (point_t cur = enemy->global_target; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (reverse_path.len >= reverse_path.capacity)
             increase_arr_point_capacity(&reverse_path);
         reverse_path.array[reverse_path.len++] = cur;
     }
-    point_array_t path = init_point_array(reverse_path.len);
     for (int i = 0; i < reverse_path.len; i++) {
+        if (path.len >= path.capacity)
+            increase_arr_point_capacity(&path);
         point_t temp = reverse_path.array[reverse_path.len - 1 - i];
         temp.x = temp.x + 0.5;
         temp.y = temp.y + 0.5;
         path.array[i] = temp;
         path.len++;
     }
+    free(reverse_path.array);
+    for (int i = 0; i < get_world()->map_width; i++) {
+        free(pred[i]);
+    }
+    free(pred);
+    for (int i = 0; i < get_world()->map_width; i++) {
+        free(used[i]);
+    }
+    free(used);
     return path;
 }
 

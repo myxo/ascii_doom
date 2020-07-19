@@ -46,8 +46,6 @@ int init_world_object() {
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
-    world_global->player.speed = 2.5;
-    world_global->player.angle_of_vision = M_PI_4;
     world_global->player.radius = 0.2;
 
     world_global->textures.wall = malloc(sizeof(sprite_t));
@@ -76,9 +74,11 @@ world_t* get_world() {
 }
 
 int is_wall(double x, double y) {
-    if (x > 0 && y > 0 && (int)x < get_world()->map_height && (int)y < get_world()->map_width)
-        return world_global->map[(int)x][(int)y] == '#';
-    return 1;
+    if (x < 0 || y < 0)
+        return 1;
+    if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
+        return 1;
+    return world_global->map[(int)x][(int)y] == '#';
 }
 
 int read_map_for_file() {
