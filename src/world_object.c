@@ -32,6 +32,8 @@ void init_sprites(world_t* world) {
     init_sprite(world_global->sprites.bullet);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
+    load_texture_from_file("bullet1.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
 
 int init_world_object() {

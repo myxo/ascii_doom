@@ -15,6 +15,7 @@ typedef struct {
 } sprite_t;
 
 char get_texture_glyph(int x, int y, texture_t* texture);
+char sample_texture_glyph(double x, double y, texture_t* texture);
 void set_texture_glyph(int x, int y, texture_t* texture, char glyph);
 
 void init_texture(int width, int height, texture_t* texture);
@@ -35,6 +36,7 @@ short get_sprite_color(int x, int y, sprite_t* sprite, int texture_index);
 short sample_sprite_color(double x, double y, sprite_t* sprite, int texture_index);
 void set_sprite_color(int x, int y, sprite_t* sprite, short color, int texture_index);
 char get_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index);
+char sample_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index);
 void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph, int texture_index);
 
 #endif

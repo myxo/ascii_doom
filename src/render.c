@@ -64,9 +64,14 @@ void draw_enemies(world_t* world) {
 
 void draw_bullets(world_t* world) {
     player_t* player = &world->player;
+    int tex_width = world->sprites.bullet->texture[0].width;
+    int tex_height = world->sprites.bullet->texture[0].height;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        draw_object(player, bullet->pos, bullet->radius, '*', FG_RED, 4);
+        double distance = get_distance_from_pos1_to_pos2(player->pos, bullet->pos);
+        double sprite_width = tex_width / distance;
+        double sprite_height = tex_height / distance;
+        draw_sprite(world->sprites.bullet, (olc_screen_width() - sprite_width) / 2, (olc_screen_height() - sprite_height) / 2, distance, 0, sprite_width, sprite_height);
     }
 }
 
@@ -139,7 +144,6 @@ void draw_screen(world_t* world) {
 }
 
 void draw_minimap(world_t* world) {
-
     for (int i = 0; i < world->map_height; i++) {
         for (int j = 0; j < world->map_width; j++) {
             enum COLOR sym_col_BG;
@@ -196,12 +200,14 @@ void draw_hp(world_t* world) {
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
 
-void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index) {
-    for (int i = 0; i < sprite->texture[texture_index].width; i++) {
-        for (int j = 0; j < sprite->texture[texture_index].height; j++) {
-            char sym = get_sprite_glyph(i, j, sprite, texture_index);
-            if (sym != ' ' && distance < get_world()->z_buffer[i + x][j + y]) {
-                olc_draw(i + x, j + y, sym, get_sprite_color(i, j, sprite, texture_index));
+void draw_sprite(sprite_t* sprite, int x, int y, double distance, int texture_index, int width, int height) {
+    for (int i = 0; i <= width; i++) {
+        for (int j = 0; j <= height; j++) {
+            double i_d = (double)i / width;
+            double j_d = (double)j / height;
+            char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
+            if (/*sym != ' ' && */distance < get_world()->z_buffer[i + x][j + y]) {
+                olc_draw(i + x, j + y, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
                 get_world()->z_buffer[i + x][j + y] = distance;
             }
         }
