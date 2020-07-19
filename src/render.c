@@ -20,7 +20,7 @@ double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis,
     double start_player_view_angle = player->angle - player->angle_of_vision / 2;
     double stop_player_view_angle = player->angle + player->angle_of_vision / 2;
     if ((player->angle < start_player_view_angle) || (player->angle > stop_player_view_angle))
-        return;
+        return 0.0;
     double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
     double player_to_obj_width_angle = atan2(obj_radis, distance);
     double angle_from_player_to_obj_left = angle_from_player_to_obj - player_to_obj_width_angle;

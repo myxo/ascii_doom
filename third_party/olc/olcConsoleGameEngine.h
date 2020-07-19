@@ -408,9 +408,9 @@ public:
 		if (!GetConsoleScreenBufferInfo(m_hConsole, &csbi))
 			return Error(L"GetConsoleScreenBufferInfo");
 		if (m_nScreenHeight > csbi.dwMaximumWindowSize.Y)
-			return Error(L"Screen Height / Font Height Too Big");
+            m_nScreenHeight = csbi.dwMaximumWindowSize.Y;
 		if (m_nScreenWidth > csbi.dwMaximumWindowSize.X)
-			return Error(L"Screen Width / Font Width Too Big");
+		    m_nScreenWidth = csbi.dwMaximumWindowSize.X;
 
 		// Set Physical Console Window Size
 		m_rectWindow = { 0, 0, (short)m_nScreenWidth - 1, (short)m_nScreenHeight - 1 };
@@ -450,7 +450,7 @@ public:
 	void DrawString(int x, int y, std::wstring c, short col = 0x000F)
 	{
 		for (size_t i = 0; i < c.size(); i++)
-		{
+		{ 
 			m_bufScreen[y * m_nScreenWidth + x + i].Char.UnicodeChar = c[i];
 			m_bufScreen[y * m_nScreenWidth + x + i].Attributes = col;
 		}
