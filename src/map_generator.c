@@ -54,11 +54,14 @@ void increase_arr_next_nodes_capacity(node_of_room_t* node) {
     node->next_nodes = realloc(node->next_nodes, node->capacity_nexts * sizeof(node_of_room_t));
 }
 
-node_of_room_t init_next_nodes_array(int capacity) {
-    node_of_room_t node;
-    node.capacity_nexts = capacity;
-    node.len_nexts = 0;
-    node.next_nodes = malloc(node.capacity_nexts * sizeof(node_of_room_t));
+node_of_room_t* init_room_node(int capacity) {
+    node_of_room_t* node = malloc(sizeof(node_of_room_t));
+    node->capacity_nexts = capacity;
+    node->len_nexts = 0;
+    node->next_nodes = malloc(node->capacity_nexts * sizeof(node_of_room_t));
+    for (int i = 0; i < capacity; i++) {
+        node->next_nodes[i] = NULL;
+    }
     return node;
 }
 
@@ -125,20 +128,44 @@ int is_intersection_circle_with_circle(point_t center1, point_t center2, double 
 }
 
 graph_of_rooms_t read_graph_from_file(char* name_file) {
+    type_of_room_t type_of_room = read_room_for_file("map.txt"); //TODO
     FILE* fgraph = fopen(name_file, "r");
     int n;
     fscanf(fgraph, "%d", &n);
-    node_of_room_t* array_of_rooms = malloc(n * sizeof(node_of_room_t));
+    node_of_room_t** array_of_rooms = malloc(n * sizeof(node_of_room_t*));
+    int* is_exist = malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++)
+        is_exist[i] = 0;
     int pred_id, next_id;
     fscanf(fgraph, "%d %d", &pred_id, &next_id);
-    node_of_room_t temp_node = init_next_nodes_array(3);
-    node_of_room_t temp_node_second = init_next_nodes_array(3);
-    temp_node.next_nodes[0] = temp_node_second;
+    node_of_room_t* temp_node = init_room_node(3);
+    temp_node->type_of_room = type_of_room;
+    node_of_room_t* temp_node_second = init_room_node(3);
+    temp_node_second->type_of_room = type_of_room;
+    graph_of_rooms_t graph;
+    graph.start = temp_node;
+    temp_node->next_nodes[temp_node->len_nexts++] = temp_node_second;
     array_of_rooms[pred_id] = temp_node;
+    is_exist[pred_id] = 1;
     array_of_rooms[next_id] = temp_node_second;
-    for (int i = 0; i  < n; i++) {
-
+    is_exist[next_id] = 1;
+    for (int i = 1; i  < n; i++) {
+        fscanf(fgraph, "%d %d", &pred_id, &next_id);
+        if (array_of_rooms[pred_id]->len_nexts >= array_of_rooms[pred_id]->capacity_nexts)
+            increase_arr_next_nodes_capacity(array_of_rooms[pred_id]);
+        if (is_exist[next_id]) {
+            array_of_rooms[pred_id]->next_nodes[array_of_rooms[pred_id]->len_nexts++] = array_of_rooms[next_id];
+        }
+        else {
+            node_of_room_t* temp = init_room_node(3);
+            temp->type_of_room = type_of_room;
+            array_of_rooms[pred_id]->next_nodes[array_of_rooms[pred_id]->len_nexts++] = temp;
+            array_of_rooms[next_id] = temp;
+            is_exist[next_id] = 1;
+        }
     }
+    free(array_of_rooms);
+    return graph;
 }
 
 void init_graph_of_rooms() {
@@ -161,4 +188,5 @@ void init_graph_of_rooms() {
     point_t tempc1 = { 0, 0 };
     point_t tempc2 = { 6, 3 };
     point_t x = get_random_point_on_circle(0, 2 * M_PI, tempc1, 2);
+    graph_of_rooms_t graph = read_graph_from_file("graph.txt");
 }
