@@ -96,7 +96,7 @@ int update(float time_elapsed) {
 }
 
 int main() {
-    srand(time(0));
+    srand(time(NULL));
 	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;

@@ -6,48 +6,7 @@
 
 #include <stdlib.h>
 #include <math.h>
-
-point_t* create_point_t_4cube() {
-    point_t temp;
-    point_t* cube = malloc(sizeof(point_t) * 12);
-    temp.x = 0;
-    temp.y = 0;
-    cube[0] = temp;
-    temp.x = 1;
-    temp.y = 0;
-    cube[1] = temp;
-    temp.x = 2;
-    temp.y = 0;
-    cube[2] = temp;
-    temp.x = 3;
-    temp.y = 0;
-    cube[3] = temp;
-    temp.x = 0;
-    temp.y = 1;
-    cube[4] = temp;
-    temp.x = 0;
-    temp.y = 2;
-    cube[5] = temp;
-    temp.x = 0;
-    temp.y = 3;
-    cube[6] = temp;
-    temp.x = 1;
-    temp.y = 3;
-    cube[7] = temp;
-    temp.x = 2;
-    temp.y = 3;
-    cube[8] = temp;
-    temp.x = 3;
-    temp.y = 3;
-    cube[9] = temp;
-    temp.x = 3;
-    temp.y = 1;
-    cube[10] = temp;
-    temp.x = 3;
-    temp.y = 2;
-    cube[11] = temp;
-    return cube;
-}
+#include <limits.h>
 
 void increase_arr_next_nodes_capacity(node_of_room_t* node) {
     node->capacity_nexts = node->capacity_nexts * 2;
@@ -59,9 +18,6 @@ node_of_room_t* init_room_node(int capacity) {
     node->capacity_nexts = capacity;
     node->len_nexts = 0;
     node->next_nodes = malloc(node->capacity_nexts * sizeof(node_of_room_t));
-    for (int i = 0; i < capacity; i++) {
-        node->next_nodes[i] = NULL;
-    }
     return node;
 }
 
@@ -100,10 +56,7 @@ type_of_room_t read_room_for_file(char* name_file) {
     }
     fclose(fmap);
 
-    if (height > width)
-        type_of_room.radius = height / 2 + 1;
-    else
-        type_of_room.radius = width / 2 + 1;
+    type_of_room.radius = sqrt(pow(width / 2 + 1, 2) + pow(height / 2 + 1, 2));
     type_of_room.center.x = width / 2;
     type_of_room.center.y = height / 2;
     return type_of_room;
@@ -128,13 +81,13 @@ int is_intersection_circle_with_circle(point_t center1, point_t center2, double 
 }
 
 graph_of_rooms_t read_graph_from_file(char* name_file) {
-    type_of_room_t type_of_room = read_room_for_file("map.txt"); //TODO
+    type_of_room_t type_of_room = read_room_for_file("main_room.txt"); //TODO
     FILE* fgraph = fopen(name_file, "r");
     int n;
     fscanf(fgraph, "%d", &n);
-    node_of_room_t** array_of_rooms = malloc(n * sizeof(node_of_room_t*));
-    int* is_exist = malloc(n * sizeof(int));
-    for (int i = 0; i < n; i++)
+    node_of_room_t** array_of_rooms = malloc((n + 1) * sizeof(node_of_room_t*));
+    int* is_exist = malloc((n + 1) * sizeof(int));
+    for (int i = 0; i < n + 1; i++)
         is_exist[i] = 0;
     int pred_id, next_id;
     fscanf(fgraph, "%d %d", &pred_id, &next_id);
@@ -164,29 +117,120 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
             is_exist[next_id] = 1;
         }
     }
-    free(array_of_rooms);
+    graph.array_of_rooms = array_of_rooms;
+    graph.n_nodes = n + 1;
+    graph.is_exist = is_exist;
     return graph;
 }
 
-void init_graph_of_rooms() {
-    point_t* room = create_point_t_4cube();
-    type_of_room_t type_of_room = read_room_for_file("map.txt");
-    char** im = malloc(type_of_room.height * sizeof(char*));
-    for (int i = 0; i < type_of_room.height; i++) {
-        im[i] = malloc((type_of_room.width + 1) * sizeof(char));
-        for (int j = 0; j < type_of_room.width; j++) {
-            im[i][j] = ' ';
+void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room_t* node) {
+    double external_r = node->type_of_room.radius;
+    while (1) {
+        point_t random_point_to_set = get_random_point_on_circle(0, 2 * M_PI, parent->center_on_map, parent->type_of_room.radius + external_r + 1);
+        int count_of_check = 0;
+        int is_intersection = 0;
+        for (int i = 0; i < graph->n_nodes; i++) {
+            if (graph->is_exist[i] && graph->array_of_rooms[i] != node) {
+                is_intersection = is_intersection_circle_with_circle(parent->center_on_map, random_point_to_set, parent->type_of_room.radius, node->type_of_room.radius);
+                if (is_intersection)
+                    break;
+            }
         }
-        im[i][type_of_room.width] = '\0';
+        if (is_intersection) {
+            count_of_check++;
+        }
+        else {
+            node->center_on_map = random_point_to_set;
+            for (int i = 0; i < node->len_nexts; i++) {
+                set_node_near(graph, node, node->next_nodes[i]);
+            }
+            break;
+        }
+        if (count_of_check % 5 == 0)
+            external_r *= 2;
     }
-    for (int i = 0; i < type_of_room.shape.len; i++) {
-        im[(int)type_of_room.shape.array[i].x][(int)type_of_room.shape.array[i].y] = '#';
+
+}
+
+char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int* height) {
+    graph->start->center_on_map.x = 0;
+    graph->start->center_on_map.y = 0;
+    for (int i = 0; i < graph->start->len_nexts; i++) {
+        set_node_near(graph, graph->start, graph->start->next_nodes[i]);
     }
-    for (int i = 0; i < 16; i++) {
-        fprintf(log_file(), "%s\n", im[i]);
+
+    int shift_x, shift_y;
+    int min_x = INT_MAX, max_x = INT_MIN;
+    int min_y = INT_MAX, max_y = INT_MIN;
+    int min_x_r = 0, max_x_r = 0;
+    int min_y_r = 0, max_y_r = 0;
+    for (int i = 0; i < graph->n_nodes; i++) {
+        if (graph->is_exist[i]) {
+            if (graph->array_of_rooms[i]->center_on_map.x - graph->array_of_rooms[i]->type_of_room.radius < min_x - min_x_r) {
+                min_x = graph->array_of_rooms[i]->center_on_map.x;
+                min_x_r = graph->array_of_rooms[i]->type_of_room.radius;
+            }
+            if (graph->array_of_rooms[i]->center_on_map.y - graph->array_of_rooms[i]->type_of_room.radius < min_y - min_y_r) {
+                min_y = graph->array_of_rooms[i]->center_on_map.y;
+                min_y_r = graph->array_of_rooms[i]->type_of_room.radius;
+            }
+            if (graph->array_of_rooms[i]->center_on_map.x + graph->array_of_rooms[i]->type_of_room.radius > max_x + max_x_r) {
+                max_x = graph->array_of_rooms[i]->center_on_map.x;
+                max_x_r = graph->array_of_rooms[i]->type_of_room.radius;
+            }
+            if (graph->array_of_rooms[i]->center_on_map.y + graph->array_of_rooms[i]->type_of_room.radius > max_y + max_y_r) {
+                max_y = graph->array_of_rooms[i]->center_on_map.y;
+                max_y_r = graph->array_of_rooms[i]->type_of_room.radius;
+            }
+        }
     }
-    point_t tempc1 = { 0, 0 };
-    point_t tempc2 = { 6, 3 };
-    point_t x = get_random_point_on_circle(0, 2 * M_PI, tempc1, 2);
+    *width = max_x - min_x + max_x_r + min_x_r;
+    *height = max_y - min_y + max_y_r + min_y_r;
+    shift_x = 0 - (min_x - min_x_r);
+    shift_y = 0 - (min_y - min_y_r);
+
+    char** map = malloc(*height * sizeof(char*));
+    for (int i = 0; i < *height; i++) {
+        map[i] = malloc((*width + 1) * sizeof(char));
+        for (int j = 0; j < *width; j++)
+            map[i][j] = ' ';
+        map[i][*width] = '\0';
+    }
+    for (int node_room_index = 0; node_room_index < graph->n_nodes; node_room_index++) {
+        node_of_room_t node_room = *(graph->array_of_rooms[node_room_index]);
+        for (int i = 0; i < node_room.type_of_room.shape.len; i++) {
+            int y = node_room.center_on_map.y + node_room.type_of_room.shape.array[i].y - node_room.type_of_room.center.y + shift_y;
+            int x = node_room.center_on_map.x + node_room.type_of_room.shape.array[i].x - node_room.type_of_room.center.x + shift_x;
+            map[y][x] = '#';
+        }
+    }
+    return map;
+}
+
+void init_graph_of_rooms() {
+    //point_t* room = create_point_t_4cube();
+    //type_of_room_t type_of_room = read_room_for_file("map.txt");
+    //char** im = malloc(type_of_room.height * sizeof(char*));
+    //for (int i = 0; i < type_of_room.height; i++) {
+    //    im[i] = malloc((type_of_room.width + 1) * sizeof(char));
+    //    for (int j = 0; j < type_of_room.width; j++) {
+    //        im[i][j] = ' ';
+    //    }
+    //    im[i][type_of_room.width] = '\0';
+    //}
+    //for (int i = 0; i < type_of_room.shape.len; i++) {
+    //    im[(int)type_of_room.shape.array[i].x][(int)type_of_room.shape.array[i].y] = '#';
+    //}
+    //for (int i = 0; i < 16; i++) {
+    //    fprintf(log_file(), "%s\n", im[i]);
+    //}
+    //point_t tempc1 = { 0, 0 };
+    //point_t tempc2 = { 6, 3 };
+    //point_t x = get_random_point_on_circle(0, 2 * M_PI, tempc1, 2);
     graph_of_rooms_t graph = read_graph_from_file("graph.txt");
+    int width, height;
+    char** map = put_node_rooms_on_map_from_graph(&graph, &width, &height);
+    for (int i = 0; i < height; i++) {
+        fprintf(log_file(), "%s\n", map[i]);
+    }
 }
