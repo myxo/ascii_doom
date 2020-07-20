@@ -106,6 +106,7 @@ typedef struct {
     game_sprites_t sprites;
 } world_t;
 
+void init_player(world_t* world);
 int init_world_object();
 void deinit_world_object();
 void init_z_buffer();
@@ -113,11 +114,11 @@ void deinit_z_buffer();
 world_t* get_world();
 int read_map_for_file();
 int is_in_circle(point_t pos, point_t circle_center, double radius);
-int is_wall(double x, double y);
+int is_wall(double x, double y, double radius);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
 int is_enemy(double x, double y, int* enemy_index);
-point_t get_rand_pos_on_floor(world_t* world);
+point_t get_rand_pos_on_floor(world_t* world, double radius);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);

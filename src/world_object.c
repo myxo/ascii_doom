@@ -53,16 +53,17 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
 
+void init_player(world_t* world) {
+    world->player.health = 3;
+    world->player.maxhealth = 3;
+    world->player.radius = 0.2;
+    world->player.pos = get_rand_pos_on_floor(world, world->player.radius);
+    world->player.angle = M_PI_4;
+}
+
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
     update_world_from_config();
-
-    world_global->player.health = 3;
-    world_global->player.maxhealth = 3;
-    world_global->player.pos.x = 1;
-    world_global->player.pos.y = 1;
-    world_global->player.angle = M_PI_4;
-    world_global->player.radius = 0.2;
 
     world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
     init_std_weapon_list(world_global->weapon_list);
@@ -110,12 +111,18 @@ world_t* get_world() {
     return world_global;
 }
 
-int is_wall(double x, double y) {
+int is_wall2(double x, double y) {
     if (x < 0 || y < 0)
         return 1;
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_wall(double x, double y, double radius) {
+    int result = is_wall2(x + radius, y - radius) || is_wall2(x - radius, y + radius)
+        || is_wall2(x + radius, y + radius) || is_wall2(x - radius, y - radius);
+    return result;
 }
 
 int read_map_for_file() {
@@ -177,12 +184,12 @@ int is_enemy(double x, double y, int* enemy_index) {
     return 0;
 }
 
-point_t get_rand_pos_on_floor(world_t* world) {
+point_t get_rand_pos_on_floor(world_t* world, double radius) {
     point_t pos;
     do {
         pos.x = rand() % world->map_width;
         pos.y = rand() % world->map_height;
-    } while (is_wall(pos.x, pos.y));
+    } while (is_wall(pos.x, pos.y, radius));
     return pos;
 }
 
@@ -199,7 +206,7 @@ double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance) {
     double x = pos1.x;
     double y = pos1.y;
-    while (!is_wall(x, y)) {
+    while (!is_wall2(x, y)) {
         x += d_distance * sin(angle);
         y += d_distance * cos(angle);
         point_t pos = { x, y };

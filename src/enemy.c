@@ -50,7 +50,7 @@ point_array_t build_path(enemy_t* enemy) {
         for (int i = 0; i < 4; i++) {
             int x = (int)cur.x + x_move[i];
             int y = (int)cur.y + y_move[i];
-            if (!is_wall(x, y)) {
+            if (!is_wall(x, y, 0)) {
                 point_t to = { x, y };
                 if (!used[x][y]) {
                     used[x][y] = 1;
@@ -102,14 +102,14 @@ void add_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
-    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world);
-    world->enemy_array.array[world->enemy_array.len].global_target = get_rand_pos_on_floor(world);
-    world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world, 0.2);
+    world->enemy_array.array[world->enemy_array.len].global_target = get_rand_pos_on_floor(world, 0.2);
+    world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
     world->enemy_array.len++;
@@ -119,7 +119,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
         if (is_in_circle(enemy->global_target, enemy->pos, 0.5)) {
-            enemy->global_target = get_rand_pos_on_floor(world);
+            enemy->global_target = get_rand_pos_on_floor(world, enemy->radius);
             enemy->path = build_path(enemy);
             enemy->local_target_id = 0;
         }
@@ -154,7 +154,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
+            if (!is_wall(new_pos.x, new_pos.y, 0) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->pos = new_pos;
             }
             if (is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
