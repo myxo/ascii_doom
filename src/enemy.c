@@ -62,8 +62,8 @@ point_array_t build_path(enemy_t* enemy) {
                 used[(int)to.x][(int)to.y] = 1;
                 point_queue_push_back(&q, to);
                 pred[(int)to.x][(int)to.y] = cur;
-                //if (to.x == enemy->global_target.x && to.y == enemy->global_target.y)
-                //    i++;
+                if (to.x == enemy->global_target.x && to.y == enemy->global_target.y)
+                    i++;
             }
         }
     }

@@ -14,11 +14,21 @@ void point_queue_push_back(point_queue_t* q, point_t point)
     point_list_t* temp = malloc(sizeof(point_list_t));
     if (q->tail == NULL || q->head == NULL) {
         q->head = temp;
-    } else
+    }
+    else {
         q->tail->ptr = temp;
+    }
     q->tail = temp;
     temp->point = point;
     temp->ptr = NULL;
+}
+
+void point_queue_push_front(point_queue_t* q, point_t point)
+{
+    point_list_t* temp = malloc(sizeof(point_list_t));
+    temp->ptr = q->head;
+    q->head = temp;
+    temp->point = point;
 }
 
 int isempty_point_queue(point_queue_t q) {

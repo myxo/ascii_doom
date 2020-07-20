@@ -6,6 +6,8 @@
 typedef struct{
     int width, height;
     point_array_t shape;
+    point_array_t floor;
+    point_array_t doors;
     int radius;
     point_t center;
 } type_of_room_t;
