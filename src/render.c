@@ -10,7 +10,13 @@
 #include <math.h>
 #include <stdlib.h>
 
-double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height, int* row_left, int* row_right, int* line_start, int* line_end) {
+screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
+    screen_obj_t res;
+    res.row_left = 0;
+    res.row_right = 0;
+    res.line_start = 0;
+    res.line_end = 0;
+    res.distance = 0;
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
         angle_from_player_to_obj += 2 * M_PI;
@@ -20,7 +26,7 @@ double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis,
     double start_player_view_angle = player->angle - player->angle_of_vision / 2;
     double stop_player_view_angle = player->angle + player->angle_of_vision / 2;
     if ((player->angle < start_player_view_angle) || (player->angle > stop_player_view_angle))
-        return 0.0;
+        return res;
     double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
     double player_to_obj_width_angle = atan2(obj_radis, distance);
     double angle_from_player_to_obj_left = angle_from_player_to_obj - player_to_obj_width_angle;
@@ -31,11 +37,11 @@ double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis,
     if (start_player_view_angle_floor_PI < 0)
         start_player_view_angle_floor_PI += 2 * M_PI;
     int lrow_left = ((int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5));
+    int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (lrow_left < 0)
         lrow_left = 0;
     if (lrow_left > olc_screen_width())
         lrow_left = olc_screen_width();
-    int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
     if (lrow_right > olc_screen_width())
         lrow_right = olc_screen_width();
     if (lrow_right < 0)
@@ -47,24 +53,21 @@ double get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis,
         lline_end = olc_screen_height();
     if (lline_start < 0)
         lline_start = 0;
-    *row_left = lrow_left;
-    *row_right = lrow_right;
-    *line_start = lline_start;
-    *line_end = lline_end;
-    return distance;
+    res.row_left = lrow_left;
+    res.row_right = lrow_right;
+    res.line_start = lline_start;
+    res.line_end = lline_end;
+    res.distance = distance;
+    return res;
 }
 
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
-    int row_left = 0;
-    int row_right = 0;
-    int draw_start = 0;
-    int draw_end = 0;
-    double distance = get_object_on_screen(player, obj_pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);
-    for (int i = row_left; i <= row_right; i++)
-        for (int j = draw_start; j < draw_end; j++) {
-            if (distance < get_world()->z_buffer[i][j]) {
+    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height);
+    for (int i = obj.row_left; i <= obj.row_right; i++)
+        for (int j = obj.line_start; j < obj.line_end; j++) {
+            if (obj.distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, ch, col);
-                get_world()->z_buffer[i][j] = distance;
+                get_world()->z_buffer[i][j] = obj.distance;
             }
         }
 }
@@ -210,21 +213,17 @@ void draw_hp(world_t* world) {
 }
 
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
-    int row_left = 0;
-    int row_right = 0;
-    int draw_start = 0;
-    int draw_end = 0;
     player_t player = get_world()->player;
-    double distance = get_object_on_screen(&player, pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);
-    if ((draw_end - draw_start) != 0 && (row_right - row_left) != 0) {
-        for (int i = row_left; i <= row_right; i++) {
-            double i_d = (double)(i - row_left) / (row_right - row_left);
-            for (int j = draw_start; j <= draw_end; j++) {
-                double j_d = (double)(j - draw_start) / (draw_end - draw_start);
+    screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height);
+    if ((obj.line_end - obj.line_start) != 0 && (obj.row_right - obj.row_left) != 0) {
+        for (int i = obj.row_left; i <= obj.row_right; i++) {
+            double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);
+            for (int j = obj.line_start; j <= obj.line_end; j++) {
+                double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
                 char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-                if (sym != 0 && distance < get_world()->z_buffer[i][j]) {
+                if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
                     olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
-                    get_world()->z_buffer[i][j] = distance;
+                    get_world()->z_buffer[i][j] = obj.distance;
                 }
             }
         }
