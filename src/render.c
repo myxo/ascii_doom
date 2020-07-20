@@ -70,6 +70,14 @@ void draw_bullets(world_t* world) {
     }
 }
 
+void draw_rockets(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->rocket_array.len; i++) {
+        rocket_t* rocket = &world->rocket_array.array[i];
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4);
+    }
+}
+
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
@@ -136,6 +144,7 @@ void draw_screen(world_t* world) {
     }
     draw_enemies(world);
     draw_bullets(world);
+    draw_rockets(world);
 }
 
 void draw_minimap(world_t* world) {

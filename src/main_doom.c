@@ -8,6 +8,7 @@
 #include "enemy.h"
 #include "player.h"
 #include "weapon.h"
+#include "rocket.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -59,6 +60,9 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('2').pressed) {
         set_active_weapon(get_world(), RIFLE);
     }
+    if (olc_get_key('3').pressed) {
+        set_active_weapon(get_world(), ROCKET_LAUNCHER);
+    }
     move_player(move_vec_x, move_vec_y, time_elapsed);
     if (olc_get_key(VK_SPACE).held) {
         shoot_from_active_weapon(get_world());
@@ -88,10 +92,15 @@ int update(float time_elapsed) {
     }
     update_time_since_last_shot(get_world(), time_elapsed);
     bullets_movement(get_world(), time_elapsed);
+    rockets_movement(get_world(), time_elapsed);
     enemy_movement(get_world(), time_elapsed);
 	draw_screen(get_world());
     draw_minimap(get_world());
     draw_hp(get_world());
+    if (get_world()->rocket_array.len > 0) {
+        add_watch("x", get_world()->rocket_array.array[0].pos.x);
+        add_watch("y", get_world()->rocket_array.array[0].pos.y);
+    }
     display_watch();
     draw_config_ui();
 	return 1;
