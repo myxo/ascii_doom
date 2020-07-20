@@ -59,7 +59,7 @@ void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, e
     int row_right = 0;
     int draw_start = 0;
     int draw_end = 0;
-    double distance = 0;/* get_object_on_screen(player, obj_pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);*/
+    double distance = get_object_on_screen(player, obj_pos, obj_radis, obj_height, &row_left, &row_right, &draw_start, &draw_end);
     for (int i = row_left; i <= row_right; i++)
         for (int j = draw_start; j < draw_end; j++) {
             if (distance < get_world()->z_buffer[i][j]) {
@@ -79,8 +79,6 @@ void draw_enemies(world_t* world) {
 
 void draw_bullets(world_t* world) {
     player_t* player = &world->player;
-    int tex_width = world->sprites.bullet->texture[0].width;
-    int tex_height = world->sprites.bullet->texture[0].height;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
         draw_sprite(world->sprites.bullet, 0, bullet->pos, bullet->radius, 150 * bullet->radius);
