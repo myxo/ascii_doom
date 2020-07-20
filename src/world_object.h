@@ -64,6 +64,7 @@ typedef struct {
     int len;
     int capacity;
 } enemy_array_t;
+
 typedef enum bullet_host {
     kBulletPlayer,
     kBulletEnemy
@@ -119,10 +120,24 @@ typedef struct {
 } rocket_array_t;
 
 typedef struct {
+    point_t pos;
+    double radius;
+    double life_time;
+    double max_life_time;
+} explosion_t;
+
+typedef struct {
+    explosion_t* array;
+    int len;
+    int capacity;
+} explosion_array_t;
+
+typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
     rocket_array_t rocket_array;
+    explosion_array_t explosion_array;
     enemy_array_t enemy_array;
     std_weapon_list_t* weapon_list;
     int map_width;

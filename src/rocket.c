@@ -1,7 +1,7 @@
 #include "world_object.h"
 #include "rocket.h"
-#include "player.h"
-#include "enemy.h"
+#include "render.h"
+#include "explosion.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -29,19 +29,19 @@ void rockets_movement(world_t* world, float time_elapsed) {
         }
         else {
             point_t expl_point = { new_x, new_y };
-            make_explosion(expl_point, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
+            make_explosion(world, expl_point, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
             rocket_destruct(world, i);
         }
         int index;
         if (is_enemy(world->rocket_array.array[i].pos.x, world->rocket_array.array[i].pos.y, &index)) {
             if (world->rocket_array.array[i].host == kBulletPlayer) {
-                make_explosion(world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
+                make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
                 rocket_destruct(world, i);
             }
         }
         if (is_player(world->rocket_array.array[i].pos.x, world->rocket_array.array[i].pos.y)) {
             if (world->rocket_array.array[i].host == kBulletEnemy) {
-                make_explosion(world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
+                make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
                 rocket_destruct(world, i);
             }
         }
@@ -61,19 +61,4 @@ void shoot_rocket(world_t* world, point_t pos, double angle, bullet_host_t host,
     world->rocket_array.array[world->rocket_array.len].damage = damage;
     world->rocket_array.array[world->rocket_array.len].explosive_radius = expl_radius;
     world->rocket_array.len++;
-}
-
-void make_explosion(point_t pos, double std_damage, double radius) {
-    if (is_in_circle(get_world()->player.pos, pos, radius)) {
-        double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(get_world()->player.pos, pos)) / radius;
-        double damage = std_damage * rate_of_damage;
-        player_hit(damage);
-    }
-    for (int i = 0; i < get_world()->enemy_array.len; i++) {
-        if (is_in_circle(get_world()->enemy_array.array[i].pos, pos, radius)) {
-            double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(get_world()->enemy_array.array[i].pos, pos)) / radius;
-            double damage = std_damage * rate_of_damage;
-            enemy_hit(get_world(), i, damage);
-        }
-    }
 }

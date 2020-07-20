@@ -61,7 +61,7 @@ void init_rocket_launcher(weapon_t* rocket_launcher) {
     rocket_launcher->fire_rate = 0.5;
     rocket_launcher->host = kBulletPlayer;
     rocket_launcher->label = ROCKET_LAUNCHER;
-    rocket_launcher->expl_radius = 4;
+    rocket_launcher->expl_radius = 3;
     rocket_launcher->shot_delay = 0;
 }
 

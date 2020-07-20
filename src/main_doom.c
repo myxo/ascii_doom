@@ -9,6 +9,7 @@
 #include "player.h"
 #include "weapon.h"
 #include "rocket.h"
+#include "explosion.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -90,13 +91,15 @@ int update(float time_elapsed) {
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
-    update_time_since_last_shot(get_world(), time_elapsed);
-    bullets_movement(get_world(), time_elapsed);
-    rockets_movement(get_world(), time_elapsed);
-    enemy_movement(get_world(), time_elapsed);
-	draw_screen(get_world());
-    draw_minimap(get_world());
-    draw_hp(get_world());
+    world_t* world = get_world();
+    update_time_since_last_shot(world, time_elapsed);
+    bullets_movement(world, time_elapsed);
+    rockets_movement(world, time_elapsed);
+    enemy_movement(world, time_elapsed);
+    update_life_time(world, time_elapsed);
+	draw_screen(world);
+    draw_minimap(world);
+    draw_hp(world);
     display_watch();
     draw_config_ui();
 	return 1;
