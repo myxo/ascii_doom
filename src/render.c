@@ -73,7 +73,7 @@ void draw_enemies(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
-        draw_object(player, enemy->pos, enemy->radius, '%', FG_BLUE, 50);
+        draw_sprite(world->sprites.mob1, 0, enemy->pos, enemy->radius, 40);
     }
 }
 
