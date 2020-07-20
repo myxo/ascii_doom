@@ -32,7 +32,7 @@ int create() {
         return 0;
     }
     log_init("debug.txt");
-    init_graph_of_rooms();
+    create_map(get_world());
     return 1;
 }
 

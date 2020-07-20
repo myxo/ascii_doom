@@ -27,6 +27,6 @@ typedef struct graph_of_rooms {
     int* is_exist;
 } graph_of_rooms_t;
 
-void init_graph_of_rooms();
+void create_map(world_t* world);
 
 #endif 

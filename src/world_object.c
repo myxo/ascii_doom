@@ -43,8 +43,8 @@ int init_world_object() {
     update_world_from_config();
 
     world_global->player.health = 3;
-    world_global->player.pos.x = 1;
-    world_global->player.pos.y = 1;
+    world_global->player.pos.x = 13;
+    world_global->player.pos.y = 5;
     world_global->player.angle = M_PI_4;
     world_global->player.speed = 2.5;
     world_global->player.angle_of_vision = M_PI_4;

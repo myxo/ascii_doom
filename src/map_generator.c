@@ -169,7 +169,15 @@ void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room
 
 }
 
-char** build_corridor(char** map, node_of_room_t* start_room, node_of_room_t* stop_room, double shift_y, double shift_x, double map_width, double map_height, char ch_door_start, char ch_door_stop) {
+char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_room, node_of_room_t* stop_room, double shift_y, double shift_x, double map_width, double map_height) {
+    char ch_door_start = '0', ch_door_stop = '0';
+    for (int i = 0; i < g->n_nodes; i++) {
+        if (g->array_of_rooms[i] == start_room)
+            ch_door_start = '0' + i;
+        if (g->array_of_rooms[i] == stop_room)
+            ch_door_start = '0' + i;
+    }
+
     point_queue_t q = point_queue_init();
     int** used = malloc(map_width * sizeof(int*));
     for (int i = 0; i < map_width; i++) {
@@ -184,8 +192,8 @@ char** build_corridor(char** map, node_of_room_t* start_room, node_of_room_t* st
     }
     for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
         point_t temp;
-        temp.y = start_room->center_on_map.y + start_room->type_of_room.floor.array[i].y - start_room->type_of_room.center.y + shift_y;
-        temp.x = start_room->center_on_map.x + start_room->type_of_room.floor.array[i].x - start_room->type_of_room.center.x + shift_x;
+        temp.y = start_room->center_on_map.y + start_room->type_of_room.doors.array[i].y - start_room->type_of_room.center.y + shift_y;
+        temp.x = start_room->center_on_map.x + start_room->type_of_room.doors.array[i].x - start_room->type_of_room.center.x + shift_x;
         point_queue_push_back(&q, temp);
         used[(int)temp.x][(int)temp.y] = 1;
         point_t null = { -1, -1 };
@@ -204,9 +212,9 @@ char** build_corridor(char** map, node_of_room_t* start_room, node_of_room_t* st
                 if (!used[x][y]) {
                     used[x][y] = 1;
                     pred[x][y] = cur;
-                    for (int i = 0; i < stop_room->type_of_room.doors.len; i++) {
-                        stop_door.y = stop_room->center_on_map.y + stop_room->type_of_room.floor.array[i].y - stop_room->type_of_room.center.y + shift_y;
-                        stop_door.x = stop_room->center_on_map.x + stop_room->type_of_room.floor.array[i].x - stop_room->type_of_room.center.x + shift_x;
+                    for (int j = 0; j < stop_room->type_of_room.doors.len; j++) {
+                        stop_door.y = stop_room->center_on_map.y + stop_room->type_of_room.doors.array[j].y - stop_room->type_of_room.center.y + shift_y;
+                        stop_door.x = stop_room->center_on_map.x + stop_room->type_of_room.doors.array[j].x - stop_room->type_of_room.center.x + shift_x;
                         if (x == (int)stop_door.x && y == (int)stop_door.y) {
                             break;
                         }
@@ -219,12 +227,15 @@ char** build_corridor(char** map, node_of_room_t* start_room, node_of_room_t* st
         }
     }
     for (point_t cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
-        map[(int)cur.y][(int)cur.x] = ' ';
+        if (cur.x < 0 || cur.y < 0)
+            break;
+        map[(int)cur.y][(int)cur.x] = '.';
     }
+    
     return map;
 }
 
-char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int* height) {
+char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int* height, point_t* player_pos) {
     graph->start->center_on_map.x = 0;
     graph->start->center_on_map.y = 0;
     for (int i = 0; i < graph->start->len_nexts; i++) {
@@ -287,36 +298,34 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
             int x = node_room.center_on_map.x + node_room.type_of_room.doors.array[i].x - node_room.type_of_room.center.x + shift_x;
             map[y][x] = '0' + node_room_index;
         }
-        //map[(int)node_room.center_on_map.y + shift_y][(int)(node_room.center_on_map.x + shift_x)] = '0' + node_room_index;
     }
-    map = build_corridor(map, graph->start, graph->start->next_nodes[0], shift_y, shift_x, *width, *height, '0', '0' + 1);
+    for (int i = 0; i < graph->n_nodes; i++) {
+        if (graph->is_exist[i])
+            for (int j = 0; j < graph->array_of_rooms[i]->len_nexts; j++) {
+                map = build_corridor(graph, map, graph->array_of_rooms[i], graph->array_of_rooms[i]->next_nodes[j], shift_y, shift_x, *width, *height);
+            }
+    }
+    for (int y = 0; y < *height; y++) {
+        for (int x = 0; x < *width; x++) {
+            if (map[y][x] == '.')
+                map[y][x] = ' ';
+            if (map[y][x] != ' ')
+                map[y][x] = '#';
+        }
+    }
+    player_pos->x = graph->start->center_on_map.y + shift_y;
+    player_pos->y = graph->start->center_on_map.x + shift_x;
     return map;
 }
 
-void init_graph_of_rooms() {
-    //point_t* room = create_point_t_4cube();
-    //type_of_room_t type_of_room = read_room_for_file("map.txt");
-    //char** im = malloc(type_of_room.height * sizeof(char*));
-    //for (int i = 0; i < type_of_room.height; i++) {
-    //    im[i] = malloc((type_of_room.width + 1) * sizeof(char));
-    //    for (int j = 0; j < type_of_room.width; j++) {
-    //        im[i][j] = ' ';
-    //    }
-    //    im[i][type_of_room.width] = '\0';
-    //}
-    //for (int i = 0; i < type_of_room.shape.len; i++) {
-    //    im[(int)type_of_room.shape.array[i].x][(int)type_of_room.shape.array[i].y] = '#';
-    //}
-    //for (int i = 0; i < 16; i++) {
-    //    fprintf(log_file(), "%s\n", im[i]);
-    //}
-    //point_t tempc1 = { 0, 0 };
-    //point_t tempc2 = { 6, 3 };
-    //point_t x = get_random_point_on_circle(0, 2 * M_PI, tempc1, 2);
+void create_map(world_t* world) {
     graph_of_rooms_t graph = read_graph_from_file("graph.txt");
     int width, height;
-    char** map = put_node_rooms_on_map_from_graph(&graph, &width, &height);
+    char** map = put_node_rooms_on_map_from_graph(&graph, &width, &height, &world->player.pos);
     for (int i = 0; i < height; i++) {
         fprintf(log_file(), "%s\n", map[i]);
     }
+    world->map = map;
+    world->map_height = height;
+    world->map_width = width;
 }
