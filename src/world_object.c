@@ -3,6 +3,7 @@
 #include "olc/olc.h"
 
 #include "world_object.h"
+#include "weapon.h"
 #include "sprite.h"
 #include "config.h"
 
@@ -53,12 +54,14 @@ int init_world_object() {
     update_world_from_config();
 
     world_global->player.health = 3;
-    world_global->player.maxhealth = world_global->player.health;
+    world_global->player.maxhealth = 3;
     world_global->player.pos.x = 1;
     world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
     world_global->player.radius = 0.2;
 
+    world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
+    init_std_weapon_list(world_global->weapon_list);
     init_z_buffer();
     init_sprites(world_global);
 
@@ -72,6 +75,7 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
+    deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
     //deinit_sprite(world_global->sprites.bullet);
     deinit_texture(&world_global->textures.wall);
