@@ -111,7 +111,7 @@ world_t* get_world() {
     return world_global;
 }
 
-int is_wall2(double x, double y) {
+int is_wall(double x, double y) {
     if (x < 0 || y < 0)
         return 1;
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
@@ -119,9 +119,9 @@ int is_wall2(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
 }
 
-int is_wall(double x, double y, double radius) {
-    int result = is_wall2(x + radius, y - radius) || is_wall2(x - radius, y + radius)
-        || is_wall2(x + radius, y + radius) || is_wall2(x - radius, y - radius);
+int is_wall_in_radius(double x, double y, double radius) {
+    int result = is_wall(x + radius, y - radius) || is_wall(x - radius, y + radius)
+        || is_wall(x + radius, y + radius) || is_wall(x - radius, y - radius);
     return result;
 }
 
@@ -189,7 +189,7 @@ point_t get_rand_pos_on_floor(world_t* world, double radius) {
     do {
         pos.x = rand() % world->map_width;
         pos.y = rand() % world->map_height;
-    } while (is_wall(pos.x, pos.y, radius));
+    } while (is_wall_in_radius(pos.x, pos.y, radius));
     return pos;
 }
 
@@ -206,7 +206,7 @@ double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance) {
     double x = pos1.x;
     double y = pos1.y;
-    while (!is_wall2(x, y)) {
+    while (!is_wall(x, y)) {
         x += d_distance * sin(angle);
         y += d_distance * cos(angle);
         point_t pos = { x, y };

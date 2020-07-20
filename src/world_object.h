@@ -114,7 +114,7 @@ void deinit_z_buffer();
 world_t* get_world();
 int read_map_for_file();
 int is_in_circle(point_t pos, point_t circle_center, double radius);
-int is_wall(double x, double y, double radius);
+int is_wall_in_radius(double x, double y, double radius);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
 int is_enemy(double x, double y, int* enemy_index);
