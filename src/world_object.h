@@ -29,11 +29,13 @@ typedef struct {
 typedef struct {
     texture_t wall;
     texture_t bullet;
+    texture_t mob1;
 } game_textures_t;
 
 typedef struct {
     sprite_t* wall;
     sprite_t* bullet;
+    sprite_t* mob1;
 } game_sprites_t;
 
 

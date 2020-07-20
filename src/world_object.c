@@ -41,10 +41,16 @@ void increase_arr_point_capacity(point_array_t* point_array) {
 void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1 = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
+    init_sprite(world_global->sprites.mob1);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
+    load_texture_from_file("mob1.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("bullet1.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
 
 int init_world_object() {

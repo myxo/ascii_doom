@@ -92,6 +92,7 @@ int update(float time_elapsed) {
 	draw_screen(get_world());
     draw_minimap(get_world());
     draw_hp(get_world());
+    add_watch("angle", get_world()->player.angle);
     display_watch();
     draw_config_ui();
 	return 1;
