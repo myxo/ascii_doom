@@ -2,10 +2,11 @@
 #include "olc/olc.h"
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 typedef struct {
     double value;
-    char label[10];
+    char label[30];
 } var_to_display_t;
 
 typedef struct {
@@ -59,7 +60,8 @@ void add_watch(const char* label, double value) {
         increase_arr_vars_capacity(&display_logging);
     }
     display_logging.array[display_logging.len].value = value;
-    strncpy(display_logging.array[display_logging.len].label, label, 10);
+    assert(strlen(label) < 30);
+    strncpy(display_logging.array[display_logging.len].label, label, 30);
     display_logging.len++;
 }
 
@@ -83,8 +85,8 @@ void stop_watch(const char* label) {
 void display_watch() {
     if (display_logging.len == 0)
         return;
-    char str[27];
-    olc_fill(0, 0, 27, display_logging.len + 1, ' ', BG_BLACK);
+    char str[47];
+    olc_fill(0, 0, 47, display_logging.len + 1, ' ', BG_BLACK);
     for (int i = 0; i < display_logging.len; i++) {
         sprintf(str, "%s : %9.5f", display_logging.array[i].label, display_logging.array[i].value);
         olc_draw_string(0, i, str, FG_WHITE);

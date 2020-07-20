@@ -97,10 +97,6 @@ int update(float time_elapsed) {
 	draw_screen(get_world());
     draw_minimap(get_world());
     draw_hp(get_world());
-    if (get_world()->rocket_array.len > 0) {
-        add_watch("x", get_world()->rocket_array.array[0].pos.x);
-        add_watch("y", get_world()->rocket_array.array[0].pos.y);
-    }
     display_watch();
     draw_config_ui();
 	return 1;
