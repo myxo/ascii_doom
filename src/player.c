@@ -27,7 +27,5 @@ void turn_player(int dir, double time_elapsed) {
 void player_hit(double damage) {
     world_t* world = get_world();;
     world->player.health -= damage;
-    if (world->player.health <= 0)
-        exit(0);
 }
 
