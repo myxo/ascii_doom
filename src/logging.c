@@ -2,6 +2,7 @@
 #include "olc/olc.h"
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 typedef struct {
     double value;
@@ -59,11 +60,8 @@ void add_watch(const char* label, double value) {
         increase_arr_vars_capacity(&display_logging);
     }
     display_logging.array[display_logging.len].value = value;
-    if (strlen(label) >= 30) {
-        strcpy(display_logging.array[display_logging.len].label, "Name is too big(<30)");
-    } else {
-        strncpy(display_logging.array[display_logging.len].label, label, 30);
-    }
+    assert(strlen(label) < 30);
+    strncpy(display_logging.array[display_logging.len].label, label, 30);
     display_logging.len++;
 }
 
