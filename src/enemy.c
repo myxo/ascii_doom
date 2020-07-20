@@ -3,7 +3,8 @@
 #include "sprite.h"
 #include "world_object.h"
 #include "bullet.h"
-#include "../third_party/olc/olc.h"
+#include "olc/olc.h"
+#include "enemy.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -41,46 +42,59 @@ point_array_t build_path(enemy_t* enemy) {
     }
     point_t null = { -1, -1 };
     pred[(int)enemy->pos.x][(int)enemy->pos.y] = null;
+    int global_target_found = 0;
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
-        point_array_t point_near = init_point_array(8);
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                //if (x == 0 && y == 0)
-                //    continue;
-                if (abs(x) == abs(y))
-                    continue;
-                if (!is_wall(cur.x + x, cur.y + y)) {
-                    point_t temp = { cur.x + x, cur.y + y };
-                    point_near.array[point_near.len++] = temp;
+        int x_move[4] = { -1, 0,  0, 1 };
+        int y_move[4] = { 0, 1, -1, 0 };
+        for (int i = 0; i < 4; i++) {
+            int x = (int)cur.x + x_move[i];
+            int y = (int)cur.y + y_move[i];
+            if (!is_wall(x, y)) {
+                point_t to = { x, y };
+                if (to.x > 0 && to.y > 0 && to.x < get_world()->map_width && to.y < get_world()->map_height && !used[x][y]) {
+                    used[x][y] = 1;
+                    point_queue_push_back(&q, to);
+                    pred[x][y] = cur;
+                    if (x == (int)enemy->global_target.x && y == (int)enemy->global_target.y) {
+                        global_target_found = 1;
+                        break;
+                    }
                 }
             }
         }
-        for (int i = 0; i < point_near.len; ++i) {
-            point_t to = point_near.array[i];
-            if (to.x > 0 && to.y > 0 && to.x < get_world()->map_width && to.y < get_world()->map_height && !used[(int)to.x][(int)to.y]) {
-                used[(int)to.x][(int)to.y] = 1;
-                point_queue_push_back(&q, to);
-                pred[(int)to.x][(int)to.y] = cur;
-                if (to.x == enemy->global_target.x && to.y == enemy->global_target.y)
-                    i++;
-            }
-        }
+        if (global_target_found)
+            break;
     }
+    point_array_t path = init_point_array(8);
+    point_t temp_point = { enemy->pos.x, enemy->pos.y };
+    path.array[path.len++] = temp_point;
+    if (!global_target_found)
+        return path;
     point_array_t reverse_path = init_point_array(8);
     for (point_t cur = enemy->global_target; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (reverse_path.len >= reverse_path.capacity)
             increase_arr_point_capacity(&reverse_path);
         reverse_path.array[reverse_path.len++] = cur;
     }
-    point_array_t path = init_point_array(reverse_path.len);
     for (int i = 0; i < reverse_path.len; i++) {
+        if (path.len >= path.capacity)
+            increase_arr_point_capacity(&path);
         point_t temp = reverse_path.array[reverse_path.len - 1 - i];
         temp.x = temp.x + 0.5;
         temp.y = temp.y + 0.5;
         path.array[i] = temp;
         path.len++;
     }
+    free(reverse_path.array);
+    for (int i = 0; i < get_world()->map_width; i++) {
+        free(pred[i]);
+    }
+    free(pred);
+    for (int i = 0; i < get_world()->map_width; i++) {
+        free(used[i]);
+    }
+    free(used);
     return path;
 }
 
@@ -97,6 +111,7 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
+    world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
     world->enemy_array.len++;
 }
 
@@ -123,16 +138,18 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (!has_wall_between(enemy->pos, world->player.pos)) {
                 if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
-
-
-                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy);
+                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 1);
                 }
                 if (distance_to_player <= 4) {
                     update_position = 0;
                 }
-                enemy->global_target = world->player.pos;
-                enemy->path = build_path(enemy);
-                enemy->local_target_id = 0;
+                double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
+                if (delta >= 0.5) {
+                    enemy->global_target = world->player.pos;
+                    enemy->path = build_path(enemy);
+                    enemy->local_target_id = 0;
+                    enemy->last_player_pos = world->player.pos;
+                }
             }
         }
         if (update_position) {
@@ -154,7 +171,7 @@ void enemy_destruct(world_t* world, int index) {
     world->enemy_array.len--;
 }
 
-void enemy_hit(world_t* world, int index, int damage) {
+void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);

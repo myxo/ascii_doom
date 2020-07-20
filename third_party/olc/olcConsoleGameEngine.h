@@ -408,9 +408,9 @@ public:
 		if (!GetConsoleScreenBufferInfo(m_hConsole, &csbi))
 			return Error(L"GetConsoleScreenBufferInfo");
 		if (m_nScreenHeight > csbi.dwMaximumWindowSize.Y)
-			return Error(L"Screen Height / Font Height Too Big");
+            m_nScreenHeight = csbi.dwMaximumWindowSize.Y;
 		if (m_nScreenWidth > csbi.dwMaximumWindowSize.X)
-			return Error(L"Screen Width / Font Width Too Big");
+		    m_nScreenWidth = csbi.dwMaximumWindowSize.X;
 
 		// Set Physical Console Window Size
 		m_rectWindow = { 0, 0, (short)m_nScreenWidth - 1, (short)m_nScreenHeight - 1 };
@@ -1198,7 +1198,10 @@ protected: // Audio Engine =====================================================
 	// Static wrapper for sound card handler
 	static void CALLBACK waveOutProcWrap(HWAVEOUT hWaveOut, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 	{
-		((olcConsoleGameEngine*)dwInstance)->waveOutProc(hWaveOut, uMsg, dwParam1, dwParam2);
+#pragma warning(push)
+#pragma warning(disable: 4312) // conversion from 'DWORD' to 'olc::olcConsoleGameEngine *' of greater size
+		(reinterpret_cast<olcConsoleGameEngine*>(dwInstance))->waveOutProc(hWaveOut, uMsg, dwParam1, dwParam2);
+#pragma warning(pop)
 	}
 
 	// Audio thread. This loop responds to requests from the soundcard to fill 'blocks'

@@ -27,23 +27,23 @@ type_of_room_t read_room_for_file(char* name_file) {
     FILE* fmap;
     int width, height;
     fmap = fopen(name_file, "r");
-    if (fmap == NULL) {
-        return;
-    }
     char tmp;
     fscanf(fmap, "%d %d", &width, &height);
-    char** map = malloc(height * sizeof(char*));
-    for (int i = 0; i < height; i++) {
-        map[i] = malloc((width + 1) * sizeof(char));
-    }
-    fgetc(fmap);
-
     type_of_room_t type_of_room;
     type_of_room.height = height;
     type_of_room.width = width;
     type_of_room.shape = init_point_array(4);
     type_of_room.floor = init_point_array(4);
     type_of_room.doors = init_point_array(4);
+    if (fmap == NULL) {
+        return type_of_room;
+    }
+    char** map = malloc(height * sizeof(char*));
+    for (int i = 0; i < height; i++) {
+        map[i] = malloc((width + 1) * sizeof(char));
+    }
+    fgetc(fmap);
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             map[i][j] = fgetc(fmap);
@@ -179,16 +179,16 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     }
 
     point_queue_t q = point_queue_init();
-    int** used = malloc(map_width * sizeof(int*));
+    int** used = malloc((int)map_width * sizeof(int*));
     for (int i = 0; i < map_width; i++) {
-        used[i] = malloc(map_height * sizeof(int));
+        used[i] = malloc((int)map_height * sizeof(int));
         for (int j = 0; j < map_height; j++) {
             used[i][j] = 0;
         }
     }
-    point_t** pred = malloc(map_width * sizeof(point_t*));
+    point_t** pred = malloc((int)map_width * sizeof(point_t*));
     for (int i = 0; i < map_width; i++) {
-        pred[i] = malloc(map_height * sizeof(point_t));
+        pred[i] = malloc((int)map_height * sizeof(point_t));
     }
     for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
         point_t temp;
@@ -199,7 +199,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         point_t null = { -1, -1 };
         pred[(int)temp.x][(int)temp.y] = null;
     }
-    point_t stop_door;
+    point_t stop_door = {0, 0};
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
         int x_move[4] = { -1, 0,  0, 1 };
@@ -250,20 +250,20 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
     for (int i = 0; i < graph->n_nodes; i++) {
         if (graph->is_exist[i]) {
             if (graph->array_of_rooms[i]->center_on_map.x - graph->array_of_rooms[i]->type_of_room.radius < min_x - min_x_r) {
-                min_x = graph->array_of_rooms[i]->center_on_map.x;
-                min_x_r = graph->array_of_rooms[i]->type_of_room.radius + 1;
+                min_x = (int)graph->array_of_rooms[i]->center_on_map.x;
+                min_x_r = (int)graph->array_of_rooms[i]->type_of_room.radius + 1;
             }
             if (graph->array_of_rooms[i]->center_on_map.y - graph->array_of_rooms[i]->type_of_room.radius < min_y - min_y_r) {
-                min_y = graph->array_of_rooms[i]->center_on_map.y;
-                min_y_r = graph->array_of_rooms[i]->type_of_room.radius + 1;
+                min_y = (int)graph->array_of_rooms[i]->center_on_map.y;
+                min_y_r = (int)graph->array_of_rooms[i]->type_of_room.radius + 1;
             }
             if (graph->array_of_rooms[i]->center_on_map.x + graph->array_of_rooms[i]->type_of_room.radius > max_x + max_x_r) {
-                max_x = graph->array_of_rooms[i]->center_on_map.x;
-                max_x_r = graph->array_of_rooms[i]->type_of_room.radius + 1;
+                max_x = (int)graph->array_of_rooms[i]->center_on_map.x;
+                max_x_r = (int)graph->array_of_rooms[i]->type_of_room.radius + 1;
             }
             if (graph->array_of_rooms[i]->center_on_map.y + graph->array_of_rooms[i]->type_of_room.radius > max_y + max_y_r) {
-                max_y = graph->array_of_rooms[i]->center_on_map.y;
-                max_y_r = graph->array_of_rooms[i]->type_of_room.radius + 1;
+                max_y = (int)graph->array_of_rooms[i]->center_on_map.y;
+                max_y_r = (int)graph->array_of_rooms[i]->type_of_room.radius + 1;
             }
         }
     }
@@ -284,18 +284,18 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
             continue;
         node_of_room_t node_room = *(graph->array_of_rooms[node_room_index]);
         for (int i = 0; i < node_room.type_of_room.shape.len; i++) {
-            int y = node_room.center_on_map.y + node_room.type_of_room.shape.array[i].y - node_room.type_of_room.center.y + shift_y;
-            int x = node_room.center_on_map.x + node_room.type_of_room.shape.array[i].x - node_room.type_of_room.center.x + shift_x;
+            int y = (int)(node_room.center_on_map.y + node_room.type_of_room.shape.array[i].y - node_room.type_of_room.center.y + shift_y);
+            int x = (int)(node_room.center_on_map.x + node_room.type_of_room.shape.array[i].x - node_room.type_of_room.center.x + shift_x);
             map[y][x] = '|';
         }
         for (int i = 0; i < node_room.type_of_room.floor.len; i++) {
-            int y = node_room.center_on_map.y + node_room.type_of_room.floor.array[i].y - node_room.type_of_room.center.y + shift_y;
-            int x = node_room.center_on_map.x + node_room.type_of_room.floor.array[i].x - node_room.type_of_room.center.x + shift_x;
+            int y = (int)(node_room.center_on_map.y + node_room.type_of_room.floor.array[i].y - node_room.type_of_room.center.y + shift_y);
+            int x = (int)(node_room.center_on_map.x + node_room.type_of_room.floor.array[i].x - node_room.type_of_room.center.x + shift_x);
             map[y][x] = ' ';
         }
         for (int i = 0; i < node_room.type_of_room.doors.len; i++) {
-            int y = node_room.center_on_map.y + node_room.type_of_room.doors.array[i].y - node_room.type_of_room.center.y + shift_y;
-            int x = node_room.center_on_map.x + node_room.type_of_room.doors.array[i].x - node_room.type_of_room.center.x + shift_x;
+            int y = (int)(node_room.center_on_map.y + node_room.type_of_room.doors.array[i].y - node_room.type_of_room.center.y + shift_y);
+            int x = (int)(node_room.center_on_map.x + node_room.type_of_room.doors.array[i].x - node_room.type_of_room.center.x + shift_x);
             map[y][x] = '0' + node_room_index;
         }
     }

@@ -2,7 +2,7 @@
 #include "sprite.h"
 #include "olc/olc.h"
 #include <stdio.h>
-#include <Windows.h>
+#include <windows.h>
 
 typedef struct {
     int size;
@@ -19,12 +19,13 @@ typedef struct {
     int menu_num;
 } menu_t;
 
-sprite_t sprite;
+texture_t texture;
 menu_t menu;
 int width = 50;
 int height = 30;
 int glyph_size = 20;
 brush_t brush;
+short editor_bg;
 
 int stop = 0;
 
@@ -37,6 +38,7 @@ enum menu_nums
     SAVE_FILE = 4,
     LOAD_FILE = 5,
     CHOOSE_GLYPH = 6,
+    HOTKEYS = 7,
 };
 
 void init_brush(int x1, int x2, int y1, int y2) {
@@ -50,9 +52,12 @@ void init_brush(int x1, int x2, int y1, int y2) {
 }
 
 void preview(int x, int y) {
-    for (int i = y; i < y + sprite.height; i++) {
-        for (int j = x; j < x + sprite.width; j++) {
-            olc_draw(j, i, get_sprite_glyph(j - x, i - y, &sprite), get_sprite_color(j - x, i - y, &sprite));
+    for (int i = y; i < y + texture.height; i++) {
+        for (int j = x; j < x + texture.width; j++) {
+            char sym = get_texture_glyph(j - x, i - y, &texture);
+            if (sym != '\0') {
+                olc_draw(j, i, sym, get_texture_color(j - x, i - y, &texture));
+            }
         }
     }
 }
@@ -68,108 +73,90 @@ int CheckBorder(int a, int b) {
 }
 
 void show_brush() {
-    //olc_fill(brush.pos_x, brush.pos_y, brush.size + brush.pos_x, brush.size + brush.pos_y, '*', brush.col);
     int x1, x2, y1, y2;
     x1 = brush.pos_x + 1;
-    x2 = x1 + brush.size, sprite.width;
+    x2 = x1 + brush.size, texture.width;
     y1 = brush.pos_y+ 1;
-    y2 = y1 + brush.size, sprite.height;
+    y2 = y1 + brush.size, texture.height;
     olc_fill(x1, y1, x2, y2, brush.glyph, brush.col);
 }
 
 void draw_menu() {
     if (menu.menu_num == START_MENU) {
-        olc_draw_string(width / 2 - 6, 1, "SPRITE EDITOR", FG_RED);
+        olc_draw_string(width / 2 - 7, 1, "TEXTURE EDITOR", FG_RED);
         if (menu.select < 0) {
             menu.select = 2;
         }
         else if (menu.select > 2) {
             menu.select = 0;
         }
+        olc_draw_string(width / 2 - 4, 4, "new file", FG_GREY);
+        olc_draw_string(width / 2 - 5, 5, "load file", FG_GREY);
+        olc_draw_string(width / 2 - 2, 6, "exit", FG_GREY);
         if (menu.select == 0) {
             olc_draw_string(width / 2 - 5, 4, ">new file", FG_GREEN);
-            olc_draw_string(width / 2 - 5, 5, "load file", FG_GREY);
-            olc_draw_string(width / 2 - 2, 6, "exit", FG_GREY);
         }
         else if (menu.select == 1) {
-            olc_draw_string(width / 2 - 4, 4, "new file", FG_GREY);
             olc_draw_string(width / 2 - 6, 5, ">load file", FG_GREEN);
-            olc_draw_string(width / 2 - 2, 6, "exit", FG_GREY);
         }
         else if (menu.select == 2) {
-            olc_draw_string(width / 2 - 4, 4, "new file", FG_GREY);
-            olc_draw_string(width / 2 - 5, 5, "load file", FG_GREY);
             olc_draw_string(width / 2 - 3, 6, ">exit", FG_GREEN);
         }
     }
     else if (menu.menu_num == NEW_FILE) {
         system("cls");
         printf("Enter the width and height of the sprite: \n");
-        scanf("%d%d", &sprite.width, &sprite.height);
-        init_sprite(sprite.width, sprite.height, &sprite);
+        scanf("%d%d", &texture.width, &texture.height);
+        init_texture(texture.width, texture.height, &texture);
         menu.menu_num = EDITOR;
-        init_brush(1, 1 + sprite.width, 1, 1 + sprite.height);
+        init_brush(1, 1 + texture.width, 1, 1 + texture.height);
     }
     else if (menu.menu_num == EDITOR) {
-        brush.pos_x = CheckBorder(brush.pos_x, sprite.width);
-        brush.pos_y = CheckBorder(brush.pos_y, sprite.height);
+        brush.pos_x = CheckBorder(brush.pos_x, texture.width);
+        brush.pos_y = CheckBorder(brush.pos_y, texture.height);
         olc_draw(0, 0, 'X', FG_WHITE);
-        olc_draw(0, 1 + sprite.height, 'X', FG_WHITE);
-        olc_draw(1 + sprite.width, 0, 'X', FG_WHITE);
-        olc_draw(1 + sprite.width, 1 + sprite.height, 'X', FG_WHITE);
+        olc_draw(0, 1 + texture.height, 'X', FG_WHITE);
+        olc_draw(1 + texture.width, 0, 'X', FG_WHITE);
+        olc_draw(1 + texture.width, 1 + texture.height, 'X', FG_WHITE);
         preview(1, 1);
         show_brush();
+        olc_draw_string(height - 8, 0, "press H to open hotkey list", FG_WHITE);
     }
     else if (menu.menu_num == LOAD_FILE) {
         system("cls");
         printf("Enter name of file: \n");
         char filename[1024];
         scanf("%s", &filename);
-        load_sprite_from_file(filename, &sprite);
+        load_texture_from_file(filename, &texture);
         menu.menu_num = EDITOR;
-        init_brush(1, 1 + sprite.width, 1, 1 + sprite.height);
+        init_brush(1, 1 + texture.width, 1, 1 + texture.height);
     }
     else if (menu.menu_num == MAIN_MENU) {
-        olc_draw_string(width / 2 - 6, 1, "SPRITE EDITOR", FG_RED);
+        olc_draw_string(width / 2 - 7, 1, "TEXTURE EDITOR", FG_RED);
         if (menu.select < 0) {
             menu.select = 5;
         }
         else if (menu.select > 4) {
             menu.select = 0;
         }
+        olc_draw_string(width / 2 - 4, 4, "save file", FG_GREY);
+        olc_draw_string(width / 2 - 4, 5, "load file", FG_GREY);
+        olc_draw_string(width / 2 - 4, 6, "new file", FG_GREY);
+        olc_draw_string(width / 2 - 7, 7, "return to edit", FG_GREY);
+        olc_draw_string(width / 2 - 2, 9, "exit", FG_GREY);
         if (menu.select == 0) {
             olc_draw_string(width / 2 - 5, 4, ">save file", FG_GREEN);
-            olc_draw_string(width / 2 - 4, 5, "load file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 6, "new file", FG_GREY);
-            olc_draw_string(width / 2 - 7, 7, "return to edit", FG_GREY);
-            olc_draw_string(width / 2 - 2, 9, "exit", FG_GREY);
         }
         else if (menu.select == 1) {
-            olc_draw_string(width / 2 - 4, 4, "save file", FG_GREY);
             olc_draw_string(width / 2 - 5, 5, ">load file", FG_GREEN);
-            olc_draw_string(width / 2 - 4, 6, "new file", FG_GREY);
-            olc_draw_string(width / 2 - 7, 7, "return to edit", FG_GREY);
-            olc_draw_string(width / 2 - 2, 9, "exit", FG_GREY);
         }
         else if (menu.select == 2) {
-            olc_draw_string(width / 2 - 4, 4, "save file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 5, "load file", FG_GREY);
             olc_draw_string(width / 2 - 5, 6, ">new file", FG_GREEN);
-            olc_draw_string(width / 2 - 7, 7, "return to edit", FG_GREY);
-            olc_draw_string(width / 2 - 2, 9, "exit", FG_GREY);
         }
         else if (menu.select == 3) {
-            olc_draw_string(width / 2 - 4, 4, "save file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 5, "load file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 6, "new file", FG_GREY);
             olc_draw_string(width / 2 - 8, 7, ">return to edit", FG_GREEN);
-            olc_draw_string(width / 2 - 2, 9, "exit", FG_GREY);
         }
         else if (menu.select == 4) {
-            olc_draw_string(width / 2 - 4, 4, "save file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 5, "load file", FG_GREY);
-            olc_draw_string(width / 2 - 4, 6, "new file", FG_GREY);
-            olc_draw_string(width / 2 - 7, 7, "return to edit", FG_GREY);
             olc_draw_string(width / 2 - 3, 9, ">exit", FG_GREEN);
         }
     }
@@ -178,21 +165,35 @@ void draw_menu() {
         printf("Enter name of file: \n");
         char filename[1024];
         scanf("%s", &filename);
-        save_sprite_to_file(filename, &sprite);
+        save_texture_to_file(filename, &texture);
         menu.menu_num = EDITOR;
-        init_brush(1, 1 + sprite.width, 1, 1 + sprite.height);
+        init_brush(1, 1 + texture.width, 1, 1 + texture.height);
     }
     else if (menu.menu_num == CHOOSE_GLYPH){
         system("cls");
         printf("Enter character for brush: \n");
-        char tmp[4];
-        scanf("%s", &tmp);
-        if (tmp == '\0') {
-            brush.glyph = ' ';
+        brush.glyph = getc(stdin);
+        while (brush.glyph == '\n')
+        {
+            brush.glyph = getc(stdin);
         }
-        else {
-            brush.glyph = tmp[0];
-        }
+        menu.menu_num = EDITOR;
+    }
+    else if (menu.menu_num == HOTKEYS) {
+        system("cls");
+        printf("HOTKEYS: \n");
+        printf("Q/E : change glyph of brush \n");
+        printf("W/S : change FG colour of brush \n");
+        printf("A/D : change BG colour of brush \n");
+        printf("R: get colour and glyph to brush \n");
+        printf("-/+ : change size of brush \n");
+        printf("LShift: set glyph of brush \n");
+        printf("Tab: set null as a glyph of brush\n");
+        printf("Spacebar: draw\n");
+        printf("F/G change BG colour to BG_BLACK/BG_WHITE\n");
+        printf("H: show hotkeys list\n");
+        printf("Esc: open menu\n");
+        system("pause");
         menu.menu_num = EDITOR;
     }
 }
@@ -212,14 +213,14 @@ void press_button() {
     if (menu.menu_num == EDITOR) {
         for (int i = 0; i < brush.size; i++) {
             for (int j = 0; j < brush.size; j++) {
-                if (brush.pos_x + j < sprite.width && brush.pos_y + i < sprite.height) {
-                    set_sprite_color(brush.pos_x + j, brush.pos_y + i, &sprite, brush.col);
-                    set_sprite_glyph(brush.pos_x + j, brush.pos_y + i, &sprite, brush.glyph);
+                if (brush.pos_x + j < texture.width && brush.pos_y + i < texture.height) {
+                    set_texture_color(brush.pos_x + j, brush.pos_y + i, &texture, brush.col);
+                    set_texture_glyph(brush.pos_x + j, brush.pos_y + i, &texture, brush.glyph);
                 }
             }
         }
-        set_sprite_color(brush.pos_x, brush.pos_y, &sprite, brush.col);
-        set_sprite_glyph(brush.pos_x, brush.pos_y, &sprite, brush.glyph);
+        set_texture_color(brush.pos_x, brush.pos_y, &texture, brush.col);
+        set_texture_glyph(brush.pos_x, brush.pos_y, &texture, brush.glyph);
     }
     if (menu.menu_num == MAIN_MENU) {
         if (menu.select == 0)   {
@@ -229,7 +230,7 @@ void press_button() {
             menu.menu_num = LOAD_FILE;
         }
         if (menu.select == 2) {
-            deinit_sprite(&sprite);
+            deinit_texture(&texture);
             menu.menu_num = NEW_FILE;
         }
         if (menu.select == 3) {
@@ -270,11 +271,14 @@ void handle_input(float time_elapsed) {
                 brush.size++;
             }
         }
-        if (olc_get_key(0x1B).held) { // Esc
+        if (olc_get_key(VK_ESCAPE).held) {
             menu.menu_num = MAIN_MENU;
             menu.select = 0;
         }
-        if (olc_get_key(0x57).pressed) { //W key
+        if (olc_get_key(VK_TAB).pressed) {
+            brush.glyph = '\0';
+        }
+        if (olc_get_key('W').pressed) { //W key
             if (brush.col_fg >= 15) {
                 brush.col_fg = 0;
             }
@@ -283,7 +287,7 @@ void handle_input(float time_elapsed) {
             }
             brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
-        if (olc_get_key(0x53).pressed) { //S key
+        if (olc_get_key('S').pressed) { //S key
             if (brush.col_fg <= 0) {
                 brush.col_fg = 15;
             }
@@ -292,7 +296,7 @@ void handle_input(float time_elapsed) {
             }
             brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
-        if (olc_get_key(0x44).pressed) { //D key
+        if (olc_get_key('D').pressed) { //D key
             if (brush.col_bg >= 15) {
                 brush.col_bg = 0;
             }
@@ -301,11 +305,13 @@ void handle_input(float time_elapsed) {
             }
             brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
-        if (olc_get_key(0x52).pressed) { //R key
-            brush.glyph = get_sprite_glyph(brush.pos_x, brush.pos_y, &sprite);
-            brush.col = get_sprite_color(brush.pos_x, brush.pos_y, &sprite);
+        if (olc_get_key('R').pressed) { //R key
+            brush.glyph = get_texture_glyph(brush.pos_x, brush.pos_y, &texture);
+            brush.col = get_texture_color(brush.pos_x, brush.pos_y, &texture);
+            brush.col_bg = brush.col / 16;
+            brush.col_fg = brush.col % 16;
         }
-        if (olc_get_key(0x41).pressed) { //A key
+        if (olc_get_key('A').pressed) { //A key
             if (brush.col_bg <= 0) {
                 brush.col_bg = 15;
             }
@@ -314,7 +320,7 @@ void handle_input(float time_elapsed) {
             }
             brush.col = (brush.col_bg * 16) + brush.col_fg;
         }
-        if (olc_get_key(0x45).pressed) { //E key
+        if (olc_get_key('E').pressed) { //E key
             if (brush.glyph >= 255) {
                 brush.glyph = 0;
             }
@@ -322,13 +328,16 @@ void handle_input(float time_elapsed) {
                 brush.glyph++;
             }
         }
-        if (olc_get_key(0x51).pressed) { //Q key
+        if (olc_get_key('Q').pressed) { //Q key
             if (brush.glyph <= 0) {
                 brush.glyph = 255;
             }
             else {
                 brush.glyph--;
             }
+        }
+        if (olc_get_key('H').pressed) {
+            menu.menu_num = HOTKEYS;
         }
         if (olc_get_key(VK_LSHIFT).pressed) {
             menu.menu_num = CHOOSE_GLYPH;
@@ -345,6 +354,12 @@ void handle_input(float time_elapsed) {
         if (olc_get_key(VK_LEFT).pressed) {
             brush.pos_x--;
         }
+        if (olc_get_key('F').pressed) {
+            editor_bg = BG_BLACK;
+        }
+        if (olc_get_key('G').pressed) {
+            editor_bg = BG_WHITE;
+        }
     }
 }
 
@@ -353,12 +368,13 @@ int update(float time_elapsed) {
     if (stop) {
         return 0;
     }
-    olc_fill(0, 0, width, height, ' ', FG_BLACK);
+    olc_fill(0, 0, width, height, ' ', editor_bg);
     draw_menu();
     return 1;
 }
 
 int main() {
+    editor_bg = BG_BLACK;
     menu.select = 0;
     menu.menu_num = 0;
     if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
@@ -370,8 +386,6 @@ int main() {
 
     olc_start(); // block until update return 0
     olc_deinitialize();
-    system("pause");
-
     return 0;
 }
 

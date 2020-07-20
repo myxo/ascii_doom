@@ -3,6 +3,7 @@
 #include "olc/olc.h"
 
 #include "world_object.h"
+#include "weapon.h"
 #include "sprite.h"
 #include "config.h"
 
@@ -37,24 +38,34 @@ void increase_arr_point_capacity(point_array_t* point_array) {
     point_array->capacity = point_array->capacity * 2;
     point_array->array = realloc(point_array->array, point_array->capacity * sizeof(point_t));
 }
+void init_sprites(world_t* world) {
+    world_global->sprites.wall = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    init_sprite(world_global->sprites.wall);
+    init_sprite(world_global->sprites.bullet);
+    init_sprite(world_global->sprites.mob1);
+    load_texture_from_file("wall1.tex", &world->textures.wall);
+    attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
+    load_texture_from_file("mob1.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("bullet1.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+}
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
     update_world_from_config();
 
     world_global->player.health = 3;
-    world_global->player.pos.x = 13;
-    world_global->player.pos.y = 5;
+    world_global->player.maxhealth = 3;
     world_global->player.angle = M_PI_4;
-    world_global->player.speed = 2.5;
-    world_global->player.angle_of_vision = M_PI_4;
     world_global->player.radius = 0.2;
 
-    world_global->textures.wall = malloc(sizeof(sprite_t));
-    world_global->textures.bullet = malloc(sizeof(sprite_t));
-    init_sprite(8, 8, world_global->textures.wall);
-    init_sprite(8, 8, world_global->textures.bullet);
-    load_sprite_from_file("wall1.spr", world_global->textures.wall);
+    world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
+    init_std_weapon_list(world_global->weapon_list);
+    init_z_buffer();
+    init_sprites(world_global);
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
@@ -66,9 +77,31 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
-    deinit_sprite(world_global->textures.wall);
-    deinit_sprite(world_global->textures.bullet);
+    deinit_std_weapon_list(world_global->weapon_list);
+    deinit_sprite(world_global->sprites.wall);
+    //deinit_sprite(world_global->sprites.bullet);
+    deinit_texture(&world_global->textures.wall);
+    deinit_z_buffer();
     free(world_global);
+}
+
+void init_z_buffer() {
+    world_global->z_buffer = calloc(olc_screen_width(), (olc_screen_width() + 1) * sizeof(double*));
+    for (int i = 0; i <= olc_screen_width(); i++) {
+        world_global->z_buffer[i] = calloc(olc_screen_height(), (olc_screen_height() + 1) * sizeof(double));
+    }
+    for (int i = 0; i < olc_screen_width(); i++) {
+        for (int j = 0; j < olc_screen_height(); j++) {
+            world_global->z_buffer[i][j] = MAX_BUFF;
+        }
+    }
+}
+
+void deinit_z_buffer() {
+    for (int i = 0; i < olc_screen_width(); i++) {
+        free(world_global->z_buffer[i]);
+    }
+    free(world_global->z_buffer);
 }
 
 world_t* get_world() {
@@ -76,9 +109,11 @@ world_t* get_world() {
 }
 
 int is_wall(double x, double y) {
-    if (x > 0 && y > 0 && (int)x < get_world()->map_height && (int)y < get_world()->map_width)
-        return world_global->map[(int)x][(int)y] == '#';
-    return 1;
+    if (x < 0 || y < 0)
+        return 1;
+    if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
+        return 1;
+    return world_global->map[(int)x][(int)y] == '#';
 }
 
 int read_map_for_file() {
