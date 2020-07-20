@@ -58,7 +58,7 @@ point_array_t build_path(enemy_t* enemy) {
         }
         for (int i = 0; i < point_near.len; ++i) {
             point_t to = point_near.array[i];
-            if (!used[(int)to.x][(int)to.y]) {
+            if (to.x > 0 && to.y > 0 && to.x < get_world()->map_width && to.y < get_world()->map_height && !used[(int)to.x][(int)to.y]) {
                 used[(int)to.x][(int)to.y] = 1;
                 point_queue_push_back(&q, to);
                 pred[(int)to.x][(int)to.y] = cur;

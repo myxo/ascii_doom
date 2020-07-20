@@ -17,7 +17,7 @@
 
 
 int width =  200;
-int height = 100;
+int height = 150;
 int glyph_size =  8;
 const char config_filename[50] = "cfg.txt";
 int stop = 0;
