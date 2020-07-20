@@ -4,6 +4,12 @@
 
 #include "sprite.h"
 
+enum GUN {
+    PISTOL,
+    RIFLE,
+    ROCKET_LAUNCHER
+};
+
 typedef struct {
     double x;
     double y;
@@ -58,6 +64,7 @@ typedef struct {
     int len;
     int capacity;
 } enemy_array_t;
+
 typedef enum bullet_host {
     kBulletPlayer,
     kBulletEnemy
@@ -66,16 +73,19 @@ typedef enum bullet_host {
 typedef struct {
     sprite_t sprite;
     bullet_host_t host;
+    enum GUN label;
     double fire_rate;
     double damage;
-    double time_since_last_shoot;
     double shot_delay;
+    double expl_radius;
 } weapon_t;
 
 typedef struct {
     weapon_t* pistol;
     weapon_t* rifle;
+    weapon_t* rocket_launcher;
     enum GUN active_weapon;
+    double time_since_last_shot;
 } std_weapon_list_t;
 
 typedef struct {
@@ -94,9 +104,40 @@ typedef struct {
 } bullet_array_t;
 
 typedef struct {
+    point_t pos;
+    double angle;
+    double speed;
+    double radius;
+    int host;
+    double damage;
+    double explosive_radius;
+} rocket_t;
+
+typedef struct {
+    rocket_t* array;
+    int len;
+    int capacity;
+} rocket_array_t;
+
+typedef struct {
+    point_t pos;
+    double radius;
+    double life_time;
+    double max_life_time;
+} explosion_t;
+
+typedef struct {
+    explosion_t* array;
+    int len;
+    int capacity;
+} explosion_array_t;
+
+typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
+    rocket_array_t rocket_array;
+    explosion_array_t explosion_array;
     enemy_array_t enemy_array;
     std_weapon_list_t* weapon_list;
     int map_width;
