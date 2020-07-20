@@ -9,6 +9,8 @@
 #include "player.h"
 #include "map_generator.h"
 #include "weapon.h"
+#include "rocket.h"
+#include "explosion.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -62,6 +64,9 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('2').pressed) {
         set_active_weapon(get_world(), RIFLE);
     }
+    if (olc_get_key('3').pressed) {
+        set_active_weapon(get_world(), ROCKET_LAUNCHER);
+    }
     move_player(move_vec_x, move_vec_y, time_elapsed);
     if (olc_get_key(VK_SPACE).held) {
         shoot_from_active_weapon(get_world());
@@ -80,25 +85,30 @@ int update(float time_elapsed) {
     handle_config_ui_keypress();
     update_world_from_config();
 
-	handle_input(time_elapsed);
-	if (stop) {
-		return 0;
-	}
-	olc_fill(0, 0, width, height, ' ', BG_BLACK);
+    handle_input(time_elapsed);
+    if (stop) {
+        return 0;
+    }
+    olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
-    update_time_since_last_shot(get_world(), time_elapsed);
-    bullets_movement(get_world(), time_elapsed);
-    enemy_movement(get_world(), time_elapsed);
-	draw_screen(get_world());
-    draw_minimap(get_world());
-    draw_hp(get_world());
-    //add_watch("angle", get_world()->player.angle);
+
+    world_t* world = get_world();
+    update_time_since_last_shot(world, time_elapsed);
+    bullets_movement(world, time_elapsed);
+    rockets_movement(world, time_elapsed);
+    enemy_movement(world, time_elapsed);
+
+    update_life_time(world, time_elapsed);
+
+    draw_screen(world);
+    draw_minimap(world);
+    draw_hp(world);
     display_watch();
     draw_config_ui();
-	return 1;
+    return 1;
 }
 
 int main() {

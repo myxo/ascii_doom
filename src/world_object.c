@@ -13,12 +13,31 @@
 
 world_t* world_global = NULL;
 
+void init_explosion_array() {
+    world_global->explosion_array.capacity = 5;
+    world_global->explosion_array.len = 0;
+    world_global->explosion_array.array = malloc(world_global->explosion_array.capacity * sizeof(explosion_t));
+}
+
+void deinit_explosion_array() {
+    free(world_global->explosion_array.array);
+}
+
 void init_bullet_array(world_t* world, int capacity) {
     world_global->bullet_array.capacity = capacity;
     world_global->bullet_array.len = 0;
     world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
 }
 
+void init_rocket_array(int capacity) {
+    world_global->rocket_array.capacity = capacity;
+    world_global->rocket_array.len = 0;
+    world_global->rocket_array.array = malloc(world_global->rocket_array.capacity * sizeof(rocket_t));
+}
+
+void deinit_rocket_array() {
+    free(world_global->rocket_array.array);
+}
 
 void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.capacity = capacity;
@@ -69,6 +88,8 @@ int init_world_object() {
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
+    init_rocket_array(5);
+    init_explosion_array();
     return read_map_for_file();
 }
 
@@ -77,9 +98,10 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
+    deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
-    //deinit_sprite(world_global->sprites.bullet);
+    deinit_rocket_array(5);
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
     free(world_global);
