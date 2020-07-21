@@ -181,7 +181,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         if (g->array_of_rooms[i] == start_room)
             ch_door_start = '0' + i;
         if (g->array_of_rooms[i] == stop_room)
-            ch_door_start = '0' + i;
+            ch_door_stop = '0' + i;
     }
 
     point_queue_t q = point_queue_init();
@@ -196,15 +196,23 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     for (int i = 0; i < map_width; i++) {
         pred[i] = malloc((int)map_height * sizeof(point_t));
     }
-    for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
-        point_t temp;
-        temp.y = start_room->center_on_map.y + start_room->type_of_room.doors.array[i].y - start_room->type_of_room.center.y + shift_y;
-        temp.x = start_room->center_on_map.x + start_room->type_of_room.doors.array[i].x - start_room->type_of_room.center.x + shift_x;
-        point_queue_push_back(&q, temp);
-        used[(int)temp.x][(int)temp.y] = 1;
-        point_t null = { -1, -1 };
-        pred[(int)temp.x][(int)temp.y] = null;
-    }
+    //for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
+    //    point_t temp;
+    //    temp.y = start_room->center_on_map.y + start_room->type_of_room.doors.array[i].y - start_room->type_of_room.center.y + shift_y;
+    //    temp.x = start_room->center_on_map.x + start_room->type_of_room.doors.array[i].x - start_room->type_of_room.center.x + shift_x;
+    //    point_queue_push_back(&q, temp);
+    //    used[(int)temp.x][(int)temp.y] = 1;
+    //    point_t null = { -1, -1 };
+    //    pred[(int)temp.x][(int)temp.y] = null;
+    //}
+    point_t temp;
+    temp.y = (int)(start_room->center_on_map.y+ shift_y + 0.5);
+    temp.x = (int)(start_room->center_on_map.x+ shift_x + 0.5);
+    point_queue_push_back(&q, temp);
+    used[(int)temp.x][(int)temp.y] = 1;
+    point_t null = { -1, -1 };
+    pred[(int)temp.x][(int)temp.y] = null;
+
     point_t stop_door = {-1000000,-1000000};
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
@@ -232,12 +240,22 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
             }
         }
     }
-    for (point_t cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
+    point_t cur;
+    char marker = ' ';
+    for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
             break;
-        map[(int)cur.y][(int)cur.x] = '.';
+        if (map[(int)cur.y][(int)cur.x] == ch_door_stop) {
+            marker = '.';
+            map[(int)cur.y][(int)cur.x] = marker;
+        }else if (map[(int)cur.y][(int)cur.x] == ch_door_start) {
+            map[(int)cur.y][(int)cur.x] = marker;
+            marker = ' ';
+        }
+        else {
+            map[(int)cur.y][(int)cur.x] = marker;
+        }
     }
-    
     return map;
 }
 
@@ -316,7 +334,7 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
         for (int x = 0; x < *width; x++) {
             if (map[y][x] == '.')
                 map[y][x] = ' ';
-            if (map[y][x] != ' ')
+            if (map[y][x] != ' ')// && map[y][x] < '0'&& map[y][x] > '0')
                 map[y][x] = '#';
         }
     }
