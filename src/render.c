@@ -88,6 +88,14 @@ void draw_bullets(world_t* world) {
     }
 }
 
+void draw_rockets(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->rocket_array.len; i++) {
+        rocket_t* rocket = &world->rocket_array.array[i];
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4);
+    }
+}
+
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
@@ -153,6 +161,8 @@ void draw_screen(world_t* world) {
     }
     draw_enemies(world);
     draw_bullets(world);
+    draw_rockets(world);
+    draw_explosions(world);
 }
 
 void draw_minimap(world_t* world) {
@@ -225,6 +235,35 @@ void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_ra
                     olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
                     get_world()->z_buffer[i][j] = obj.distance;
                 }
+            }
+        }
+    }
+}
+
+void draw_explosions(world_t* world) {
+    for (int i = 0; i < world->explosion_array.len; i++) {
+        draw_explosion(world, world->explosion_array.array[i].pos, world->explosion_array.array[i].radius, world->explosion_array.array[i].life_time);
+    }
+}
+
+void draw_explosion(world_t* world, point_t pos, double radius, double life_time) {
+    screen_obj_t expl = get_object_on_screen(&get_world()->player, pos, 1, 1);
+    point_t expl_center;
+    expl_center.x = (expl.row_left + expl.row_right) / 2;
+    expl_center.y = (expl.line_start + expl.line_end) / 2;
+    radius /= expl.distance;
+    //radius *= 10;
+    radius *= (1 + 250 * life_time);
+    int row_start = (int)(expl_center.x - radius / 2);
+    int row_end = (int)(expl_center.x + radius / 2);
+    int line_start = (int)(expl_center.y - radius / 2);
+    int line_end = (int)(expl_center.y + radius / 2);
+    for (int i = row_start; i < row_end; i++) {
+        for (int j = line_start; j < line_end; j++) {
+            int state = rand() % 2;
+            if (i >= 0 && j >= 0 && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
+                olc_draw(i, j, '*', FG_RED);
+                get_world()->z_buffer[i][j] = expl.distance;
             }
         }
     }

@@ -52,7 +52,7 @@ point_array_t build_path(enemy_t* enemy) {
             int y = (int)cur.y + y_move[i];
             if (!is_wall(x, y)) {
                 point_t to = { x, y };
-                if (!used[x][y]) {
+                if (to.x > 0 && to.y > 0 && to.x < get_world()->map_width && to.y < get_world()->map_height && !used[x][y]) {
                     used[x][y] = 1;
                     point_queue_push_back(&q, to);
                     pred[x][y] = cur;
