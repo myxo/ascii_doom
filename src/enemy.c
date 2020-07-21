@@ -50,7 +50,7 @@ point_array_t build_path(enemy_t* enemy) {
         for (int i = 0; i < 4; i++) {
             int x = (int)cur.x + x_move[i];
             int y = (int)cur.y + y_move[i];
-            if (!is_wall_in_radius(x, y, 0)) {
+            if (!is_wall(x, y)) {
                 point_t to = { x, y };
                 if (!used[x][y]) {
                     used[x][y] = 1;
@@ -154,7 +154,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall_in_radius(new_pos.x, new_pos.y, 0) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
+            if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->pos = new_pos;
             }
             if (is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
