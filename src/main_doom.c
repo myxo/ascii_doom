@@ -118,7 +118,9 @@ int main() {
 	}
 	olc_register_create(&create);
     olc_register_update(&update);
-
+    olc_enable_sound();
+    int pistolid  = olc_load_sound("C://programming/SSYP2020/SnakeGame/ascii_doom/res/dspistol.wav");
+    olc_play_sound(pistolid);
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();
