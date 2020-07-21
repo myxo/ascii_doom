@@ -112,7 +112,7 @@ void draw_screen(world_t* world) {
         double ray_sin = sin(ray_angle);
         double ray_cos = cos(ray_angle);
         int bullet_height = 0;
-        while (!is_wall_in_radius(x, y, 0)) {
+        while (!is_wall(x, y)) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
@@ -128,12 +128,12 @@ void draw_screen(world_t* world) {
         double sprite_x;
         if (dy > dx) {
             sprite_x = fabs(y - (int)(y));
-            if (is_wall_in_radius(x - 0.2, y, 0)) {
+            if (is_wall(x - 0.2, y)) {
                 sprite_x = 1 - sprite_x;
             }
         } else {
             sprite_x = fabs(x - (int)(x));
-            if (is_wall_in_radius(x, y + 0.2, 0)) {
+            if (is_wall(x, y + 0.2)) {
                 sprite_x = 1 - sprite_x;
             }
         }
