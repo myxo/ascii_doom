@@ -28,7 +28,11 @@ PRIVATE
     src/player.c
     src/structs_of_data.c
     src/config.c 
-    src/weapon.c)
+    src/map_generator.c
+    src/weapon.c
+    src/rocket.c
+    src/explosion.c
+    src/barrel.c)
 
 add_executable(sprite_editor)
 target_sources(sprite_editor

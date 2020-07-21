@@ -6,6 +6,7 @@
 #include "weapon.h"
 #include "sprite.h"
 #include "config.h"
+#include "barrel.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,12 +14,31 @@
 
 world_t* world_global = NULL;
 
+void init_explosion_array() {
+    world_global->explosion_array.capacity = 5;
+    world_global->explosion_array.len = 0;
+    world_global->explosion_array.array = malloc(world_global->explosion_array.capacity * sizeof(explosion_t));
+}
+
+void deinit_explosion_array() {
+    free(world_global->explosion_array.array);
+}
+
 void init_bullet_array(world_t* world, int capacity) {
     world_global->bullet_array.capacity = capacity;
     world_global->bullet_array.len = 0;
     world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
 }
 
+void init_rocket_array(int capacity) {
+    world_global->rocket_array.capacity = capacity;
+    world_global->rocket_array.len = 0;
+    world_global->rocket_array.array = malloc(world_global->rocket_array.capacity * sizeof(rocket_t));
+}
+
+void deinit_rocket_array() {
+    free(world_global->rocket_array.array);
+}
 
 void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.capacity = capacity;
@@ -28,8 +48,25 @@ void init_enemy_array(world_t* world, int capacity) {
 
 void init_barrel_array() {
     world_global->barrel_array.capacity = 5;
-    world_global->barrel_array.len = 1;
+    world_global->barrel_array.len = 0;
     world_global->barrel_array.array = malloc(world_global->barrel_array.capacity * sizeof(barrel_t));
+}
+
+void deinit_barrel_array() {
+    free(world_global->barrel_array.array);
+}
+
+void spawn_barrels() {
+    while (world_global->barrel_array.len < 5) {
+        int new_x = rand() % world_global->map_height;
+        int new_y = rand() % world_global->map_width;
+        double x_float = (rand() % 10) / 10;
+        double y_float = (rand() % 10) / 10;
+        if (!is_wall(new_x + x_float, new_y + y_float)) {
+            point_t point = {new_x + x_float, new_y + y_float};
+            add_barrel(world_global, point, 2, 3, 0.1);
+        }
+    }
 }
 
 point_array_t init_point_array(int capacity) {
@@ -65,8 +102,6 @@ int init_world_object() {
 
     world_global->player.health = 3;
     world_global->player.maxhealth = 3;
-    world_global->player.pos.x = 1;
-    world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
     world_global->player.radius = 0.2;
 
@@ -77,6 +112,9 @@ int init_world_object() {
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
+    init_rocket_array(5);
+    init_explosion_array();
+    init_barrel_array();
     return read_map_for_file();
 }
 
@@ -85,9 +123,11 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
+    deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
-    //deinit_sprite(world_global->sprites.bullet);
+    deinit_rocket_array(5);
+    deinit_barrel_array();
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
     free(world_global);
@@ -183,6 +223,16 @@ int is_enemy(double x, double y, int* enemy_index) {
     return 0;
 }
 
+int is_barrel(point_t pos, int* index){
+    for (int i = 0; i < world_global->barrel_array.len; i++) {
+        if (is_in_circle(pos, world_global->barrel_array.array[i].pos, world_global->barrel_array.array[i].radius)) {
+            *index = i;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 point_t get_rand_pos_on_floor(world_t* world) {
     point_t pos;
     do {
@@ -215,7 +265,6 @@ int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d
     }
     return 1;
 }
-
 
 int has_wall_between(point_t pos1, point_t pos2) {
     return has_wall_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);

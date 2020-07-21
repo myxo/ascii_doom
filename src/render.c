@@ -17,7 +17,7 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     res.line_start = 0;
     res.line_end = 0;
     res.distance = 0;
-    double half_screen_dist = 10;
+    double half_screen_dist = 16;
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
         angle_from_player_to_obj += 2 * M_PI;
@@ -55,12 +55,17 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
         lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
     }
     else {
-        double dist_on_screen = (olc_screen_height() / 2) * (distance / half_screen_dist);
+        double dist_rate = 1 / distance;
+        if (dist_rate > 1) {
+            dist_rate = 1;
+        }
+        double dist_on_screen = (olc_screen_height() / 2) * dist_rate;
         if (dist_on_screen > olc_screen_height()) {
             dist_on_screen = olc_screen_height();
         }
-        int lline_start = olc_screen_height() - (int)dist_on_screen;
-        int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+        int center = olc_screen_height()/2 + (int)dist_on_screen;
+        lline_start = center - (int)obj_height;
+        lline_end = center;
     }
     if (lline_end > olc_screen_height())
         lline_end = olc_screen_height();
@@ -74,15 +79,16 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     return res;
 }
 
-void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
-    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height, AIR);
-    for (int i = obj.row_left; i <= obj.row_right; i++)
+void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height, enum PLACE_ON_SCREEN place) {
+    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height, place);
+    for (int i = obj.row_left; i <= obj.row_right; i++) {
         for (int j = obj.line_start; j < obj.line_end; j++) {
             if (obj.distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, ch, col);
                 get_world()->z_buffer[i][j] = obj.distance;
             }
         }
+    }
 }
 
 void draw_enemies(world_t* world) {
@@ -98,6 +104,22 @@ void draw_bullets(world_t* world) {
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
         draw_sprite(world->sprites.bullet, 0, bullet->pos, bullet->radius, 150 * bullet->radius);
+    }
+}
+
+void draw_rockets(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->rocket_array.len; i++) {
+        rocket_t* rocket = &world->rocket_array.array[i];
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4, AIR);
+    }
+}
+
+void draw_barrels(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->barrel_array.len; i++) {
+        barrel_t* barrel = &world->barrel_array.array[i];
+        draw_object(player, barrel->pos, barrel->radius, '#', FG_RED, 60, FLOOR);
     }
 }
 
@@ -166,6 +188,9 @@ void draw_screen(world_t* world) {
     }
     draw_enemies(world);
     draw_bullets(world);
+    draw_rockets(world);
+    draw_explosions(world);
+    draw_barrels(world);
 }
 
 void draw_minimap(world_t* world) {
@@ -238,6 +263,35 @@ void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_ra
                     olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
                     get_world()->z_buffer[i][j] = obj.distance;
                 }
+            }
+        }
+    }
+}
+
+void draw_explosions(world_t* world) {
+    for (int i = 0; i < world->explosion_array.len; i++) {
+        draw_explosion(world, world->explosion_array.array[i].pos, world->explosion_array.array[i].radius, world->explosion_array.array[i].life_time);
+    }
+}
+
+void draw_explosion(world_t* world, point_t pos, double radius, double life_time) {
+    screen_obj_t expl = get_object_on_screen(&get_world()->player, pos, 1, 1, AIR);
+    point_t expl_center;
+    expl_center.x = (expl.row_left + expl.row_right) / 2;
+    expl_center.y = (expl.line_start + expl.line_end) / 2;
+    radius /= expl.distance;
+    //radius *= 10;
+    radius *= (1 + 250 * life_time);
+    int row_start = (int)(expl_center.x - radius / 2);
+    int row_end = (int)(expl_center.x + radius / 2);
+    int line_start = (int)(expl_center.y - radius / 2);
+    int line_end = (int)(expl_center.y + radius / 2);
+    for (int i = row_start; i < row_end; i++) {
+        for (int j = line_start; j < line_end; j++) {
+            int state = rand() % 2;
+            if (i >= 0 && j >= 0 && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
+                olc_draw(i, j, '*', FG_RED);
+                get_world()->z_buffer[i][j] = expl.distance;
             }
         }
     }
