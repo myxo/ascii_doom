@@ -19,16 +19,9 @@ double normilize_angle(double angle) {
 }
 
 screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
-    screen_obj_t res;
-    res.row_left = 0;
-    res.row_right = 0;
-    res.line_start = 0;
-    res.line_end = 0;
-    res.distance = 0;
     double angle_from_player_to_obj = normilize_angle(get_angle_from_pos1_to_pos2(player->pos, obj_pos));
     double player_angle = normilize_angle(player->angle);
-    double x = player->pos.x;
-    double y = player->pos.y;
+
     double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
     double obj_width_angle = atan2(obj_radis, distance);
     double angle_to_obj_left = angle_from_player_to_obj - obj_width_angle;
@@ -37,17 +30,12 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     double start_view_angle = player_angle - player->angle_of_vision / 2;
     int lrow_left = (int)(olc_screen_width() * (angle_to_obj_left - start_view_angle) / player->angle_of_vision + 0.5);
     int lrow_right = (int)(olc_screen_width() * (angle_to_obj_right - start_view_angle) / player->angle_of_vision + 0.5);
-    if (lrow_left < 0)
-        lrow_left = 0;
-    if (lrow_left > olc_screen_width())
-        lrow_left = olc_screen_width();
-    if (lrow_right > olc_screen_width())
-        lrow_right = olc_screen_width();
-    if (lrow_right < 0)
-        lrow_right = 0;
+
     obj_height = (obj_height / distance);
     int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
     int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+
+    screen_obj_t res;
     res.row_left = lrow_left;
     res.row_right = lrow_right;
     res.line_start = lline_start;
