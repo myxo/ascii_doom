@@ -38,14 +38,6 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
         start_player_view_angle_floor_PI += 2 * M_PI;
     int lrow_left = ((int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5));
     int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
-    if (lrow_left < 0)
-        lrow_left = 0;
-    if (lrow_left > olc_screen_width())
-        lrow_left = olc_screen_width();
-    if (lrow_right > olc_screen_width())
-        lrow_right = olc_screen_width();
-    if (lrow_right < 0)
-        lrow_right = 0;
     obj_height = (obj_height / distance);
     int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
     int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
@@ -227,13 +219,15 @@ void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_ra
     screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height);
     if ((obj.line_end - obj.line_start) != 0 && (obj.row_right - obj.row_left) != 0) {
         for (int i = obj.row_left; i <= obj.row_right; i++) {
-            double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);
-            for (int j = obj.line_start; j <= obj.line_end; j++) {
-                double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
-                char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-                if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
-                    olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
-                    get_world()->z_buffer[i][j] = obj.distance;
+            if (i >= 0 && i <= olc_screen_width()) {
+                double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);
+                for (int j = obj.line_start; j <= obj.line_end; j++) {
+                    double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
+                    char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
+                    if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
+                        olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
+                        get_world()->z_buffer[i][j] = obj.distance;
+                    }
                 }
             }
         }
