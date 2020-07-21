@@ -32,6 +32,7 @@ int create() {
     if (init_world_object() == 0) {
         return 0;
     }
+    init_player(get_world());
     log_init("debug.txt");
     create_map(get_world());
     return 1;
