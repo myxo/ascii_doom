@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
+#include <string.h>
 
 void increase_arr_next_nodes_capacity(node_of_room_t* node) {
     node->capacity_nexts = node->capacity_nexts * 2;
@@ -107,11 +108,15 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     for (int i = 0; i < n + 1; i++)
         is_exist[i] = 0;
     int pred_id, next_id;
-    fscanf(fgraph, "%d %d", &pred_id, &next_id);
+    char name_type_of_room_start[64];
+    char name_type_of_room[64];
+    fscanf(fgraph, "%d %d %s %s", &pred_id, &next_id, name_type_of_room_start, name_type_of_room);
+    strcat(name_type_of_room_start, ".txt");
+    strcat(name_type_of_room, ".txt");
     node_of_room_t* temp_node = init_room_node(3);
-    temp_node->type_of_room = type_of_room;
+    temp_node->type_of_room = read_room_for_file(name_type_of_room_start);//todo
     node_of_room_t* temp_node_second = init_room_node(3);
-    temp_node_second->type_of_room = type_of_room;
+    temp_node_second->type_of_room = read_room_for_file(name_type_of_room);
     graph_of_rooms_t graph;
     graph.start = temp_node;
     temp_node->next_nodes[temp_node->len_nexts++] = temp_node_second;
@@ -120,7 +125,8 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     array_of_rooms[next_id] = temp_node_second;
     is_exist[next_id] = 1;
     for (int i = 1; i  < n; i++) {
-        fscanf(fgraph, "%d %d", &pred_id, &next_id);
+        fscanf(fgraph, "%d %d %s", &pred_id, &next_id, name_type_of_room);
+        strcat(name_type_of_room, ".txt");
         if (array_of_rooms[pred_id]->len_nexts >= array_of_rooms[pred_id]->capacity_nexts)
             increase_arr_next_nodes_capacity(array_of_rooms[pred_id]);
         if (is_exist[next_id]) {
@@ -128,7 +134,7 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
         }
         else {
             node_of_room_t* temp = init_room_node(3);
-            temp->type_of_room = type_of_room;
+            temp->type_of_room = read_room_for_file(name_type_of_room);
             array_of_rooms[pred_id]->next_nodes[array_of_rooms[pred_id]->len_nexts++] = temp;
             array_of_rooms[next_id] = temp;
             is_exist[next_id] = 1;
@@ -199,7 +205,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         point_t null = { -1, -1 };
         pred[(int)temp.x][(int)temp.y] = null;
     }
-    point_t stop_door = {0, 0};
+    point_t stop_door = {-1000000,-1000000};
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
         int x_move[4] = { -1, 0,  0, 1 };
@@ -298,6 +304,7 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
             int x = (int)(node_room.center_on_map.x + node_room.type_of_room.doors.array[i].x - node_room.type_of_room.center.x + shift_x);
             map[y][x] = '0' + node_room_index;
         }
+        //map[(int)(node_room.center_on_map.y + shift_y)][(int)(node_room.center_on_map.x + shift_x)] = '0' + node_room_index;
     }
     for (int i = 0; i < graph->n_nodes; i++) {
         if (graph->is_exist[i])
@@ -313,8 +320,8 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
                 map[y][x] = '#';
         }
     }
-    player_pos->x = graph->start->center_on_map.y + shift_y;
-    player_pos->y = graph->start->center_on_map.x + shift_x;
+    player_pos->x = (int)(graph->start->center_on_map.y + shift_y + 0.5);
+    player_pos->y = (int)(graph->start->center_on_map.x + shift_x + 0.5);
     return map;
 }
 
