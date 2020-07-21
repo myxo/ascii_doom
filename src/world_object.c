@@ -78,8 +78,6 @@ int init_world_object() {
 
     world_global->player.health = 3;
     world_global->player.maxhealth = 3;
-    world_global->player.pos.x = 1;
-    world_global->player.pos.y = 1;
     world_global->player.angle = M_PI_4;
     world_global->player.radius = 0.2;
 

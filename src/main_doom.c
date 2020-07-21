@@ -7,6 +7,7 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "player.h"
+#include "map_generator.h"
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
@@ -26,11 +27,13 @@ const char config_filename[50] = "cfg.txt";
 int stop = 0;
 
 int create() {
+    srand(time(NULL));
     read_config_from_file(config_filename);
     if (init_world_object() == 0) {
         return 0;
     }
     log_init("debug.txt");
+    create_map(get_world());
     return 1;
 }
 
@@ -82,31 +85,33 @@ int update(float time_elapsed) {
     handle_config_ui_keypress();
     update_world_from_config();
 
-	handle_input(time_elapsed);
-	if (stop) {
-		return 0;
-	}
-	olc_fill(0, 0, width, height, ' ', BG_BLACK);
+    handle_input(time_elapsed);
+    if (stop) {
+        return 0;
+    }
+    olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
     if (get_world()->enemy_array.len == 0) {
         add_enemy(get_world());
     }
+
     world_t* world = get_world();
     update_time_since_last_shot(world, time_elapsed);
     bullets_movement(world, time_elapsed);
     rockets_movement(world, time_elapsed);
     enemy_movement(world, time_elapsed);
+
     update_life_time(world, time_elapsed);
-	draw_screen(world);
+
+    draw_screen(world);
     draw_minimap(world);
     draw_hp(world);
     display_watch();
     draw_config_ui();
-	return 1;
+    return 1;
 }
 
 int main() {
-    srand(time(0));
 	if (olc_initialize(width, height, glyph_size, glyph_size) == 0) {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;
