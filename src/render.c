@@ -10,6 +10,14 @@
 #include <math.h>
 #include <stdlib.h>
 
+// ensure angle in interval [0; 2*M_PI)
+double normilize_angle(double angle) {
+    double pi2 = 2 * M_PI;
+    while (angle < 0) { angle += pi2; }
+    while (angle >= pi2) { angle -= pi2; }
+    return angle;
+}
+
 screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
     screen_obj_t res;
     res.row_left = 0;
@@ -17,21 +25,18 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     res.line_start = 0;
     res.line_end = 0;
     res.distance = 0;
-    double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
+    double angle_from_player_to_obj = normilize_angle(get_angle_from_pos1_to_pos2(player->pos, obj_pos));
+    double player_angle = normilize_angle(player->angle);
     double x = player->pos.x;
     double y = player->pos.y;
-    double player_angle = player->angle ;
     double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
-    double player_to_obj_width_angle = atan2(obj_radis, distance);
-    double angle_from_player_to_obj_left = angle_from_player_to_obj - player_to_obj_width_angle;
-    double angle_from_player_to_obj_right = angle_from_player_to_obj + player_to_obj_width_angle;
+    double obj_width_angle = atan2(obj_radis, distance);
+    double angle_to_obj_left = angle_from_player_to_obj - obj_width_angle;
+    double angle_to_obj_right = angle_from_player_to_obj + obj_width_angle;
 
-    double player_angle_floor_PI = player_angle - ((int)(player_angle /2 / M_PI)) * 2 * M_PI;
-    if (player_angle < 0)
-        player_angle_floor_PI = 2 * M_PI + player_angle_floor_PI;
-    double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
-    int lrow_left = ((int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5));
-    int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
+    double start_view_angle = player_angle - player->angle_of_vision / 2;
+    int lrow_left = (int)(olc_screen_width() * (angle_to_obj_left - start_view_angle) / player->angle_of_vision + 0.5);
+    int lrow_right = (int)(olc_screen_width() * (angle_to_obj_right - start_view_angle) / player->angle_of_vision + 0.5);
     if (lrow_left < 0)
         lrow_left = 0;
     if (lrow_left > olc_screen_width())
