@@ -207,9 +207,11 @@ point_t get_rand_pos_on_floor(world_t* world) {
 }
 
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2) {
-    double delta_x = pos2.x - pos1.x;
-    double delta_y = pos2.y - pos1.y;
-    return atan2(delta_x, delta_y);
+    double vec_x = pos2.x - pos1.x;
+    double vec_y = pos2.y - pos1.y;
+    if (vec_x < 0)
+        return 2* M_PI - acos(vec_y / (sqrt(vec_x * vec_x + vec_y * vec_y)));
+    return acos(vec_y / (sqrt(vec_x * vec_x + vec_y * vec_y)));
 }
 
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2) {
