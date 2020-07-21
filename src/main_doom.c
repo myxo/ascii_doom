@@ -92,7 +92,8 @@ int update(float time_elapsed) {
     olc_fill(0, 0, width, height, ' ', BG_BLACK);
 
     if (get_world()->enemy_array.len == 0) {
-        add_enemy(get_world());
+        add_enemy(get_world(), hound);
+        add_enemy(get_world(), shooter);
     }
 
     world_t* world = get_world();

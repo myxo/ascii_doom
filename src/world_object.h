@@ -10,6 +10,11 @@ enum GUN {
     ROCKET_LAUNCHER
 };
 
+typedef enum type_of_enemy {
+    hound,
+    shooter
+} type_of_enemy_t;
+
 typedef struct {
     double x;
     double y;
@@ -57,6 +62,7 @@ typedef struct {
     double radius;
     double time_from_last_shot;
     point_t last_player_pos;
+    type_of_enemy_t type;
 } enemy_t;
 
 typedef struct {
