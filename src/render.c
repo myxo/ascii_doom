@@ -252,7 +252,6 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
     expl_center.x = (expl.row_left + expl.row_right) / 2;
     expl_center.y = (expl.line_start + expl.line_end) / 2;
     radius /= expl.distance;
-    //radius *= 10;
     radius *= (1 + 250 * life_time);
     int row_start = (int)(expl_center.x - radius / 2);
     int row_end = (int)(expl_center.x + radius / 2);

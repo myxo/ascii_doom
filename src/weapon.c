@@ -6,19 +6,15 @@
 #include <stdlib.h>
 
 void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
-    if (weapon->label != ROCKET_LAUNCHER) {
-        if (*time_since_last_shot >= weapon->shot_delay) {
+    if (*time_since_last_shot >= weapon->shot_delay) {
+        if (weapon->label != ROCKET_LAUNCHER) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
-            weapon->shot_delay = 1 / weapon->fire_rate;
-            *time_since_last_shot = 0;
         }
-    }
-    else {
-        if (*time_since_last_shot >= weapon->shot_delay) {
+        else {
             shoot_rocket(get_world(), get_world()->player.pos, get_world()->player.angle, weapon->host, weapon->damage, weapon->expl_radius);
-            weapon->shot_delay = 1 / weapon->fire_rate;
-            *time_since_last_shot = 0;
         }
+        weapon->shot_delay = 1 / weapon->fire_rate;
+        *time_since_last_shot = 0;
     }
 }
 
