@@ -252,7 +252,6 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
     expl_center.x = (expl.row_left + expl.row_right) / 2;
     expl_center.y = (expl.line_start + expl.line_end) / 2;
     radius /= expl.distance;
-    //radius *= 10;
     radius *= (1 + 250 * life_time);
     int row_start = (int)(expl_center.x - radius / 2);
     int row_end = (int)(expl_center.x + radius / 2);
@@ -261,7 +260,7 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
     for (int i = row_start; i < row_end; i++) {
         for (int j = line_start; j < line_end; j++) {
             int state = rand() % 2;
-            if (i >= 0 && j >= 0 && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
+            if (i >= 0 && j >= 0 && i <= olc_screen_width() && j <= olc_screen_height()&&state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, '*', FG_RED);
                 get_world()->z_buffer[i][j] = expl.distance;
             }
