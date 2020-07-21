@@ -41,10 +41,6 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     obj_height = (obj_height / distance);
     int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
     int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
-    if (lline_end > olc_screen_height())
-        lline_end = olc_screen_height();
-    if (lline_start < 0)
-        lline_start = 0;
     res.row_left = lrow_left;
     res.row_right = lrow_right;
     res.line_start = lline_start;
@@ -222,11 +218,13 @@ void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_ra
             if (i >= 0 && i <= olc_screen_width()) {
                 double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);
                 for (int j = obj.line_start; j <= obj.line_end; j++) {
-                    double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
-                    char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-                    if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
-                        olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
-                        get_world()->z_buffer[i][j] = obj.distance;
+                    if (j >= 0 && j <= olc_screen_height()) {
+                        double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
+                        char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
+                        if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
+                            olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
+                            get_world()->z_buffer[i][j] = obj.distance;
+                        }
                     }
                 }
             }
