@@ -28,17 +28,17 @@ point_array_t build_path(enemy_t* enemy) {
     temp.y = (int)enemy->pos.y;
     point_queue_t q = point_queue_init();
     point_queue_push_back(&q, temp);
-    int** used = malloc(get_world()->map_width * sizeof(int*));
-    for (int i = 0; i < get_world()->map_width; i++) {
-        used[i] = malloc(get_world()->map_height * sizeof(int));
-        for (int j = 0; j < get_world()->map_height; j++) {
+    int** used = malloc(get_world()->map_height * sizeof(int*));
+    for (int i = 0; i < get_world()->map_height; i++) {
+        used[i] = malloc(get_world()->map_width * sizeof(int));
+        for (int j = 0; j < get_world()->map_width; j++) {
             used[i][j] = 0;
         }
     }
     used[(int)enemy->pos.x][(int)enemy->pos.y] = 1;
-    point_t** pred = malloc(get_world()->map_width * sizeof(point_t*));
-    for (int i = 0; i < get_world()->map_width; i++) {
-        pred[i] = malloc(get_world()->map_height * sizeof(point_t));
+    point_t** pred = malloc(get_world()->map_height * sizeof(point_t*));
+    for (int i = 0; i < get_world()->map_height; i++) {
+        pred[i] = malloc(get_world()->map_width * sizeof(point_t));
     }
     point_t null = { -1, -1 };
     pred[(int)enemy->pos.x][(int)enemy->pos.y] = null;
@@ -87,11 +87,11 @@ point_array_t build_path(enemy_t* enemy) {
         path.len++;
     }
     free(reverse_path.array);
-    for (int i = 0; i < get_world()->map_width; i++) {
+    for (int i = 0; i < get_world()->map_height; i++) {
         free(pred[i]);
     }
     free(pred);
-    for (int i = 0; i < get_world()->map_width; i++) {
+    for (int i = 0; i < get_world()->map_height; i++) {
         free(used[i]);
     }
     free(used);

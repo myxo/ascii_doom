@@ -261,7 +261,7 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
     for (int i = row_start; i < row_end; i++) {
         for (int j = line_start; j < line_end; j++) {
             int state = rand() % 2;
-            if (i >= 0 && j >= 0 && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
+            if (i >= 0 && j >= 0 && i < olc_screen_width() && j < olc_screen_height() && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, '*', FG_RED);
                 get_world()->z_buffer[i][j] = expl.distance;
             }
