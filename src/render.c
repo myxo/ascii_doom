@@ -10,13 +10,14 @@
 #include <math.h>
 #include <stdlib.h>
 
-screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
+screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height, enum PLACE_ON_SCREEN place) {
     screen_obj_t res;
     res.row_left = 0;
     res.row_right = 0;
     res.line_start = 0;
     res.line_end = 0;
     res.distance = 0;
+    double half_screen_dist = 10;
     double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
     if (angle_from_player_to_obj < 0)
         angle_from_player_to_obj += 2 * M_PI;
@@ -47,8 +48,20 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     if (lrow_right < 0)
         lrow_right = 0;
     obj_height = (obj_height / distance);
-    int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
-    int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    int lline_start = 0;
+    int lline_end = 0;
+    if (place == AIR) {
+        lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
+        lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    }
+    else {
+        double dist_on_screen = (olc_screen_height() / 2) * (distance / half_screen_dist);
+        if (dist_on_screen > olc_screen_height()) {
+            dist_on_screen = olc_screen_height();
+        }
+        int lline_start = olc_screen_height() - (int)dist_on_screen;
+        int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    }
     if (lline_end > olc_screen_height())
         lline_end = olc_screen_height();
     if (lline_start < 0)
@@ -62,7 +75,7 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
 }
 
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
-    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height);
+    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height, AIR);
     for (int i = obj.row_left; i <= obj.row_right; i++)
         for (int j = obj.line_start; j < obj.line_end; j++) {
             if (obj.distance < get_world()->z_buffer[i][j]) {
@@ -214,7 +227,7 @@ void draw_hp(world_t* world) {
 
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
     player_t player = get_world()->player;
-    screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height);
+    screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height, AIR);
     if ((obj.line_end - obj.line_start) != 0 && (obj.row_right - obj.row_left) != 0) {
         for (int i = obj.row_left; i <= obj.row_right; i++) {
             double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);

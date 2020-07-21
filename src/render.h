@@ -9,7 +9,7 @@ typedef struct {
     double distance;
 } screen_obj_t;
 
-screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height);
+screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height, enum PLACE_ON_SCREEN place);
 
 void draw_screen(world_t* world);
 void draw_minimap(world_t* world);

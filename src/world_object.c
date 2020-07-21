@@ -26,6 +26,12 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+void init_barrel_array() {
+    world_global->barrel_array.capacity = 5;
+    world_global->barrel_array.len = 1;
+    world_global->barrel_array.array = malloc(world_global->barrel_array.capacity * sizeof(barrel_t));
+}
+
 point_array_t init_point_array(int capacity) {
     point_array_t array;
     array.capacity = capacity;

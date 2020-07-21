@@ -4,6 +4,11 @@
 
 #include "sprite.h"
 
+enum PLACE_ON_SCREEN {
+    FLOOR,
+    AIR
+};
+
 typedef struct {
     double x;
     double y;
@@ -94,11 +99,24 @@ typedef struct {
 } bullet_array_t;
 
 typedef struct {
+    point_t pos;
+    double radius;
+    double damage;
+} barrel_t;
+
+typedef struct {
+    barrel_t* array;
+    int len;
+    int capacity;
+} barrel_array_t;
+
+typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
     enemy_array_t enemy_array;
     std_weapon_list_t* weapon_list;
+    barrel_array_t barrel_array;
     int map_width;
     int map_height;
     double** z_buffer;
