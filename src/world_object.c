@@ -6,6 +6,7 @@
 #include "weapon.h"
 #include "sprite.h"
 #include "config.h"
+#include "map_generator.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -93,7 +94,10 @@ int init_world_object() {
     init_enemy_array(world_global, 5);
     init_rocket_array(5);
     init_explosion_array();
-    return read_map_for_file();
+    create_map(world_global);
+
+    init_player(world_global);
+    return 1;
 }
 
 void deinit_world_object() {
