@@ -108,15 +108,23 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     for (int i = 0; i < n + 1; i++)
         is_exist[i] = 0;
     int pred_id, next_id;
-    char name_type_of_room_start[64];
-    char name_type_of_room[64];
-    fscanf(fgraph, "%d %d %s %s", &pred_id, &next_id, name_type_of_room_start, name_type_of_room);
-    strcat(name_type_of_room_start, ".txt");
-    strcat(name_type_of_room, ".txt");
+    char str_temp[128];
+    char name_type[64];
+    char name_second[64];
+    fgets(str_temp, 128, fgraph);
+    fgets(str_temp, 128, fgraph);
     node_of_room_t* temp_node = init_room_node(3);
-    temp_node->type_of_room = read_room_for_file(name_type_of_room_start);//todo
     node_of_room_t* temp_node_second = init_room_node(3);
-    temp_node_second->type_of_room = read_room_for_file(name_type_of_room);
+    sscanf(str_temp, "%d %d %s %s", &pred_id, &next_id, name_type, name_second);
+    strcat(name_type, ".txt");
+    strcat(name_second, ".txt");
+    temp_node->type_of_room = read_room_for_file(name_type);
+    strcpy(temp_node->type_of_room.name, name_type);
+    if (!strcmp(name_type, name_second))
+        temp_node_second->type_of_room = temp_node->type_of_room;
+    else
+        temp_node_second->type_of_room = read_room_for_file(name_second);
+    strcpy(temp_node_second->type_of_room.name, name_second);
     graph_of_rooms_t graph;
     graph.start = temp_node;
     temp_node->next_nodes[temp_node->len_nexts++] = temp_node_second;
@@ -125,8 +133,8 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     array_of_rooms[next_id] = temp_node_second;
     is_exist[next_id] = 1;
     for (int i = 1; i  < n; i++) {
-        fscanf(fgraph, "%d %d %s", &pred_id, &next_id, name_type_of_room);
-        strcat(name_type_of_room, ".txt");
+        fscanf(fgraph, "%d %d %s", &pred_id, &next_id, name_type);
+        strcat(name_type, ".txt");
         if (array_of_rooms[pred_id]->len_nexts >= array_of_rooms[pred_id]->capacity_nexts)
             increase_arr_next_nodes_capacity(array_of_rooms[pred_id]);
         if (is_exist[next_id]) {
@@ -134,7 +142,18 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
         }
         else {
             node_of_room_t* temp = init_room_node(3);
-            temp->type_of_room = read_room_for_file(name_type_of_room);
+            int is_type = 0;
+            for (int j = 0; j < n; j++) {
+                if (is_exist[j]) {
+                    if (!strcmp(array_of_rooms[j]->type_of_room.name, name_type)) {
+                        temp->type_of_room = array_of_rooms[j]->type_of_room;
+                        is_type = 1;
+                        break;
+                    }
+                }
+            }
+            if (!is_type)
+                temp->type_of_room = read_room_for_file(name_type);
             array_of_rooms[pred_id]->next_nodes[array_of_rooms[pred_id]->len_nexts++] = temp;
             array_of_rooms[next_id] = temp;
             is_exist[next_id] = 1;
