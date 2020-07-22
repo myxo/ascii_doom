@@ -68,15 +68,19 @@ void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.door = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.door);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    load_texture_from_file("door1.tex", &world->textures.door);
+    attach_texture_to_sprite(world->sprites.door, world->textures.door);
 }
 
 void init_player(world_t* world) {
@@ -148,6 +152,14 @@ int is_wall(double x, double y) {
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_door(double x, double y) {
+    if (x < 0 || y < 0)
+        return 1;
+    if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
+        return 1;
+    return world_global->map[(int)x][(int)y] == 'd';
 }
 
 int is_wall_in_radius(double x, double y, double radius) {

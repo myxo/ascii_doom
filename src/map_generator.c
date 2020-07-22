@@ -386,6 +386,9 @@ void create_map(world_t* world) {
     for (int i = 0; i < height; i++) {
         fprintf(log_file(), "%s\n", map[i]);
     }
+    for (int i = 0; i < world->door_array.len; i++) {
+        map[(int)world->door_array.array[i].pos.y][(int)world->door_array.array[i].pos.x] = 'd';
+    }
     world->map = map;
     world->map_height = height;
     world->map_width = width;

@@ -36,12 +36,14 @@ typedef struct {
     texture_t wall;
     texture_t bullet;
     texture_t mob1;
+    texture_t door;
 } game_textures_t;
 
 typedef struct {
     sprite_t* wall;
     sprite_t* bullet;
     sprite_t* mob1;
+    sprite_t* door;
 } game_sprites_t;
 
 
@@ -174,6 +176,7 @@ world_t* get_world();
 int read_map_for_file();
 int is_in_circle(point_t pos, point_t circle_center, double radius);
 int is_wall(double x, double y);
+int is_door(double x, double y);
 int is_wall_in_radius(double x, double y, double radius);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
