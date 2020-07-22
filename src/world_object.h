@@ -78,6 +78,7 @@ typedef struct {
     double damage;
     double shot_delay;
     double expl_radius;
+    int fire_sound;
 } weapon_t;
 
 typedef struct {
@@ -128,6 +129,7 @@ typedef struct {
     explosion_t* array;
     int len;
     int capacity;
+    int explosion_sound;
 } explosion_array_t;
 
 
@@ -153,6 +155,20 @@ typedef struct {
 } rocket_array_t;
 
 typedef struct {
+    int* music_array;
+    float* duration_array;
+    int len;
+    float current_music_time;
+    int current_index;
+}music_array_t;
+
+typedef struct {
+    int caco_fire_sound_id;
+    int caco_pain_sound_id;
+    int caco_death_sound_id;
+} sound_effects_t;
+
+typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
@@ -165,6 +181,9 @@ typedef struct {
     double** z_buffer;
     game_textures_t textures;
     game_sprites_t sprites;
+    music_array_t music;
+    sound_effects_t sound_effects;
+
     drop_array_t drop_array;
     double first_aid_heal;
     double pistol_ammo;

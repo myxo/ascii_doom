@@ -14,10 +14,33 @@
 
 world_t* world_global = NULL;
 
+void init_music_array() {
+    world_global->music.music_array = malloc(2 * sizeof(int));
+    world_global->music.duration_array = malloc(2 * sizeof(float));
+
+    world_global->music.music_array[0] = olc_load_sound("E1M1.wav");
+    world_global->music.duration_array[0] = 95;
+
+    world_global->music.music_array[1] = olc_load_sound("E1M2.wav");
+    world_global->music.duration_array[1] = 154;
+
+    world_global->music.len = 2;
+
+    world_global->music.current_index = 1;
+    world_global->music.current_music_time = 0;
+    olc_play_sound(world_global->music.music_array[world_global->music.current_index]);
+}
+
+void deinit_music_array() {
+    free(world_global->music.music_array);
+    free(world_global->music.duration_array);
+}
+
 void init_explosion_array() {
     world_global->explosion_array.capacity = 5;
     world_global->explosion_array.len = 0;
     world_global->explosion_array.array = malloc(world_global->explosion_array.capacity * sizeof(explosion_t));
+    world_global->explosion_array.explosion_sound = olc_load_sound("dsexplosion.wav");
 }
 
 void deinit_explosion_array() {
@@ -46,6 +69,13 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+
+void init_sound_effects() {
+    world_global->sound_effects.caco_fire_sound_id = olc_load_sound("dsfirshot.wav");
+    world_global->sound_effects.caco_death_sound_id = olc_load_sound("dscacdth.wav");
+    world_global->sound_effects.caco_pain_sound_id = olc_load_sound("dsdmpain.wav");
+}
+  
 void init_drop_array(world_t* world, int capacity) {
     world_global->drop_array.capacity = capacity;
     world_global->drop_array.len = 0;
@@ -110,6 +140,8 @@ int init_world_object() {
     init_drop_array(world_global, 5);
     init_rocket_array(5);
     init_explosion_array();
+    init_music_array();
+    init_sound_effects();
     create_map(world_global);
 
     init_player(world_global);
@@ -127,6 +159,7 @@ void deinit_world_object() {
     deinit_rocket_array(5);
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
+    deinit_music_array();
     free(world_global);
 }
 

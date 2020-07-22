@@ -12,6 +12,7 @@
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -90,7 +91,6 @@ int update(float time_elapsed) {
     world_t* world = get_world();
     if (world->player.health <= 0) {
         update_dead_screen();
-
     } else {
         if (get_world()->enemy_array.len == 0) {
             add_enemy(get_world());
@@ -106,6 +106,7 @@ int update(float time_elapsed) {
         enemy_movement(world, time_elapsed);
         drop_check(world);
 
+        update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
         player_regen(time_elapsed);
 
@@ -126,7 +127,7 @@ int main() {
 	}
 	olc_register_create(&create);
     olc_register_update(&update);
-
+    olc_enable_sound();
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();
