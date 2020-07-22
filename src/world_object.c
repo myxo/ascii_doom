@@ -71,6 +71,10 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    load_texture_from_file("bullet2.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    load_texture_from_file("bullet_mob.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
 
 void init_player(world_t* world) {

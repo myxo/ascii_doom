@@ -70,6 +70,12 @@ typedef enum bullet_host {
     kBulletEnemy
 } bullet_host_t;
 
+typedef enum bullet_type {
+    cacodemon_bullet,
+    player_pistol,
+    player_rifle
+} bullet_type_t;
+
 typedef struct {
     sprite_t sprite;
     bullet_host_t host;
@@ -95,6 +101,7 @@ typedef struct {
     double radius;
     int host;
     double damage;
+    bullet_type_t type;
 } bullet_t;
 
 typedef struct {

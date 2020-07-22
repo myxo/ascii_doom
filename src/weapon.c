@@ -8,7 +8,14 @@
 void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
     if (*time_since_last_shot >= weapon->shot_delay) {
         if (weapon->label != ROCKET_LAUNCHER) {
-            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
+            bullet_type_t type;
+            if (weapon->label == PISTOL) {
+                type = player_pistol;
+            }
+            else {
+                type = player_rifle;
+            }
+            shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage, type);
         }
         else {
             shoot_rocket(get_world(), get_world()->player.pos, get_world()->player.angle, weapon->host, weapon->damage, weapon->expl_radius);
