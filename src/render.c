@@ -205,6 +205,9 @@ void draw_minimap(world_t* world) {
     for (int i = 0; i < world->enemy_array.len; i++) {
         olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
     }
+    for (int i = 0; i < world->door_array.len; i++) {
+        olc_draw((int)world->door_array.array[i].pos.y, world->map_width - (int)world->door_array.array[i].pos.x - 1, '8', FG_MAGENTA + BG_MAGENTA);
+    }
 }
 
 void draw_hp(world_t* world) {

@@ -103,6 +103,7 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     FILE* fgraph = fopen(name_file, "r");
     int n;
     fscanf(fgraph, "%d", &n);
+    init_door_array(get_world(), n * 2);
     node_of_room_t** array_of_rooms = malloc((n + 1) * sizeof(node_of_room_t*));
     int* is_exist = malloc((n + 1) * sizeof(int));
     for (int i = 0; i < n + 1; i++)
@@ -267,6 +268,10 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     }
     point_t cur;
     char marker = ' ';
+    door_t temp_door;
+    temp_door.pos = stop_door;
+    temp_door.status = door_close;
+    get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
     for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
             break;
@@ -279,6 +284,12 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         }
         else {
             map[(int)cur.y][(int)cur.x] = marker;
+        }
+        if (pred[(int)cur.x][(int)cur.y].x == -1 && pred[(int)cur.x][(int)cur.y].y == -1) {
+            temp_door;
+            temp_door.pos = cur;
+            temp_door.status = door_close;
+            get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
         }
     }
     return map;

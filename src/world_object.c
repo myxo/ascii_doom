@@ -30,6 +30,12 @@ void init_bullet_array(world_t* world, int capacity) {
     world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
 }
 
+void init_door_array(world_t* world, int capacity) {
+    world_global->door_array.capacity = capacity;
+    world_global->door_array.len = 0;
+    world_global->door_array.array = malloc(world_global->door_array.capacity * sizeof(door_t));
+}
+
 void init_rocket_array(int capacity) {
     world_global->rocket_array.capacity = capacity;
     world_global->rocket_array.len = 0;

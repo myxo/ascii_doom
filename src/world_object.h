@@ -70,6 +70,11 @@ typedef enum bullet_host {
     kBulletEnemy
 } bullet_host_t;
 
+typedef enum door_status {
+    door_open,
+    door_close
+} door_status_t;
+
 typedef struct {
     sprite_t sprite;
     bullet_host_t host;
@@ -102,6 +107,17 @@ typedef struct {
     int len;
     int capacity;
 } bullet_array_t;
+
+typedef struct {
+    point_t pos;
+    door_status_t status;
+} door_t;
+
+typedef struct {
+    door_t* array;
+    int len;
+    int capacity;
+} door_array_t;
 
 typedef struct {
     point_t pos;
@@ -145,10 +161,12 @@ typedef struct {
     double** z_buffer;
     game_textures_t textures;
     game_sprites_t sprites;
+    door_array_t door_array;
 } world_t;
 
 void init_player(world_t* world);
 int init_world_object();
+void init_door_array(world_t* world, int capacity);
 void deinit_world_object();
 void init_z_buffer();
 void deinit_z_buffer();
