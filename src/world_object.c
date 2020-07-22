@@ -6,6 +6,7 @@
 #include "weapon.h"
 #include "sprite.h"
 #include "config.h"
+#include "map_generator.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -66,6 +67,9 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.capacity = capacity;
     world_global->enemy_array.len = 0;
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
+    world_global->enemy_array.fire_sound = olc_load_sound("..\\..\\..\\res\\dsfirshot.wav");
+    world_global->enemy_array.death_sound = olc_load_sound("..\\..\\..\\res\\dscacdth.wav");
+    world_global->enemy_array.pain_sound = olc_load_sound("..\\..\\..\\res\\dsdmpain.wav");
 }
 
 point_array_t init_point_array(int capacity) {
@@ -95,14 +99,17 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
 
+void init_player(world_t* world) {
+    world->player.health = 3;
+    world->player.maxhealth = 3;
+    world->player.radius = 0.2;
+    world->player.pos = get_rand_pos_on_floor(world, world->player.radius);
+    world->player.angle = M_PI_4;
+}
+
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
     update_world_from_config();
-
-    world_global->player.health = 3;
-    world_global->player.maxhealth = 3;
-    world_global->player.angle = M_PI_4;
-    world_global->player.radius = 0.2;
 
     world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
     init_std_weapon_list(world_global->weapon_list);
@@ -114,7 +121,10 @@ int init_world_object() {
     init_rocket_array(5);
     init_explosion_array();
     init_music_array();
-    return read_map_for_file();
+    create_map(world_global);
+
+    init_player(world_global);
+    return 1;
 }
 
 void deinit_world_object() {
@@ -161,6 +171,12 @@ int is_wall(double x, double y) {
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_wall_in_radius(double x, double y, double radius) {
+    int result = is_wall(x + radius, y - radius) || is_wall(x - radius, y + radius)
+        || is_wall(x + radius, y + radius) || is_wall(x - radius, y - radius);
+    return result;
 }
 
 int read_map_for_file() {
@@ -222,12 +238,12 @@ int is_enemy(double x, double y, int* enemy_index) {
     return 0;
 }
 
-point_t get_rand_pos_on_floor(world_t* world) {
+point_t get_rand_pos_on_floor(world_t* world, double radius) {
     point_t pos;
     do {
         pos.x = rand() % world->map_width;
         pos.y = rand() % world->map_height;
-    } while (is_wall(pos.x, pos.y));
+    } while (is_wall_in_radius(pos.x, pos.y, radius));
     return pos;
 }
 
