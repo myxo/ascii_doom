@@ -7,6 +7,8 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "player.h"
+#include "drop.h"
+#include "map_generator.h"
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
@@ -86,7 +88,6 @@ int update(float time_elapsed) {
         return 0;
     }
     world_t* world = get_world();
-
     if (world->player.health <= 0) {
         update_dead_screen();
 
@@ -111,6 +112,13 @@ int update(float time_elapsed) {
         draw_hp(world);
         display_watch();
         draw_config_ui();
+        draw_minimap(world);
+        draw_hp(world);
+        drop_check(world);
+        bullets_counter(world);
+        if (world->player.health < world->player.maxhealth) {
+          world->player.health += world->player.regen * time_elapsed;
+        }
     }
     return 1;
 }

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "drop.h"
 #include "structs_of_data.h"
 
 void increase_arr_enemy_capacity(world_t* world) {
@@ -101,7 +102,7 @@ point_array_t build_path(enemy_t* enemy) {
 void add_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
-    world->enemy_array.array[world->enemy_array.len].health = 3;
+    world->enemy_array.array[world->enemy_array.len].health = 100;
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
@@ -138,7 +139,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (!has_wall_between(enemy->pos, world->player.pos)) {
                 if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
-                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 1);
+                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34);
                 }
                 if (distance_to_player <= 4) {
                     update_position = 0;
@@ -165,6 +166,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
 }
 
 void enemy_destruct(world_t* world, int index) {
+    add_drop(world, get_rand_pos_on_floor(world, 0.5));
     for (int i = index; i < world->enemy_array.len - 1; i++) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }

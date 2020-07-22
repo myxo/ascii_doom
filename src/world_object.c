@@ -46,6 +46,12 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+void init_drop_array(world_t* world, int capacity) {
+    world_global->drop_array.capacity = capacity;
+    world_global->drop_array.len = 0;
+    world_global->drop_array.array = malloc(world_global->drop_array.capacity * sizeof(drop_t));
+}
+
 point_array_t init_point_array(int capacity) {
     point_array_t array;
     array.capacity = capacity;
@@ -62,20 +68,29 @@ void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.drop1 = malloc(sizeof(sprite_t));
+    world_global->sprites.drop2 = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.drop1);
+    init_sprite(world_global->sprites.drop2);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    load_texture_from_file("first_aid.tex", &world->textures.drop1);
+    attach_texture_to_sprite(world->sprites.drop1, world->textures.drop1);
+    load_texture_from_file("ammo.tex", &world->textures.drop2);
+    attach_texture_to_sprite(world->sprites.drop2, world->textures.drop2);
 }
 
 void init_player(world_t* world) {
-    world->player.health = 3;
-    world->player.maxhealth = 3;
+    world->player.health = 100;
+    world_global->player.maxhealth = (int)world_global->player.health;
+    world_global->player.regen = 1;
     world->player.radius = 0.2;
     world->player.pos = get_rand_pos_on_floor(world, world->player.radius);
     world->player.angle = M_PI_4;
@@ -92,6 +107,7 @@ int init_world_object() {
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
+    init_drop_array(world_global, 5);
     init_rocket_array(5);
     init_explosion_array();
     create_map(world_global);
@@ -252,4 +268,8 @@ void update_world_from_config() {
     world_global->player.speed = get_config_value(kPlayerSpeed);
     world_global->player.angle_of_vision = get_config_value(kAngleOfView);
     world_global->player.angular_speed = get_config_value(kPlayerAngularSpeed);
+    world_global->first_aid_heal = get_config_value(kFirstAidHeal);
+    world_global->pistol_ammo = get_config_value(kPistolAmmo);
+    world_global->rifle_ammo = get_config_value(kRifleAmmo);
+    world_global->rocket_ammo = get_config_value(kRocketAmmo);
 }
