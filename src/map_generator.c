@@ -197,10 +197,12 @@ void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room
 char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_room, node_of_room_t* stop_room, double shift_y, double shift_x, double map_width, double map_height) {
     char ch_door_start = '0', ch_door_stop = '0';
     for (int i = 0; i < g->n_nodes; i++) {
-        if (g->array_of_rooms[i] == start_room)
-            ch_door_start = '0' + i;
-        if (g->array_of_rooms[i] == stop_room)
-            ch_door_stop = '0' + i;
+        if (g->is_exist[i]) {
+            if (g->array_of_rooms[i] == start_room)
+                ch_door_start = '0' + i;
+            if (g->array_of_rooms[i] == stop_room)
+                ch_door_stop = '0' + i;
+        }
     }
 
     point_queue_t q = point_queue_init();
@@ -215,49 +217,53 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     for (int i = 0; i < map_width; i++) {
         pred[i] = malloc((int)map_height * sizeof(point_t));
     }
-    //for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
-    //    point_t temp;
-    //    temp.y = start_room->center_on_map.y + start_room->type_of_room.doors.array[i].y - start_room->type_of_room.center.y + shift_y;
-    //    temp.x = start_room->center_on_map.x + start_room->type_of_room.doors.array[i].x - start_room->type_of_room.center.x + shift_x;
-    //    point_queue_push_back(&q, temp);
-    //    used[(int)temp.x][(int)temp.y] = 1;
-    //    point_t null = { -1, -1 };
-    //    pred[(int)temp.x][(int)temp.y] = null;
-    //}
-    point_t temp;
-    temp.y = (int)(start_room->center_on_map.y+ shift_y + 0.5);
-    temp.x = (int)(start_room->center_on_map.x+ shift_x + 0.5);
-    point_queue_push_back(&q, temp);
-    used[(int)temp.x][(int)temp.y] = 1;
-    point_t null = { -1, -1 };
-    pred[(int)temp.x][(int)temp.y] = null;
-
-    point_t stop_door = {-1000000,-1000000};
+    for (int i = 0; i < start_room->type_of_room.doors.len; i++) {
+        point_t temp;
+        temp.y = start_room->center_on_map.y + start_room->type_of_room.doors.array[i].y - start_room->type_of_room.center.y + shift_y;
+        temp.x = start_room->center_on_map.x + start_room->type_of_room.doors.array[i].x - start_room->type_of_room.center.x + shift_x;
+        point_queue_push_back(&q, temp);
+        used[(int)temp.x][(int)temp.y] = 1;
+        point_t null = { -1, -1 };
+        pred[(int)temp.x][(int)temp.y] = null;
+    }
+    point_t stop_door = {0, 0};
+    int found_corridor = 0;
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
+        int near_corridor = 0;
         int x_move[4] = { -1, 0,  0, 1 };
         int y_move[4] = { 0, 1, -1, 0 };
         for (int i = 0; i < 4; i++) {
             int x = (int)cur.x + x_move[i];
             int y = (int)cur.y + y_move[i];
-            if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] != '|'){
-                point_t to = { x, y };
-                if (!used[x][y]) {
-                    used[x][y] = 1;
-                    pred[x][y] = cur;
-                    for (int j = 0; j < stop_room->type_of_room.doors.len; j++) {
-                        stop_door.y = stop_room->center_on_map.y + stop_room->type_of_room.doors.array[j].y - stop_room->type_of_room.center.y + shift_y;
-                        stop_door.x = stop_room->center_on_map.x + stop_room->type_of_room.doors.array[j].x - stop_room->type_of_room.center.x + shift_x;
-                        if (x == (int)stop_door.x && y == (int)stop_door.y) {
+            if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] == '.') {
+                near_corridor = 1;
+                break;
+            }
+        }
+        if (!near_corridor) {
+            for (int i = 0; i < 4; i++) {
+                int x = (int)cur.x + x_move[i];
+                int y = (int)cur.y + y_move[i];
+                if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] != '|') {
+                    point_t to = { x, y };
+                    if (!used[x][y]) {
+                        used[x][y] = 1;
+                        pred[x][y] = cur;
+                        if (map[y][x] == ch_door_stop) {
+                            stop_door.y = y;
+                            stop_door.x = x;
+                            found_corridor = 1;
                             break;
                         }
+                        if (map[y][x] == '#')
+                            point_queue_push_back(&q, to);
                     }
-                    if (map[y][x] != ' ' && map[y][x] != '#' && map[y][x] != ch_door_start && map[y][x] != ch_door_stop)
-                        continue;
-                    point_queue_push_back(&q, to);
                 }
             }
         }
+        if (found_corridor)
+            break;
     }
     point_t cur;
     char marker = ' ';
