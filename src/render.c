@@ -90,9 +90,9 @@ void draw_bullets(world_t* world) {
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
         int tex_id = 0;
-        if (bullet->type == player_rifle) {
+        if (bullet->type == PLAYER_RIFLE) {
             tex_id = 1;
-        }else if (bullet->type == cacodemon_bullet){
+        }else if (bullet->type == CACODEMON){
             tex_id = 2;
         }
         draw_sprite(world->sprites.bullet, tex_id, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);

@@ -10,10 +10,10 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
         if (weapon->label != ROCKET_LAUNCHER) {
             bullet_type_t type;
             if (weapon->label == PISTOL) {
-                type = player_pistol;
+                type = PLAYER_PISTOL;
             }
             else {
-                type = player_rifle;
+                type = PLAYER_RIFLE;
             }
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage, type);
         }

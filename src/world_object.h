@@ -71,9 +71,9 @@ typedef enum bullet_host {
 } bullet_host_t;
 
 typedef enum bullet_type {
-    cacodemon_bullet,
-    player_pistol,
-    player_rifle
+    CACODEMON,
+    PLAYER_PISTOL,
+    PLAYER_RIFLE
 } bullet_type_t;
 
 typedef struct {
