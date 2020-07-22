@@ -5,9 +5,29 @@
 #include "bullet.h"
 #include <stdlib.h>
 
+void reload_gun(weapon_t* weapon, double* time_since_last_shot) {
+    if (*time_since_last_shot >= weapon->shot_delay * 4) {
+        if (weapon->bullets > 0) {
+            if (weapon->bullets >= weapon->max_reloaded_bullets) {
+                weapon->bullets -= weapon->max_reloaded_bullets - weapon->reloaded_bullets;
+                weapon->reloaded_bullets = weapon->max_reloaded_bullets;
+            }
+            else {
+                weapon->reloaded_bullets += weapon->bullets;
+                weapon->bullets = 0;
+                if (weapon->reloaded_bullets > weapon->max_reloaded_bullets) {
+                    weapon->bullets = weapon->reloaded_bullets - weapon->max_reloaded_bullets;
+                    weapon->reloaded_bullets = weapon->max_reloaded_bullets;
+                }
+            }
+        }
+        get_world()->weapon_list->is_reloading = 0;
+    }
+}
+
 void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
-    if (*time_since_last_shot >= weapon->shot_delay && weapon->bullets > 0) {
-        weapon->bullets--;
+    if (*time_since_last_shot >= weapon->shot_delay && weapon->reloaded_bullets > 0) {
+        weapon->reloaded_bullets--;
         if (weapon->label != ROCKET_LAUNCHER) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
         }
@@ -17,6 +37,9 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
         weapon->shot_delay = 1 / weapon->fire_rate;
         *time_since_last_shot = 0;
     }
+    else {
+        reload_gun(weapon, time_since_last_shot);
+    }
 }
 
 void init_std_weapon_list(std_weapon_list_t* weapon_list) {
@@ -25,6 +48,7 @@ void init_std_weapon_list(std_weapon_list_t* weapon_list) {
     weapon_list->rocket_launcher = malloc(sizeof(weapon_t));
     weapon_list->active_weapon = PISTOL;
     weapon_list->time_since_last_shot = 0;
+    weapon_list->is_reloading = 0;
     init_pistol(weapon_list->pistol);
     init_rifle(weapon_list->rifle);
     init_rocket_launcher(weapon_list->rocket_launcher);
@@ -40,7 +64,9 @@ void deinit_std_weapon_list(std_weapon_list_t* weapon_list) {
 void init_pistol(weapon_t* pistol) {
     pistol->damage = 34;
     pistol->fire_rate = 1;
-    pistol->bullets = 15;
+    pistol->bullets = 5;
+    pistol->reloaded_bullets = 10;
+    pistol->max_reloaded_bullets = 10;
     pistol->host = kBulletPlayer;
     pistol->label = PISTOL;
     pistol->shot_delay = 0;
@@ -49,7 +75,9 @@ void init_pistol(weapon_t* pistol) {
 void init_rifle(weapon_t* rifle) {
     rifle->damage = 16;
     rifle->fire_rate = 5;
-    rifle->bullets = 30;
+    rifle->bullets = 0;
+    rifle->reloaded_bullets = 30;
+    rifle->max_reloaded_bullets = 30;
     rifle->label = RIFLE;
     rifle->host = kBulletPlayer;
     rifle->shot_delay = 0;
@@ -58,7 +86,9 @@ void init_rifle(weapon_t* rifle) {
 void init_rocket_launcher(weapon_t* rocket_launcher) {
     rocket_launcher->damage = 50;
     rocket_launcher->fire_rate = 0.5;
-    rocket_launcher->bullets = 5;
+    rocket_launcher->bullets = 4;
+    rocket_launcher->reloaded_bullets = 1;
+    rocket_launcher->max_reloaded_bullets = 1;
     rocket_launcher->host = kBulletPlayer;
     rocket_launcher->label = ROCKET_LAUNCHER;
     rocket_launcher->expl_radius = 3;
@@ -74,6 +104,18 @@ void shoot_from_active_weapon(world_t* world) {
     }
     else if (world->weapon_list->active_weapon == ROCKET_LAUNCHER) {
         shoot_from_weapon(world->weapon_list->rocket_launcher, &world->weapon_list->time_since_last_shot);
+    }
+}
+
+void reload_active_weapon(world_t* world) {
+    if (world->weapon_list->active_weapon == PISTOL) {
+        reload_gun(world->weapon_list->pistol, &world->weapon_list->time_since_last_shot);
+    }
+    else if (world->weapon_list->active_weapon == RIFLE) {
+        reload_gun(world->weapon_list->rifle, &world->weapon_list->time_since_last_shot);
+    }
+    else if (world->weapon_list->active_weapon == ROCKET_LAUNCHER) {
+        reload_gun(world->weapon_list->rocket_launcher, &world->weapon_list->time_since_last_shot);
     }
 }
 

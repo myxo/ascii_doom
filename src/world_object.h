@@ -74,6 +74,8 @@ typedef struct {
     bullet_host_t host;
     enum GUN label;
     int bullets;
+    int reloaded_bullets;
+    int max_reloaded_bullets;
     double fire_rate;
     double damage;
     double shot_delay;
@@ -138,6 +140,7 @@ typedef struct {
     weapon_t* rocket_launcher;
     enum GUN active_weapon;
     double time_since_last_shot;
+    int is_reloading;
 } std_weapon_list_t;
 
 typedef struct {

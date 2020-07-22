@@ -57,19 +57,24 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_vec_y += 1;
     }
-    if (olc_get_key('1').pressed) {
-        set_active_weapon(get_world(), PISTOL);
-    }
-    if (olc_get_key('2').pressed) {
-        set_active_weapon(get_world(), RIFLE);
-    }
-    if (olc_get_key('3').pressed) {
-        set_active_weapon(get_world(), ROCKET_LAUNCHER);
+    if (get_world()->weapon_list->is_reloading != 1) {
+        if (olc_get_key('R').held) {
+            get_world()->weapon_list->is_reloading = 1;
+        }
+        if (olc_get_key('1').pressed) {
+            set_active_weapon(get_world(), PISTOL);
+        }
+        if (olc_get_key('2').pressed) {
+            set_active_weapon(get_world(), RIFLE);
+        }
+        if (olc_get_key('3').pressed) {
+            set_active_weapon(get_world(), ROCKET_LAUNCHER);
+        }
+        if (olc_get_key(VK_SPACE).held) {
+            shoot_from_active_weapon(get_world());
+        }
     }
     move_player(move_vec_x, move_vec_y, time_elapsed);
-    if (olc_get_key(VK_SPACE).held) {
-        shoot_from_active_weapon(get_world());
-    }
 }
 
 
@@ -91,7 +96,8 @@ int update(float time_elapsed) {
     if (world->player.health <= 0) {
         update_dead_screen();
 
-    } else {
+    }
+    else {
         if (get_world()->enemy_array.len == 0) {
             add_enemy(get_world());
         }
@@ -118,6 +124,9 @@ int update(float time_elapsed) {
         bullets_counter(world);
         if (world->player.health < world->player.maxhealth) {
           world->player.health += world->player.regen * time_elapsed;
+        }
+        if (world->weapon_list->is_reloading == 1) {
+            reload_active_weapon(world);
         }
     }
     return 1;
