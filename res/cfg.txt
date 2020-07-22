@@ -4,3 +4,7 @@ bullet_speed 2
 bullet_radius 0.01
 angle_of_view 1.25
 ray_trace_step 0.01
+first_aid_heal 50
+pistol_bullets 10
+rifle_bullets 20
+rockets 5
