@@ -7,6 +7,7 @@ typedef struct {
     int line_start;
     int line_end;
     double distance;
+    int on_screen;
 } screen_obj_t;
 
 screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height);

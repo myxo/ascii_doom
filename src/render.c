@@ -10,49 +10,44 @@
 #include <math.h>
 #include <stdlib.h>
 
+// ensure angle in interval [0; 2*M_PI)
+double normilize_angle(double angle) {
+    double pi2 = 2 * M_PI;
+    while (angle < 0) { angle += pi2; }
+    while (angle >= pi2) { angle -= pi2; }
+    return angle;
+}
+
 screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
-    screen_obj_t res;
-    res.row_left = 0;
-    res.row_right = 0;
-    res.line_start = 0;
-    res.line_end = 0;
-    res.distance = 0;
-    double angle_from_player_to_obj = get_angle_from_pos1_to_pos2(player->pos, obj_pos);
-    if (angle_from_player_to_obj < 0)
-        angle_from_player_to_obj += 2 * M_PI;
-    double x = player->pos.x;
-    double y = player->pos.y;
+    double angle_from_player_to_obj = normilize_angle(get_angle_from_pos1_to_pos2(player->pos, obj_pos));
+    double player_angle = normilize_angle(player->angle);
+    double player_aov = player->angle_of_vision;
 
-    double start_player_view_angle = player->angle - player->angle_of_vision / 2;
-    double stop_player_view_angle = player->angle + player->angle_of_vision / 2;
-    if ((player->angle < start_player_view_angle) || (player->angle > stop_player_view_angle))
-        return res;
     double distance = get_distance_from_pos1_to_pos2(player->pos, obj_pos);
-    double player_to_obj_width_angle = atan2(obj_radis, distance);
-    double angle_from_player_to_obj_left = angle_from_player_to_obj - player_to_obj_width_angle;
-    double angle_from_player_to_obj_right = angle_from_player_to_obj + player_to_obj_width_angle;
-
-    double player_angle_floor_PI = player->angle - ((int)(player->angle / 2 / M_PI)) * 2 * M_PI;
-    double start_player_view_angle_floor_PI = player_angle_floor_PI - player->angle_of_vision / 2;
-    if (start_player_view_angle_floor_PI < 0)
-        start_player_view_angle_floor_PI += 2 * M_PI;
-    int lrow_left = ((int)(olc_screen_width() * (angle_from_player_to_obj_left - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5));
-    int lrow_right = (int)(olc_screen_width() * (angle_from_player_to_obj_right - start_player_view_angle_floor_PI) / player->angle_of_vision + 0.5);
-    if (lrow_left < 0)
-        lrow_left = 0;
-    if (lrow_left > olc_screen_width())
-        lrow_left = olc_screen_width();
-    if (lrow_right > olc_screen_width())
-        lrow_right = olc_screen_width();
-    if (lrow_right < 0)
-        lrow_right = 0;
     obj_height = (obj_height / distance);
+
+    double obj_width_angle = atan2(obj_radis, distance);
+    double angle_to_obj_left = angle_from_player_to_obj - obj_width_angle;
+    double angle_to_obj_right = angle_from_player_to_obj + obj_width_angle;
+
+    double start_view_angle = normilize_angle(player_angle - player_aov / 2);
+    double left_angle = normilize_angle(angle_to_obj_left - start_view_angle);
+    double right_angle = normilize_angle(angle_to_obj_right - start_view_angle);
+
+    if ((left_angle < 0 && right_angle < 0) || left_angle > player_aov && right_angle > player_aov) {
+        screen_obj_t res;
+        res.on_screen = 0;
+        return res;
+    }
+
+    int lrow_left = (int)(olc_screen_width() * left_angle / player_aov + 0.5);
+    int lrow_right = (int)(olc_screen_width() * right_angle / player_aov + 0.5);
+
     int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
     int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
-    if (lline_end > olc_screen_height())
-        lline_end = olc_screen_height();
-    if (lline_start < 0)
-        lline_start = 0;
+
+    screen_obj_t res;
+    res.on_screen = 1;
     res.row_left = lrow_left;
     res.row_right = lrow_right;
     res.line_start = lline_start;
@@ -63,13 +58,23 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
 
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
     screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height);
-    for (int i = obj.row_left; i <= obj.row_right; i++)
+    if (!obj.on_screen) {
+        return;
+    }
+    for (int i = obj.row_left; i <= obj.row_right; i++) {
+        if (i < 0 || i >= olc_screen_width()) {
+            continue;
+        }
         for (int j = obj.line_start; j < obj.line_end; j++) {
+            if (j < 0 || j >= olc_screen_height()) {
+                continue;
+            }
             if (obj.distance < get_world()->z_buffer[i][j]) {
                 olc_draw(i, j, ch, col);
                 get_world()->z_buffer[i][j] = obj.distance;
             }
         }
+    }
 }
 
 void draw_enemies(world_t* world) {
@@ -84,7 +89,7 @@ void draw_bullets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        draw_sprite(world->sprites.bullet, 0, bullet->pos, bullet->radius, 150 * bullet->radius);
+        draw_sprite(world->sprites.bullet, 0, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);
     }
 }
 
@@ -92,15 +97,13 @@ void draw_rockets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->rocket_array.len; i++) {
         rocket_t* rocket = &world->rocket_array.array[i];
-        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4);
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED | BG_BLACK, 4);
     }
 }
 
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
-    int threshold1 = 125;
-    int threshold2 = 140;
     double d_angle = world->player.angle_of_vision / width;
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = get_config_value(kRayTraceStep);
@@ -122,7 +125,6 @@ void draw_screen(world_t* world) {
             num_of_wall_sym = height;
         int ceiling_level = (height - num_of_wall_sym) / 2;
         int floor_level = (height + num_of_wall_sym) / 2;
-        char sym = '#';
         double dx = fabs(x - round(x));
         double dy = fabs(y - round(y));
         double sprite_x;
@@ -142,19 +144,11 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
+            olc_draw(row, i, '#', sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
-            if (i < threshold1) {
-                olc_draw(row, i, '-', FG_GREY);
-            }
-            else if (i < threshold2) {
-                olc_draw(row, i, 'x', FG_GREY);
-            }
-            else {
-                olc_draw(row, i, 'X', FG_GREY);
-            }
+            olc_draw(row, i, '-', BG_DARK_GREY | FG_GREY);
             world->z_buffer[row][i] = MAX_BUFF;
         }
         row++;
@@ -225,15 +219,27 @@ void draw_hp(world_t* world) {
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
     player_t player = get_world()->player;
     screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height);
-    if ((obj.line_end - obj.line_start) != 0 && (obj.row_right - obj.row_left) != 0) {
-        for (int i = obj.row_left; i <= obj.row_right; i++) {
-            double i_d = (double)(i - obj.row_left) / (obj.row_right - obj.row_left);
+    if (!obj.on_screen) {
+        return;
+    }
+    if ((obj.line_end - obj.line_start) == 0 || (obj.row_right - obj.row_left) == 0) {
+        return;
+    }
+    int obj_screen_width = obj.row_right - obj.row_left;
+    int obj_screen_height = obj.line_end - obj.line_start;
+
+    for (int i = obj.row_left; i <= obj.row_right; i++) {
+        if (i >= 0 && i <= olc_screen_width()) {
+            double i_d = (double)(i - obj.row_left) / obj_screen_width;
             for (int j = obj.line_start; j <= obj.line_end; j++) {
-                double j_d = (double)(j - obj.line_start) / (obj.line_end - obj.line_start);
-                char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
-                if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
-                    olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
-                    get_world()->z_buffer[i][j] = obj.distance;
+                if (j >= 0 && j <= olc_screen_height()) {
+                    double j_d = (double)(j - obj.line_start) / obj_screen_height;
+
+                    char sym = sample_sprite_glyph(i_d, j_d, sprite, texture_index);
+                    if (sym != 0 && obj.distance < get_world()->z_buffer[i][j]) {
+                        olc_draw(i, j, sym, sample_sprite_color(i_d, j_d, sprite, texture_index));
+                        get_world()->z_buffer[i][j] = obj.distance;
+                    }
                 }
             }
         }
@@ -252,7 +258,6 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
     expl_center.x = (expl.row_left + expl.row_right) / 2;
     expl_center.y = (expl.line_start + expl.line_end) / 2;
     radius /= expl.distance;
-    //radius *= 10;
     radius *= (1 + 250 * life_time);
     int row_start = (int)(expl_center.x - radius / 2);
     int row_end = (int)(expl_center.x + radius / 2);
@@ -262,7 +267,9 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
         for (int j = line_start; j < line_end; j++) {
             int state = rand() % 2;
             if (i >= 0 && j >= 0 && i < olc_screen_width() && j < olc_screen_height() && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
-                olc_draw(i, j, '*', FG_RED);
+                const char* syms = "*%^#/|\\";
+                char sym = syms[rand() % sizeof(syms)];
+                olc_draw(i, j, sym, FG_RED | BG_BLACK);
                 get_world()->z_buffer[i][j] = expl.distance;
             }
         }
