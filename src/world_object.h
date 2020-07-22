@@ -63,9 +63,6 @@ typedef struct {
     enemy_t* array;
     int len;
     int capacity;
-    int fire_sound;
-    int pain_sound;
-    int death_sound;
 } enemy_array_t;
 
 typedef enum bullet_host {
@@ -146,6 +143,12 @@ typedef struct {
 }music_array_t;
 
 typedef struct {
+    int caco_fire_sound_id;
+    int caco_pain_sound_id;
+    int caco_death_sound_id;
+} sound_effects_t;
+
+typedef struct {
     player_t player;
     char** map;
     bullet_array_t bullet_array;
@@ -159,6 +162,7 @@ typedef struct {
     game_textures_t textures;
     game_sprites_t sprites;
     music_array_t music;
+    sound_effects_t sound_effects;
 } world_t;
 
 void init_player(world_t* world);

@@ -1,6 +1,4 @@
 #include "olc.h"
-#include "olc.h"
-#include "olc.h"
 
 #include "olcConsoleGameEngine.h"
 
