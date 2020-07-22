@@ -88,12 +88,13 @@ void draw_drop(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->drop_array.len; i++) {
         drop_t* drop = &world->drop_array.array[i];
+        sprite_t* sprite;
         if (drop->type == 0) {
-            draw_sprite(world->sprites.drop1, 0, drop->pos, drop->radius, 40);
+            sprite = world->sprites.drop1;
+        } else {
+            sprite = world->sprites.drop2;
         }
-        else {
-            draw_sprite(world->sprites.drop2, 0, drop->pos, drop->radius, 40);
-        }
+        draw_sprite(sprite, 0, drop->pos, drop->radius, 40);
     }
 }
 
@@ -227,7 +228,7 @@ void draw_hp(world_t* world) {
     olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
-void bullets_counter(world_t* world) {
+void draw_bullets_counter(world_t* world) {
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
     double bullet;

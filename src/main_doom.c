@@ -104,21 +104,17 @@ int update(float time_elapsed) {
         bullets_movement(world, time_elapsed);
         rockets_movement(world, time_elapsed);
         enemy_movement(world, time_elapsed);
+        drop_check(world);
 
         update_life_time(world, time_elapsed);
+        player_regen(time_elapsed);
 
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();
-        draw_minimap(world);
-        draw_hp(world);
-        drop_check(world);
-        bullets_counter(world);
-        if (world->player.health < world->player.maxhealth) {
-          world->player.health += world->player.regen * time_elapsed;
-        }
+        draw_bullets_counter(world);
     }
     return 1;
 }

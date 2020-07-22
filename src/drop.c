@@ -51,7 +51,7 @@ void take_drop(world_t* world, int index) {
 void drop_check(world_t* world) {
     for (int i = 0; i < world->drop_array.len; i++) {
         double distance_to_player = get_distance_from_pos1_to_pos2(world->drop_array.array[i].pos, world->player.pos);
-        if (distance_to_player <= 1) {
+        if (distance_to_player <= world->player.radius + world->drop_array.array[i].radius) {
             take_drop(world, i);
         }
     }
