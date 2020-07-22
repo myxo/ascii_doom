@@ -93,7 +93,8 @@ int update(float time_elapsed) {
         update_dead_screen();
     } else {
         if (get_world()->enemy_array.len == 0) {
-            add_enemy(get_world());
+            add_enemy(get_world(), hound);
+            add_enemy(get_world(), shooter);
         }
 
         handle_config_ui_keypress();
