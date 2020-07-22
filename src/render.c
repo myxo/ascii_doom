@@ -81,7 +81,18 @@ void draw_enemies(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
-        draw_sprite(world->sprites.mob1, 0, enemy->pos, enemy->radius, 40);
+        int tex_id = 2;
+        double d_angle = enemy->angle - player->angle;
+        if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
+            tex_id = 1;
+        }
+        else if (d_angle >= -M_PI_4 - M_PI_2 && d_angle <= -M_PI_4) {
+            tex_id = 3;
+        }
+        else if (d_angle >= M_PI_4 + M_PI_2 || d_angle <= -M_PI_4 - M_PI_2) {
+            tex_id = 0;
+        }
+        draw_sprite(world->sprites.mob1, tex_id, enemy->pos, enemy->radius, 40);
     }
 }
 

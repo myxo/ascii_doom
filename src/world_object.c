@@ -69,6 +69,12 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("mob1_back.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("mob1_side1.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("mob1_side2.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
 }
