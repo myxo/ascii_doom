@@ -794,9 +794,6 @@ public:
 	~olcConsoleGameEngine()
 	{
         DestroyAudio();
-        if (m_AudioThread.joinable()) {
-            m_AudioThread.join();
-        }
 		SetConsoleActiveScreenBuffer(m_hOriginalConsole);
 		if (m_bufScreen) {
 			delete[] m_bufScreen;
@@ -1187,6 +1184,12 @@ protected: // Audio Engine =====================================================
 	bool DestroyAudio()
 	{
 		m_bAudioThreadActive = false;
+        if (m_AudioThread.joinable()) {
+            m_AudioThread.join();
+        }
+        if (m_hwDevice) {
+            waveOutClose(m_hwDevice);
+        }
 		return false;
 	}
 
@@ -1228,9 +1231,11 @@ protected: // Audio Engine =====================================================
 			if (m_nBlockFree == 0)
 			{
 				std::unique_lock<std::mutex> lm(m_muxBlockNotZero);
-                while (m_nBlockFree == 0) // sometimes, Windows signals incorrectly
-                    m_cvBlockNotZero.wait(lm);
+                m_cvBlockNotZero.wait(lm, [this] { return m_nBlockFree != 0 || !m_bAudioThreadActive; } );
 			}
+            if (!m_bAudioThreadActive) {
+                break;
+            }
 
 			// Block is here, so use it
 			m_nBlockFree--;
