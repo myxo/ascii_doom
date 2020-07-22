@@ -81,15 +81,29 @@ void draw_enemies(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
-        int tex_id = 2;
+        int tex_id = 1;
         double d_angle = enemy->angle - player->angle;
-        if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
-            tex_id = 1;
+        while (fabs(d_angle) > 2 * M_PI) {
+            if (d_angle > 0) {
+                d_angle -= 2 * M_PI;
+            }
+            else {
+                d_angle += 2 * M_2_PI;
+            }
         }
-        else if (d_angle >= -M_PI_4 - M_PI_2 && d_angle <= -M_PI_4) {
+        add_watch("d_angle", d_angle);
+        if (fabs(d_angle) > M_PI) {
+            d_angle = 2 * M_PI - d_angle;
+            d_angle *= (-1);
+        }
+
+        if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
             tex_id = 3;
         }
-        else if (d_angle >= M_PI_4 + M_PI_2 || d_angle <= -M_PI_4 - M_PI_2) {
+        else if (d_angle >= -M_PI_4 - M_PI_2 && d_angle <= -M_PI_4) {
+            tex_id = 2;
+        }
+        else if ((d_angle >= M_PI_4 + M_PI_2 && d_angle <= M_PI) || (d_angle <= -M_PI_4 - M_PI_2 && d_angle >= -M_PI)) {
             tex_id = 0;
         }
         draw_sprite(world->sprites.mob1, tex_id, enemy->pos, enemy->radius, 40);
