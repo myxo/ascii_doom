@@ -25,7 +25,7 @@ int glyph_size =  8;
 const char config_filename[50] = "cfg.txt";
 
 int create() {
-    //srand(time(NULL));
+    srand(time(NULL));
     log_init("debug.txt");
     read_config_from_file(config_filename);
     if (init_world_object() == 0) {
