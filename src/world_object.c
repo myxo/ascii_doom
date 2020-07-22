@@ -77,7 +77,6 @@ void init_player(world_t* world) {
     world->player.health = 3;
     world->player.maxhealth = 3;
     world->player.radius = 0.2;
-    world->player.pos = get_rand_pos_on_floor(world, world->player.radius);
     world->player.angle = M_PI_4;
 }
 
