@@ -29,17 +29,17 @@ point_array_t build_path(enemy_t* enemy) {
     temp.y = (int)enemy->pos.y;
     point_queue_t q = point_queue_init();
     point_queue_push_back(&q, temp);
-    int** used = malloc(get_world()->map_width * sizeof(int*));
-    for (int i = 0; i < get_world()->map_width; i++) {
-        used[i] = malloc(get_world()->map_height * sizeof(int));
-        for (int j = 0; j < get_world()->map_height; j++) {
+    int** used = malloc(get_world()->map_height * sizeof(int*));
+    for (int i = 0; i < get_world()->map_height; i++) {
+        used[i] = malloc(get_world()->map_width * sizeof(int));
+        for (int j = 0; j < get_world()->map_width; j++) {
             used[i][j] = 0;
         }
     }
     used[(int)enemy->pos.x][(int)enemy->pos.y] = 1;
-    point_t** pred = malloc(get_world()->map_width * sizeof(point_t*));
-    for (int i = 0; i < get_world()->map_width; i++) {
-        pred[i] = malloc(get_world()->map_height * sizeof(point_t));
+    point_t** pred = malloc(get_world()->map_height * sizeof(point_t*));
+    for (int i = 0; i < get_world()->map_height; i++) {
+        pred[i] = malloc(get_world()->map_width * sizeof(point_t));
     }
     point_t null = { -1, -1 };
     pred[(int)enemy->pos.x][(int)enemy->pos.y] = null;
@@ -88,11 +88,11 @@ point_array_t build_path(enemy_t* enemy) {
         path.len++;
     }
     free(reverse_path.array);
-    for (int i = 0; i < get_world()->map_width; i++) {
+    for (int i = 0; i < get_world()->map_height; i++) {
         free(pred[i]);
     }
     free(pred);
-    for (int i = 0; i < get_world()->map_width; i++) {
+    for (int i = 0; i < get_world()->map_height; i++) {
         free(used[i]);
     }
     free(used);
@@ -103,14 +103,14 @@ void add_shooter_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
-    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world);
-    world->enemy_array.array[world->enemy_array.len].global_target = get_rand_pos_on_floor(world);
-    world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
     world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world, world->enemy_array.array[world->enemy_array.len].radius);
+    world->enemy_array.array[world->enemy_array.len].global_target = get_rand_pos_on_floor(world, 0.2);
+    world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
     world->enemy_array.array[world->enemy_array.len].type = shooter;
@@ -121,14 +121,14 @@ void add_hound_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
     world->enemy_array.array[world->enemy_array.len].health = 3;
-    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world);
+    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world, world->enemy_array.array[world->enemy_array.len].radius);
     world->enemy_array.array[world->enemy_array.len].global_target = world->player.pos;
     world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
     world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
-    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
     world->enemy_array.array[world->enemy_array.len].type = hound;
@@ -157,14 +157,15 @@ void enemy_movement(world_t* world, float time_elapsed) {
         int update_position = 1;
         if (is_in_circle(enemy->global_target, enemy->pos, 0.5)) {
             if (enemy->type == shooter) {
-                enemy->global_target = get_rand_pos_on_floor(world);
+                enemy->global_target = get_rand_pos_on_floor(world, enemy->radius);
                 enemy->path = build_path(enemy);
                 enemy->local_target_id = 0;
             }
             else if (enemy->type == hound) {
                 if (enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
-                    bite_player(world, 1);
+                    if (is_in_circle(enemy->pos, world->player.pos, 1))
+                        bite_player(world, 1);
                 }
                 update_position = 0;
             }
@@ -199,7 +200,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 }
             }
         }
-        else if (enemy->type == hound && is_in_circle(enemy->global_target, enemy->pos, 0.5)) {
+        else if (enemy->type == hound && !is_in_circle(enemy->pos, world->player.pos, 0.5)) {
             double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
             if (delta >= 0.5) {
                 enemy->global_target = world->player.pos;
