@@ -793,6 +793,10 @@ public:
 
 	~olcConsoleGameEngine()
 	{
+        DestroyAudio();
+        if (m_AudioThread.joinable()) {
+            m_AudioThread.join();
+        }
 		SetConsoleActiveScreenBuffer(m_hOriginalConsole);
 		if (m_bufScreen) {
 			delete[] m_bufScreen;
@@ -1196,7 +1200,7 @@ protected: // Audio Engine =====================================================
 	}
 
 	// Static wrapper for sound card handler
-	static void CALLBACK waveOutProcWrap(HWAVEOUT hWaveOut, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+	static void CALLBACK waveOutProcWrap(HWAVEOUT hWaveOut, UINT uMsg, DWORD_PTR dwInstance, DWORD dwParam1, DWORD dwParam2)
 	{
 #pragma warning(push)
 #pragma warning(disable: 4312) // conversion from 'DWORD' to 'olc::olcConsoleGameEngine *' of greater size
@@ -1224,8 +1228,8 @@ protected: // Audio Engine =====================================================
 			if (m_nBlockFree == 0)
 			{
 				std::unique_lock<std::mutex> lm(m_muxBlockNotZero);
-				while (m_nBlockFree == 0) // sometimes, Windows signals incorrectly
-					m_cvBlockNotZero.wait(lm);
+                while (m_nBlockFree == 0) // sometimes, Windows signals incorrectly
+                    m_cvBlockNotZero.wait(lm);
 			}
 
 			// Block is here, so use it
