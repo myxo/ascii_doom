@@ -3,16 +3,19 @@
 #include "rocket.h"
 #include "weapon.h"
 #include "bullet.h"
+#include "olc/olc.h"
 #include <stdlib.h>
 
 void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
-    if (*time_since_last_shot >= weapon->shot_delay) {
+    if (*time_since_last_shot >= weapon->shot_delay && weapon->bullets > 0) {
+        weapon->bullets--;
         if (weapon->label != ROCKET_LAUNCHER) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
         }
         else {
             shoot_rocket(get_world(), get_world()->player.pos, get_world()->player.angle, weapon->host, weapon->damage, weapon->expl_radius);
         }
+        olc_play_sound(weapon->fire_sound);
         weapon->shot_delay = 1 / weapon->fire_rate;
         *time_since_last_shot = 0;
     }
@@ -37,28 +40,34 @@ void deinit_std_weapon_list(std_weapon_list_t* weapon_list) {
 }
 
 void init_pistol(weapon_t* pistol) {
-    pistol->damage = 1;
-    pistol->fire_rate = 1;
+    pistol->damage = 34;
+    pistol->fire_rate = 1.5;
+    pistol->bullets = 15;
     pistol->host = kBulletPlayer;
     pistol->label = PISTOL;
     pistol->shot_delay = 0;
+    pistol->fire_sound = olc_load_sound("dspistol.wav");
 }
 
 void init_rifle(weapon_t* rifle) {
-    rifle->damage = 0.5;
-    rifle->fire_rate = 5;
+    rifle->damage = 16;
+    rifle->fire_rate = 9;
+    rifle->bullets = 30;
     rifle->label = RIFLE;
     rifle->host = kBulletPlayer;
     rifle->shot_delay = 0;
+    rifle->fire_sound = olc_load_sound("dspistol.wav");
 }
 
 void init_rocket_launcher(weapon_t* rocket_launcher) {
-    rocket_launcher->damage = 1.5;
+    rocket_launcher->damage = 50;
     rocket_launcher->fire_rate = 0.5;
+    rocket_launcher->bullets = 5;
     rocket_launcher->host = kBulletPlayer;
     rocket_launcher->label = ROCKET_LAUNCHER;
     rocket_launcher->expl_radius = 3;
     rocket_launcher->shot_delay = 0;
+    rocket_launcher->fire_sound = olc_load_sound("dsrlaunc.wav");
 }
 
 void shoot_from_active_weapon(world_t* world) {

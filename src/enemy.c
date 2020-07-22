@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "drop.h"
 #include "structs_of_data.h"
 
 void increase_arr_enemy_capacity(world_t* world) {
@@ -102,7 +103,7 @@ point_array_t build_path(enemy_t* enemy) {
 void add_shooter_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
-    world->enemy_array.array[world->enemy_array.len].health = 3;
+    world->enemy_array.array[world->enemy_array.len].health = 100;
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
@@ -176,13 +177,15 @@ void enemy_movement(world_t* world, float time_elapsed) {
         double start_enemy_view_angle = enemy->angle - enemy->angle_of_vision / 2;
         double stop_enemy_view_angle = enemy->angle + enemy->angle_of_vision / 2;
         enemy->time_from_last_shot += time_elapsed;
+
         if (enemy->type == shooter) {
             if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
                 double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
                 if (!has_wall_between(enemy->pos, world->player.pos)) {
                     if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                         enemy->time_from_last_shot = 0;
-                        shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 1);
+                        shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34);
+                        olc_play_sound(world->sound_effects.caco_fire_sound_id);
                     }
                     if (distance_to_player <= 4) {
                         update_position = 0;
@@ -220,14 +223,17 @@ void enemy_movement(world_t* world, float time_elapsed) {
 }
 
 void enemy_destruct(world_t* world, int index) {
+    add_drop(world, get_rand_pos_on_floor(world, 0.5));
     for (int i = index; i < world->enemy_array.len - 1; i++) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
     world->enemy_array.len--;
+    olc_play_sound(world->sound_effects.caco_death_sound_id);
 }
 
 void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);
+    olc_play_sound(world->sound_effects.caco_pain_sound_id);
 }

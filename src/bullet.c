@@ -34,14 +34,14 @@ void bullets_movement(world_t* world, float time_elapsed) {
         int index;
         if (is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y, &index)) {
             if (world->bullet_array.array[i].host == kBulletPlayer) {
-                bullet_destruct(world, i);
                 enemy_hit(world, index, world->bullet_array.array[i].damage);
+                bullet_destruct(get_world(), i);
             }
         }
         if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
             if (world->bullet_array.array[i].host == kBulletEnemy) {
-                bullet_destruct(world, i);
                 player_hit(world->bullet_array.array[i].damage);
+                bullet_destruct(get_world(), i);
             }
         }
     }
