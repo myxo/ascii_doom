@@ -175,9 +175,6 @@ void enemy_movement(world_t* world, float time_elapsed) {
         double angle_to_player = get_angle_from_pos1_to_pos2(enemy->pos, world->player.pos);
         double start_enemy_view_angle = enemy->angle - enemy->angle_of_vision / 2;
         double stop_enemy_view_angle = enemy->angle + enemy->angle_of_vision / 2;
-        double x = enemy->pos.x;
-        double y = enemy->pos.y;
-        double d_distance = 0.01;
         enemy->time_from_last_shot += time_elapsed;
         if (enemy->type == shooter) {
             if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
@@ -190,7 +187,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                     if (distance_to_player <= 4) {
                         update_position = 0;
                     }
-                    double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
+                    double delta = get_distance_from_pos1_to_pos2(world->player.pos, enemy->last_player_pos);
                     if (delta >= 0.5) {
                         enemy->global_target = world->player.pos;
                         enemy->path = build_path(enemy);
@@ -201,7 +198,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
             }
         }
         else if (enemy->type == hound && !is_in_circle(enemy->pos, world->player.pos, 0.5)) {
-            double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
+            double delta = get_distance_from_pos1_to_pos2(world->player.pos, enemy->last_player_pos);
             if (delta >= 0.5) {
                 enemy->global_target = world->player.pos;
                 enemy->path = build_path(enemy);
