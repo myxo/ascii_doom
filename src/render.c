@@ -89,7 +89,7 @@ void draw_bullets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        draw_sprite(world->sprites.bullet, 0, bullet->pos, bullet->radius, 150 * bullet->radius);
+        draw_sprite(world->sprites.bullet, 0, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);
     }
 }
 
@@ -97,15 +97,13 @@ void draw_rockets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->rocket_array.len; i++) {
         rocket_t* rocket = &world->rocket_array.array[i];
-        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4);
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED | BG_BLACK, 4);
     }
 }
 
 void draw_screen(world_t* world) {
     int width = olc_screen_width();
     int height = olc_screen_height();
-    int threshold1 = 125;
-    int threshold2 = 140;
     double d_angle = world->player.angle_of_vision / width;
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = get_config_value(kRayTraceStep);
@@ -127,7 +125,6 @@ void draw_screen(world_t* world) {
             num_of_wall_sym = height;
         int ceiling_level = (height - num_of_wall_sym) / 2;
         int floor_level = (height + num_of_wall_sym) / 2;
-        char sym = '#';
         double dx = fabs(x - round(x));
         double dy = fabs(y - round(y));
         double sprite_x;
@@ -147,19 +144,11 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, sym, sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
+            olc_draw(row, i, '#', sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
-            if (i < threshold1) {
-                olc_draw(row, i, '-', FG_GREY);
-            }
-            else if (i < threshold2) {
-                olc_draw(row, i, 'x', FG_GREY);
-            }
-            else {
-                olc_draw(row, i, 'X', FG_GREY);
-            }
+            olc_draw(row, i, '-', BG_DARK_GREY | FG_GREY);
             world->z_buffer[row][i] = MAX_BUFF;
         }
         row++;
@@ -278,7 +267,9 @@ void draw_explosion(world_t* world, point_t pos, double radius, double life_time
         for (int j = line_start; j < line_end; j++) {
             int state = rand() % 2;
             if (i >= 0 && j >= 0 && i < olc_screen_width() && j < olc_screen_height() && state == 1 && expl.distance < get_world()->z_buffer[i][j]) {
-                olc_draw(i, j, '*', FG_RED);
+                const char* syms = "*%^#/|\\";
+                char sym = syms[rand() % sizeof(syms)];
+                olc_draw(i, j, sym, FG_RED | BG_BLACK);
                 get_world()->z_buffer[i][j] = expl.distance;
             }
         }
