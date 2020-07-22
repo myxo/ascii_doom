@@ -34,14 +34,14 @@ void bullets_movement(world_t* world, float time_elapsed) {
         int index;
         if (is_enemy(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y, &index)) {
             if (world->bullet_array.array[i].host == kBulletPlayer) {
-                bullet_destruct(world, i);
                 enemy_hit(world, index, world->bullet_array.array[i].damage);
+                bullet_destruct(get_world(), i);
             }
         }
         if (is_player(world->bullet_array.array[i].pos.x, world->bullet_array.array[i].pos.y)) {
             if (world->bullet_array.array[i].host == kBulletEnemy) {
-                bullet_destruct(world, i);
                 player_hit(world->bullet_array.array[i].damage);
+                bullet_destruct(get_world(), i);
             }
         }
     }
@@ -49,7 +49,7 @@ void bullets_movement(world_t* world, float time_elapsed) {
 
 void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host, double damage) {
     if (world->bullet_array.len >= world->bullet_array.capacity)
-    increase_arr_bullets_capacity(world);
+        increase_arr_bullets_capacity(world);
     pos.x += 0.4 * sin(angle);
     pos.y += 0.4 * cos(angle);
     world->bullet_array.array[world->bullet_array.len].pos = pos;

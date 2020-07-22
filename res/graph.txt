@@ -1,7 +1,7 @@
 6
-0 1
-1 2
-1 3
-2 4
-4 5
-3 5
+0 1 start_room main_room
+1 2 main_room
+1 3 main_room
+2 4 main_room
+4 5 boss_room
+3 5 boss_room

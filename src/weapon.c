@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
-    if (*time_since_last_shot >= weapon->shot_delay) {
+    if (*time_since_last_shot >= weapon->shot_delay && weapon->bullets > 0) {
+        weapon->bullets--;
         if (weapon->label != ROCKET_LAUNCHER) {
             shoot_bullet(get_world(), get_world()->player.pos, get_world()->player.angle, 0, weapon->host, weapon->damage);
         }
@@ -39,8 +40,9 @@ void deinit_std_weapon_list(std_weapon_list_t* weapon_list) {
 }
 
 void init_pistol(weapon_t* pistol) {
-    pistol->damage = 1;
+    pistol->damage = 34;
     pistol->fire_rate = 1.5;
+    pistol->bullets = 15;
     pistol->host = kBulletPlayer;
     pistol->label = PISTOL;
     pistol->shot_delay = 0;
@@ -48,8 +50,9 @@ void init_pistol(weapon_t* pistol) {
 }
 
 void init_rifle(weapon_t* rifle) {
-    rifle->damage = 0.3;
+    rifle->damage = 16;
     rifle->fire_rate = 9;
+    rifle->bullets = 30;
     rifle->label = RIFLE;
     rifle->host = kBulletPlayer;
     rifle->shot_delay = 0;
@@ -57,8 +60,9 @@ void init_rifle(weapon_t* rifle) {
 }
 
 void init_rocket_launcher(weapon_t* rocket_launcher) {
-    rocket_launcher->damage = 1.5;
+    rocket_launcher->damage = 50;
     rocket_launcher->fire_rate = 0.5;
+    rocket_launcher->bullets = 5;
     rocket_launcher->host = kBulletPlayer;
     rocket_launcher->label = ROCKET_LAUNCHER;
     rocket_launcher->expl_radius = 3;
