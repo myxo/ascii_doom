@@ -78,6 +78,7 @@ typedef struct {
     double damage;
     double shot_delay;
     double expl_radius;
+    int fire_sound;
 } weapon_t;
 
 typedef struct {
@@ -130,7 +131,16 @@ typedef struct {
     explosion_t* array;
     int len;
     int capacity;
+    int explosion_sound;
 } explosion_array_t;
+
+typedef struct {
+    int* music_array;
+    float* duration_array;
+    int len;
+    float current_music_time;
+    int current_index;
+}music_array_t;
 
 typedef struct {
     player_t player;
@@ -145,6 +155,7 @@ typedef struct {
     double** z_buffer;
     game_textures_t textures;
     game_sprites_t sprites;
+    music_array_t music;
 } world_t;
 
 int init_world_object();

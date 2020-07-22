@@ -52,10 +52,12 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
 void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
     screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height);
     for (int i = obj.row_left; i <= obj.row_right; i++)
-        for (int j = obj.line_start; j < obj.line_end; j++) {
-            if (obj.distance < get_world()->z_buffer[i][j]) {
-                olc_draw(i, j, ch, col);
-                get_world()->z_buffer[i][j] = obj.distance;
+        if (i >= 0 && i <= olc_screen_width()) {
+            for (int j = obj.line_start; j < obj.line_end; j++) {
+                if (j >=0 && j <= olc_screen_height() && obj.distance < get_world()->z_buffer[i][j]) {
+                    olc_draw(i, j, ch, col);
+                    get_world()->z_buffer[i][j] = obj.distance;
+                }
             }
         }
 }

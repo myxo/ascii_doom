@@ -31,7 +31,8 @@ PRIVATE
     src/map_generator.c
     src/weapon.c
     src/rocket.c
-    src/explosion.c)
+    src/explosion.c 
+    src/music.c)
 
 add_executable(sprite_editor)
 target_sources(sprite_editor

@@ -11,6 +11,7 @@
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -102,6 +103,7 @@ int update(float time_elapsed) {
     enemy_movement(world, time_elapsed);
 
     update_life_time(world, time_elapsed);
+    update_music(world, time_elapsed);
 
     draw_screen(world);
     draw_minimap(world);
@@ -119,8 +121,6 @@ int main() {
 	olc_register_create(&create);
     olc_register_update(&update);
     olc_enable_sound();
-    /*int pistolid  = olc_load_sound("dspistol.wav");
-    olc_play_sound(pistolid);*/
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();
