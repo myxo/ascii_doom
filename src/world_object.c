@@ -17,10 +17,10 @@ void init_music_array() {
     world_global->music.music_array = malloc(2 * sizeof(int));
     world_global->music.duration_array = malloc(2 * sizeof(float));
 
-    world_global->music.music_array[0] = olc_load_sound("E1M1.wav");
+    world_global->music.music_array[0] = olc_load_sound("..\\..\\..\\res\\E1M1.wav");
     world_global->music.duration_array[0] = 95;
 
-    world_global->music.music_array[1] = olc_load_sound("C://programming/SSYP2020/SnakeGame/ascii_doom/res/E1M2.wav");
+    world_global->music.music_array[1] = olc_load_sound("..\\..\\..\\res\\E1M2.wav");
     world_global->music.duration_array[1] = 154;
 
     world_global->music.len = 2;
@@ -30,11 +30,16 @@ void init_music_array() {
     olc_play_sound(world_global->music.music_array[world_global->music.current_index]);
 }
 
+void deinit_music_array() {
+    free(world_global->music.music_array);
+    free(world_global->music.duration_array);
+}
+
 void init_explosion_array() {
     world_global->explosion_array.capacity = 5;
     world_global->explosion_array.len = 0;
     world_global->explosion_array.array = malloc(world_global->explosion_array.capacity * sizeof(explosion_t));
-    world_global->explosion_array.explosion_sound = olc_load_sound("dsexplosion.wav");
+    world_global->explosion_array.explosion_sound = olc_load_sound("..\\..\\..\\res\\dsexplosion.wav");
 }
 
 void deinit_explosion_array() {
@@ -123,6 +128,7 @@ void deinit_world_object() {
     deinit_rocket_array(5);
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
+    deinit_music_array();
     free(world_global);
 }
 

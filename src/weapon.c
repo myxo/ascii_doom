@@ -49,7 +49,7 @@ void init_pistol(weapon_t* pistol) {
     pistol->host = kBulletPlayer;
     pistol->label = PISTOL;
     pistol->shot_delay = 0;
-    pistol->fire_sound = olc_load_sound("dspistol.wav");
+    pistol->fire_sound = olc_load_sound("..\\..\\..\\res\\dspistol.wav");
 }
 
 void init_rifle(weapon_t* rifle) {
@@ -58,7 +58,7 @@ void init_rifle(weapon_t* rifle) {
     rifle->label = RIFLE;
     rifle->host = kBulletPlayer;
     rifle->shot_delay = 0;
-    rifle->fire_sound = olc_load_sound("dspistol.wav");
+    rifle->fire_sound = olc_load_sound("..\\..\\..\\res\\dspistol.wav");
 }
 
 void init_rocket_launcher(weapon_t* rocket_launcher) {
@@ -68,7 +68,7 @@ void init_rocket_launcher(weapon_t* rocket_launcher) {
     rocket_launcher->label = ROCKET_LAUNCHER;
     rocket_launcher->expl_radius = 3;
     rocket_launcher->shot_delay = 0;
-    rocket_launcher->fire_sound = olc_load_sound("dsrlaunc.wav");
+    rocket_launcher->fire_sound = olc_load_sound("..\\..\\..\\res\\dsrlaunc.wav");
 }
 
 void shoot_from_active_weapon(world_t* world) {
