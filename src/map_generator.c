@@ -172,10 +172,12 @@ void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room
 char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_room, node_of_room_t* stop_room, double shift_y, double shift_x, double map_width, double map_height) {
     char ch_door_start = '0', ch_door_stop = '0';
     for (int i = 0; i < g->n_nodes; i++) {
-        if (g->array_of_rooms[i] == start_room)
-            ch_door_start = '0' + i;
-        if (g->array_of_rooms[i] == stop_room)
-            ch_door_start = '0' + i;
+        if (g->is_exist[i]) {
+            if (g->array_of_rooms[i] == start_room)
+                ch_door_start = '0' + i;
+            if (g->array_of_rooms[i] == stop_room)
+                ch_door_stop = '0' + i;
+        }
     }
 
     point_queue_t q = point_queue_init();
@@ -200,6 +202,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         pred[(int)temp.x][(int)temp.y] = null;
     }
     point_t stop_door = {0, 0};
+    int found_corridor = 0;
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
         int near_corridor = 0;
@@ -222,20 +225,20 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
                     if (!used[x][y]) {
                         used[x][y] = 1;
                         pred[x][y] = cur;
-                        for (int j = 0; j < stop_room->type_of_room.doors.len; j++) {
-                            stop_door.y = stop_room->center_on_map.y + stop_room->type_of_room.doors.array[j].y - stop_room->type_of_room.center.y + shift_y;
-                            stop_door.x = stop_room->center_on_map.x + stop_room->type_of_room.doors.array[j].x - stop_room->type_of_room.center.x + shift_x;
-                            if (x == (int)stop_door.x && y == (int)stop_door.y) {
-                                break;
-                            }
+                        if (map[y][x] == ch_door_stop) {
+                            stop_door.y = y;
+                            stop_door.x = x;
+                            found_corridor = 1;
+                            break;
                         }
-                        if (map[y][x] != ' ' && map[y][x] != '#' && map[y][x] != ch_door_start && map[y][x] != ch_door_stop)
-                            continue;
-                        point_queue_push_back(&q, to);
+                        if (map[y][x] == '#')
+                            point_queue_push_back(&q, to);
                     }
                 }
             }
         }
+        if (found_corridor)
+            break;
     }
     for (point_t cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
@@ -318,10 +321,10 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
     }
     for (int y = 0; y < *height; y++) {
         for (int x = 0; x < *width; x++) {
-            //if (map[y][x] == '.')
-            //    map[y][x] = ' ';
-            //if (map[y][x] != ' ')
-            //    map[y][x] = '#';
+            if (map[y][x] == '.')
+                map[y][x] = ' ';
+            if (map[y][x] != ' ')
+                map[y][x] = '#';
         }
     }
     player_pos->x = graph->start->center_on_map.y + shift_y;
