@@ -57,18 +57,19 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_vec_y += 1;
     }
+    if (olc_get_key('1').pressed) {
+        set_active_weapon(get_world(), PISTOL);
+    }
+    if (olc_get_key('2').pressed) {
+        set_active_weapon(get_world(), RIFLE);
+    }
+    if (olc_get_key('3').pressed) {
+        set_active_weapon(get_world(), ROCKET_LAUNCHER);
+    }
     if (get_world()->weapon_list->is_reloading != 1) {
         if (olc_get_key('R').held) {
+            get_world()->weapon_list->time_since_last_reload = 0;
             get_world()->weapon_list->is_reloading = 1;
-        }
-        if (olc_get_key('1').pressed) {
-            set_active_weapon(get_world(), PISTOL);
-        }
-        if (olc_get_key('2').pressed) {
-            set_active_weapon(get_world(), RIFLE);
-        }
-        if (olc_get_key('3').pressed) {
-            set_active_weapon(get_world(), ROCKET_LAUNCHER);
         }
         if (olc_get_key(VK_SPACE).held) {
             shoot_from_active_weapon(get_world());
@@ -126,6 +127,7 @@ int update(float time_elapsed) {
           world->player.health += world->player.regen * time_elapsed;
         }
         if (world->weapon_list->is_reloading == 1) {
+            update_time_since_reload(world, time_elapsed);
             reload_active_weapon(world);
         }
     }
