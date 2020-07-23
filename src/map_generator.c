@@ -269,7 +269,8 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     point_t cur;
     char marker = ' ';
     door_t temp_door;
-    temp_door.pos = stop_door;
+    temp_door.pos.x = stop_door.y;
+    temp_door.pos.y = stop_door.x;
     temp_door.status = door_close;
     get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
     for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
@@ -287,7 +288,8 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         }
         if (pred[(int)cur.x][(int)cur.y].x == -1 && pred[(int)cur.x][(int)cur.y].y == -1) {
             temp_door;
-            temp_door.pos = cur;
+            temp_door.pos.x = cur.y;
+            temp_door.pos.y = cur.x;
             temp_door.status = door_close;
             get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
         }
@@ -387,7 +389,7 @@ void create_map(world_t* world) {
         fprintf(log_file(), "%s\n", map[i]);
     }
     for (int i = 0; i < world->door_array.len; i++) {
-        map[(int)world->door_array.array[i].pos.y][(int)world->door_array.array[i].pos.x] = 'd';
+        map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 'd';
     }
     world->map = map;
     world->map_height = height;

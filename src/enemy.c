@@ -149,7 +149,7 @@ void add_enemy(world_t* world, type_of_enemy_t type) {
 }
 
 void bite_player(world_t* world, double damage) {
-    player_hit(1);
+    player_hit(50);
 }
 
 void enemy_movement(world_t* world, float time_elapsed) {
@@ -180,7 +180,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         if (enemy->type == shooter) {
             if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
                 double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
-                if (!has_wall_between(enemy->pos, world->player.pos)) {
+                if (!has_door_between(enemy->pos, world->player.pos)) {
                     if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                         enemy->time_from_last_shot = 0;
                         shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34, CACODEMON);
@@ -211,8 +211,15 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
+            if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius) &&
+                !is_door(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->pos = new_pos;
+            }
+            else {
+                enemy->global_target = world->player.pos;
+                enemy->path = build_path(enemy);
+                enemy->local_target_id = 0;
+                enemy->last_player_pos = world->player.pos;
             }
             if (is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->local_target_id++;

@@ -277,6 +277,12 @@ int is_wall_in_radius(double x, double y, double radius) {
     return result;
 }
 
+int is_door_in_radius(double x, double y, double radius) {
+    int result = is_door(x + radius, y - radius) || is_door(x - radius, y + radius)
+        || is_door(x + radius, y + radius) || is_door(x - radius, y - radius);
+    return result;
+}
+
 int read_map_for_file() {
     FILE* fmap;
     fmap = fopen("map.txt", "r");
@@ -379,8 +385,49 @@ int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d
     return 1;
 }
 
+int has_door_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance) {
+    double x = pos1.x;
+    double y = pos1.y;
+    while (!is_door(x, y)) {
+        x += d_distance * sin(angle);
+        y += d_distance * cos(angle);
+        point_t pos = { x, y };
+        if (is_in_circle(pos, pos2, 0.1)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int has_wall_between(point_t pos1, point_t pos2) {
     return has_wall_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);
+}
+
+int has_door_between(point_t pos1, point_t pos2) {
+    return has_door_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);
+}
+
+void update_doors_status(world_t* world) {
+    for (int i = 0; i < world->door_array.len; i++) {
+        int nobody_near = 1;
+        for (int en = 0; en < world->enemy_array.len; en++) {
+            if (world->enemy_array.array[en].type == hound && is_in_circle(world->enemy_array.array[en].pos, world->door_array.array[i].pos, 2)) {
+                world->door_array.array[i].status = door_open;
+                nobody_near = 0;
+            }
+        }
+        if (is_in_circle(world->player.pos, world->door_array.array[i].pos, 2)) {
+            world->door_array.array[i].status = door_open;
+            nobody_near = 0;
+        }
+        if (nobody_near) {
+            world->door_array.array[i].status = door_close;
+        }
+        if (world->door_array.array[i].status == door_close)
+            world->map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 'd';
+        if (world->door_array.array[i].status == door_open)
+            world->map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = ' ';
+    }
 }
 
 void update_world_from_config() {

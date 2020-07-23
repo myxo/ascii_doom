@@ -115,7 +115,7 @@ int update(float time_elapsed) {
 
         handle_config_ui_keypress();
         update_world_from_config();
-
+        update_doors_status(world);
         handle_player_movement(time_elapsed);
         update_time_since_last_shot(world, time_elapsed);
         bullets_movement(world, time_elapsed);
