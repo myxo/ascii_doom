@@ -46,6 +46,12 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_RIGHT).held) {
         turn_player(1, time_elapsed);
     }
+    if (olc_get_key(VK_LEFT).released) {
+        reset_player_angular_speed();
+    }
+    if (olc_get_key(VK_RIGHT).released) {
+        reset_player_angular_speed();
+    }
     if (olc_get_key('W').held) {
         move_vec_x += 1;
     }

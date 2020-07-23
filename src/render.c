@@ -98,7 +98,22 @@ void draw_enemies(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
-        draw_sprite(world->sprites.mob1, 0, enemy->pos, enemy->radius, 40, AIR);
+        sprite_t* mob = world->sprites.mob1_back;
+        double d_angle = normilize_angle(enemy->angle - player->angle);
+        if (fabs(d_angle) > M_PI) {
+            d_angle = 2 * M_PI - d_angle;
+            d_angle *= (-1);
+        }
+        if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
+            mob = world->sprites.mob1_side2;
+        }
+        else if (d_angle >= -M_PI_4 - M_PI_2 && d_angle <= -M_PI_4) {
+            mob = world->sprites.mob1_side1;
+        }
+        else if ((d_angle >= M_PI_4 + M_PI_2 && d_angle <= M_PI) || (d_angle <= -M_PI_4 - M_PI_2 && d_angle >= -M_PI)) {
+            mob = world->sprites.mob1;
+        }
+        draw_sprite(mob, 0, enemy->pos, enemy->radius, 40, AIR);
     }
 }
 
@@ -217,6 +232,7 @@ void draw_minimap(world_t* world) {
             olc_draw(i, world->map_width - j - 1, sym, sym_col_FG + sym_col_BG);
         }
     }
+
     double d_angle = world->player.angle_of_vision / olc_screen_width();
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = 0.1;
