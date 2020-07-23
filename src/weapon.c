@@ -3,6 +3,7 @@
 #include "rocket.h"
 #include "weapon.h"
 #include "bullet.h"
+#include "olc/olc.h"
 #include <stdlib.h>
 
 void reload_gun(weapon_t* weapon, double* time_since_reload) {
@@ -42,6 +43,9 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
             get_world()->weapon_list->time_since_last_reload = 0;
             get_world()->weapon_list->is_reloading = 1;
         }
+        olc_play_sound(weapon->fire_sound);
+        weapon->shot_delay = 1 / weapon->fire_rate;
+        *time_since_last_shot = 0;
     }
 }
 
@@ -75,6 +79,8 @@ void init_pistol(weapon_t* pistol) {
     pistol->label = PISTOL;
     pistol->shot_delay = 0;
     pistol->reload_delay = 4 / pistol->fire_rate;
+    pistol->fire_sound = olc_load_sound("dspistol.wav");
+
 }
 
 void init_rifle(weapon_t* rifle) {
@@ -87,6 +93,7 @@ void init_rifle(weapon_t* rifle) {
     rifle->host = kBulletPlayer;
     rifle->shot_delay = 0;
     rifle->reload_delay = 4 / rifle->fire_rate;
+    rifle->fire_sound = olc_load_sound("dspistol.wav");
 }
 
 void init_rocket_launcher(weapon_t* rocket_launcher) {
@@ -100,6 +107,7 @@ void init_rocket_launcher(weapon_t* rocket_launcher) {
     rocket_launcher->expl_radius = 3;
     rocket_launcher->shot_delay = 0;
     rocket_launcher-> reload_delay = 4 / rocket_launcher->fire_rate;
+    rocket_launcher->fire_sound = olc_load_sound("dsrlaunc.wav");
 }
 
 void shoot_from_active_weapon(world_t* world) {

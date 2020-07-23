@@ -4,6 +4,7 @@
 #include "world_object.h"
 
 typedef struct{
+    char name[64];
     int width, height;
     point_array_t shape;
     point_array_t floor;

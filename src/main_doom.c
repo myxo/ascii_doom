@@ -12,6 +12,7 @@
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -44,6 +45,12 @@ void handle_player_movement(float time_elapsed) {
     }
     if (olc_get_key(VK_RIGHT).held) {
         turn_player(1, time_elapsed);
+    }
+    if (olc_get_key(VK_LEFT).released) {
+        reset_player_angular_speed();
+    }
+    if (olc_get_key(VK_RIGHT).released) {
+        reset_player_angular_speed();
     }
     if (olc_get_key('W').held) {
         move_vec_x += 1;
@@ -96,11 +103,11 @@ int update(float time_elapsed) {
     world_t* world = get_world();
     if (world->player.health <= 0) {
         update_dead_screen();
-
     }
     else {
         if (get_world()->enemy_array.len == 0) {
-            add_enemy(get_world());
+            add_enemy(get_world(), hound);
+            add_enemy(get_world(), shooter);
         }
 
         handle_config_ui_keypress();
@@ -111,21 +118,21 @@ int update(float time_elapsed) {
         bullets_movement(world, time_elapsed);
         rockets_movement(world, time_elapsed);
         enemy_movement(world, time_elapsed);
+        drop_check(world);
 
+        update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
+        if (world->player.health < world->player.maxhealth) {
+            player_regen(time_elapsed);
+        }
 
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();
-        draw_minimap(world);
-        draw_hp(world);
         drop_check(world);
-        bullets_counter(world);
-        if (world->player.health < world->player.maxhealth) {
-          world->player.health += world->player.regen * time_elapsed;
-        }
+        draw_bullets_counter(world);
         if (world->weapon_list->is_reloading == 1) {
             update_time_since_reload(world, time_elapsed);
             reload_active_weapon(world);
@@ -141,7 +148,7 @@ int main() {
 	}
 	olc_register_create(&create);
     olc_register_update(&update);
-
+    olc_enable_sound();
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();

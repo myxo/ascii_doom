@@ -18,6 +18,14 @@ public:
 		update_fn_ = fn;
 	}
 
+	int AudioSampleLoad(std::wstring str) {
+		return LoadAudioSample(str);
+	}
+
+	void SamplePlay(int id) {
+		PlaySample(id);
+	}
+
 private:
 	bool OnUserCreate() override
 	{
@@ -77,6 +85,19 @@ extern "C"
 		size_t size = strlen(str);
 		assert(size < 64536); // sanity check
 		g_engine->DrawString(x, y, std::wstring(str, str+size), col);
+	}
+
+	int olc_load_sound(const char* str) {
+		size_t size = strlen(str);
+		return g_engine->AudioSampleLoad(std::wstring(str, str + size));
+	}
+
+	void olc_enable_sound() {
+		g_engine->EnableSound();
+	}
+
+	void olc_play_sound(int id) {
+		g_engine->SamplePlay(id);
 	}
 
 	key_state_t olc_get_key(int id) {
