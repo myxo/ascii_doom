@@ -60,21 +60,25 @@ void increase_arr_point_capacity(point_array_t* point_array) {
 }
 void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
-    world_global->sprites.bullet = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_pistol = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_rifle = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_caco = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
-    init_sprite(world_global->sprites.bullet);
+    init_sprite(world_global->sprites.bullet_pistol);
+    init_sprite(world_global->sprites.bullet_rifle);
+    init_sprite(world_global->sprites.bullet_caco);
     init_sprite(world_global->sprites.mob1);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
-    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_pistol, world->textures.bullet);
     load_texture_from_file("bullet2.tex", &world->textures.bullet);
-    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_rifle, world->textures.bullet);
     load_texture_from_file("bullet_mob.tex", &world->textures.bullet);
-    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_caco, world->textures.bullet);
 }
 
 void init_player(world_t* world) {
@@ -112,6 +116,9 @@ void deinit_world_object() {
     deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
+    deinit_sprite(world_global->sprites.bullet_pistol);
+    deinit_sprite(world_global->sprites.bullet_rifle);
+    deinit_sprite(world_global->sprites.bullet_caco);
     deinit_rocket_array(5);
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();

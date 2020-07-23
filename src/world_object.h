@@ -40,7 +40,9 @@ typedef struct {
 
 typedef struct {
     sprite_t* wall;
-    sprite_t* bullet;
+    sprite_t* bullet_pistol;
+    sprite_t* bullet_rifle;
+    sprite_t* bullet_caco;
     sprite_t* mob1;
 } game_sprites_t;
 

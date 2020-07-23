@@ -89,13 +89,13 @@ void draw_bullets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        int tex_id = 0;
+        sprite_t* bullet_sprite = world->sprites.bullet_pistol;
         if (bullet->type == PLAYER_RIFLE) {
-            tex_id = 1;
+            bullet_sprite = world->sprites.bullet_rifle;
         }else if (bullet->type == CACODEMON){
-            tex_id = 2;
+            bullet_sprite = world->sprites.bullet_caco;
         }
-        draw_sprite(world->sprites.bullet, tex_id, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);
+        draw_sprite(bullet_sprite, 0, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);
     }
 }
 
