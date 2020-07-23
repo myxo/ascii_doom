@@ -55,6 +55,7 @@ typedef struct {
     texture_t mob1;
     texture_t drop1;
     texture_t drop2;
+    texture_t barrel;
 } game_textures_t;
 
 typedef struct {
@@ -63,6 +64,7 @@ typedef struct {
     sprite_t* mob1;
     sprite_t* drop1;
     sprite_t* drop2;
+    sprite_t* barrel;
 } game_sprites_t;
 
 

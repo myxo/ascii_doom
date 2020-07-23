@@ -84,11 +84,11 @@ void spawn_barrels() {
     while (world_global->barrel_array.len < 5) {
         int new_x = rand() % world_global->map_height;
         int new_y = rand() % world_global->map_width;
-        double x_float = (rand() % 10) / 10;
-        double y_float = (rand() % 10) / 10;
+        double x_float = (1 + rand() % 9) / 10.0;
+        double y_float = (1 + rand() % 9) / 10.0;
         if (!is_wall(new_x + x_float, new_y + y_float)) {
             point_t point = { new_x + x_float, new_y + y_float };
-            add_barrel(world_global, point, 2, 3, 0.1);
+            add_barrel(world_global, point, 2, 3, 0.15);
         }
     }
 }
@@ -123,11 +123,13 @@ void init_sprites(world_t* world) {
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop2 = malloc(sizeof(sprite_t));
+    world_global->sprites.barrel = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
     init_sprite(world_global->sprites.drop1);
     init_sprite(world_global->sprites.drop2);
+    init_sprite(world_global->sprites.barrel);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
@@ -138,6 +140,8 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.drop1, world->textures.drop1);
     load_texture_from_file("ammo.tex", &world->textures.drop2);
     attach_texture_to_sprite(world->sprites.drop2, world->textures.drop2);
+    load_texture_from_file("barrel.tex", &world->textures.barrel);
+    attach_texture_to_sprite(world->sprites.barrel, world->textures.barrel);
 }
 
 void init_player(world_t* world) {

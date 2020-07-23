@@ -136,7 +136,7 @@ void draw_barrels(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->barrel_array.len; i++) {
         barrel_t* barrel = &world->barrel_array.array[i];
-        draw_object(player, barrel->pos, barrel->radius, '#', FG_RED, 60, FLOOR);
+        draw_sprite(world->sprites.barrel, 0, barrel->pos, barrel->radius, 60, FLOOR);
     }
 }
 
