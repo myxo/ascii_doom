@@ -212,7 +212,6 @@ void deinit_world_object() {
     deinit_sprite(world_global->sprites.mob1_back);
     deinit_sprite(world_global->sprites.mob1_side1);
     deinit_sprite(world_global->sprites.mob1_side2);
-    deinit_sprite(world_global->sprites.bullet);
     deinit_rocket_array(5);
     deinit_barrel_array();
     deinit_texture(&world_global->textures.wall);
