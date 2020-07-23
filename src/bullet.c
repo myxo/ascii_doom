@@ -5,6 +5,7 @@
 #include "enemy.h"
 #include "bullet.h"
 #include "player.h"
+#include "barrel.h"
 
 void increase_arr_bullets_capacity(world_t* world) {
     world->bullet_array.capacity = world->bullet_array.capacity * 2;
@@ -43,6 +44,9 @@ void bullets_movement(world_t* world, float time_elapsed) {
                 player_hit(world->bullet_array.array[i].damage);
                 bullet_destruct(get_world(), i);
             }
+        }
+        if (is_barrel(world->bullet_array.array[i].pos, &index)) {
+            blow_barrel(world, index);
         }
     }
 }

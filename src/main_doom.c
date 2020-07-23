@@ -102,6 +102,9 @@ int update(float time_elapsed) {
             add_enemy(get_world(), hound);
             add_enemy(get_world(), shooter);
         }
+        if (world->barrel_array.len == 0) {
+            spawn_barrels();
+        }
 
         handle_config_ui_keypress();
         update_world_from_config();
