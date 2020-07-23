@@ -205,6 +205,7 @@ void draw_minimap(world_t* world) {
             olc_draw(i, world->map_width - j - 1, sym, sym_col_FG + sym_col_BG);
         }
     }
+
     double d_angle = world->player.angle_of_vision / olc_screen_width();
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = 0.1;
