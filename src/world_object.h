@@ -174,6 +174,8 @@ typedef struct {
     int caco_fire_sound_id;
     int caco_pain_sound_id;
     int caco_death_sound_id;
+    int item_pickup_id;
+    int item_spawn_id;
 } sound_effects_t;
 
 typedef struct {
