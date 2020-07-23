@@ -10,6 +10,17 @@ enum GUN {
     ROCKET_LAUNCHER
 };
 
+typedef enum type_of_enemy {
+    hound,
+    shooter
+} type_of_enemy_t;
+
+typedef enum {
+    kBulletPlayer,
+    kBulletEnemy
+} bullet_host_t;
+
+
 typedef struct {
     double x;
     double y;
@@ -30,12 +41,15 @@ typedef struct {
     double speed;
     double angular_speed;
     double radius;
+    double regen;
 } player_t;
 
 typedef struct {
     texture_t wall;
     texture_t bullet;
     texture_t mob1;
+    texture_t drop1;
+    texture_t drop2;
 } game_textures_t;
 
 typedef struct {
@@ -45,6 +59,8 @@ typedef struct {
     sprite_t* mob1_back;
     sprite_t* mob1_side1;
     sprite_t* mob1_side2;
+    sprite_t* drop1;
+    sprite_t* drop2;
 } game_sprites_t;
 
 
@@ -60,36 +76,26 @@ typedef struct {
     double radius;
     double time_from_last_shot;
     point_t last_player_pos;
+    type_of_enemy_t type;
 } enemy_t;
+
+typedef struct {
+    sprite_t sprite;
+    bullet_host_t host;
+    enum GUN label;
+    int bullets;
+    double fire_rate;
+    double damage;
+    double shot_delay;
+    double expl_radius;
+    int fire_sound;
+} weapon_t;
 
 typedef struct {
     enemy_t* array;
     int len;
     int capacity;
 } enemy_array_t;
-
-typedef enum bullet_host {
-    kBulletPlayer,
-    kBulletEnemy
-} bullet_host_t;
-
-typedef struct {
-    sprite_t sprite;
-    bullet_host_t host;
-    enum GUN label;
-    double fire_rate;
-    double damage;
-    double shot_delay;
-    double expl_radius;
-} weapon_t;
-
-typedef struct {
-    weapon_t* pistol;
-    weapon_t* rifle;
-    weapon_t* rocket_launcher;
-    enum GUN active_weapon;
-    double time_since_last_shot;
-} std_weapon_list_t;
 
 typedef struct {
     point_t pos;
@@ -101,10 +107,16 @@ typedef struct {
 } bullet_t;
 
 typedef struct {
-    bullet_t* array;
+    int type;
+    double radius;
+    point_t pos;
+} drop_t;
+
+typedef struct {
+    drop_t* array;
     int len;
     int capacity;
-} bullet_array_t;
+} drop_array_t;
 
 typedef struct {
     point_t pos;
@@ -117,12 +129,6 @@ typedef struct {
 } rocket_t;
 
 typedef struct {
-    rocket_t* array;
-    int len;
-    int capacity;
-} rocket_array_t;
-
-typedef struct {
     point_t pos;
     double radius;
     double life_time;
@@ -133,7 +139,44 @@ typedef struct {
     explosion_t* array;
     int len;
     int capacity;
+    int explosion_sound;
 } explosion_array_t;
+
+
+
+typedef struct {
+    weapon_t* pistol;
+    weapon_t* rifle;
+    weapon_t* rocket_launcher;
+    enum GUN active_weapon;
+    double time_since_last_shot;
+} std_weapon_list_t;
+
+typedef struct {
+    bullet_t* array;
+    int len;
+    int capacity;
+} bullet_array_t;
+
+typedef struct {
+    rocket_t* array;
+    int len;
+    int capacity;
+} rocket_array_t;
+
+typedef struct {
+    int* music_array;
+    float* duration_array;
+    int len;
+    float current_music_time;
+    int current_index;
+}music_array_t;
+
+typedef struct {
+    int caco_fire_sound_id;
+    int caco_pain_sound_id;
+    int caco_death_sound_id;
+} sound_effects_t;
 
 typedef struct {
     player_t player;
@@ -148,6 +191,14 @@ typedef struct {
     double** z_buffer;
     game_textures_t textures;
     game_sprites_t sprites;
+    music_array_t music;
+    sound_effects_t sound_effects;
+
+    drop_array_t drop_array;
+    double first_aid_heal;
+    double pistol_ammo;
+    double rifle_ammo;
+    double rocket_ammo;
 } world_t;
 
 void init_player(world_t* world);

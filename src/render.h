@@ -16,11 +16,10 @@ void draw_screen(world_t* world);
 void draw_minimap(world_t* world);
 
 void draw_hp(world_t* world);
+void draw_bullets_counter(world_t* world);
 
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height);
-
 void draw_explosions(world_t* world);
-
 void draw_explosion(world_t* world, point_t pos, double radius, double life_time);
 
 #endif // !RENDER

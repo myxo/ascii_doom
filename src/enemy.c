@@ -5,10 +5,12 @@
 #include "bullet.h"
 #include "olc/olc.h"
 #include "enemy.h"
+#include "player.h"
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "drop.h"
 #include "structs_of_data.h"
 
 void increase_arr_enemy_capacity(world_t* world) {
@@ -98,10 +100,10 @@ point_array_t build_path(enemy_t* enemy) {
     return path;
 }
 
-void add_enemy(world_t* world) {
+void add_shooter_enemy(world_t* world) {
     if (world->enemy_array.len >= world->enemy_array.capacity - 1)
         increase_arr_enemy_capacity(world);
-    world->enemy_array.array[world->enemy_array.len].health = 3;
+    world->enemy_array.array[world->enemy_array.len].health = 100;
     world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
     world->enemy_array.array[world->enemy_array.len].angle = 0;
     world->enemy_array.array[world->enemy_array.len].speed = 1.5;
@@ -112,44 +114,100 @@ void add_enemy(world_t* world) {
     world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
     world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
     world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
+    world->enemy_array.array[world->enemy_array.len].type = shooter;
     world->enemy_array.len++;
+}
+
+void add_hound_enemy(world_t* world) {
+    if (world->enemy_array.len >= world->enemy_array.capacity - 1)
+        increase_arr_enemy_capacity(world);
+    world->enemy_array.array[world->enemy_array.len].health = 3;
+    world->enemy_array.array[world->enemy_array.len].radius = 0.2;
+    world->enemy_array.array[world->enemy_array.len].pos = get_rand_pos_on_floor(world, world->enemy_array.array[world->enemy_array.len].radius);
+    world->enemy_array.array[world->enemy_array.len].global_target = world->player.pos;
+    world->enemy_array.array[world->enemy_array.len].path = build_path(&world->enemy_array.array[world->enemy_array.len]);
+    world->enemy_array.array[world->enemy_array.len].local_target_id = 0;
+    world->enemy_array.array[world->enemy_array.len].angle = 0;
+    world->enemy_array.array[world->enemy_array.len].speed = 1.5;
+    world->enemy_array.array[world->enemy_array.len].angle_of_vision = M_PI_2;
+    world->enemy_array.array[world->enemy_array.len].time_from_last_shot = 0;
+    world->enemy_array.array[world->enemy_array.len].last_player_pos = world->player.pos;
+    world->enemy_array.array[world->enemy_array.len].type = hound;
+    world->enemy_array.len++;
+}
+
+void add_enemy(world_t* world, type_of_enemy_t type) {
+    switch (type)
+    {
+    case hound:
+        add_hound_enemy(world);
+        break;
+    case shooter:
+        add_shooter_enemy(world);
+        break;
+    }
+}
+
+void bite_player(world_t* world, double damage) {
+    player_hit(1);
 }
 
 void enemy_movement(world_t* world, float time_elapsed) {
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
+        int update_position = 1;
         if (is_in_circle(enemy->global_target, enemy->pos, 0.5)) {
-            enemy->global_target = get_rand_pos_on_floor(world, enemy->radius);
-            enemy->path = build_path(enemy);
-            enemy->local_target_id = 0;
+            if (enemy->type == shooter) {
+                enemy->global_target = get_rand_pos_on_floor(world, enemy->radius);
+                enemy->path = build_path(enemy);
+                enemy->local_target_id = 0;
+            }
+            else if (enemy->type == hound) {
+                if (enemy->time_from_last_shot >= 2) {
+                    enemy->time_from_last_shot = 0;
+                    if (is_in_circle(enemy->pos, world->player.pos, 1))
+                        bite_player(world, 1);
+                }
+                update_position = 0;
+            }
         }
         enemy->angle = get_angle_from_pos1_to_pos2(enemy->pos, enemy->path.array[enemy->local_target_id]);
 
         double angle_to_player = get_angle_from_pos1_to_pos2(enemy->pos, world->player.pos);
         double start_enemy_view_angle = enemy->angle - enemy->angle_of_vision / 2;
         double stop_enemy_view_angle = enemy->angle + enemy->angle_of_vision / 2;
-        double x = enemy->pos.x;
-        double y = enemy->pos.y;
-        double d_distance = 0.01;
-        int update_position = 1;
         enemy->time_from_last_shot += time_elapsed;
-        if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
-            double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
-            if (!has_wall_between(enemy->pos, world->player.pos)) {
-                if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
-                    enemy->time_from_last_shot = 0;
-                    shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 1);
+
+        if (enemy->type == shooter) {
+            if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
+                double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
+                if (!has_wall_between(enemy->pos, world->player.pos)) {
+                    if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
+                        enemy->time_from_last_shot = 0;
+                        shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34);
+                        olc_play_sound(world->sound_effects.caco_fire_sound_id);
+                    }
+                    if (distance_to_player <= 4) {
+                        update_position = 0;
+                    }
+                    double delta = get_distance_from_pos1_to_pos2(world->player.pos, enemy->last_player_pos);
+                    if (delta >= 0.5) {
+                        enemy->global_target = world->player.pos;
+                        enemy->path = build_path(enemy);
+                        enemy->local_target_id = 0;
+                        enemy->last_player_pos = world->player.pos;
+                    }
                 }
-                if (distance_to_player <= 4) {
-                    update_position = 0;
-                }
-                double delta = sqrt(pow(world->player.pos.x - enemy->last_player_pos.x, 2) + pow(world->player.pos.y - enemy->last_player_pos.y, 2));
-                if (delta >= 0.5) {
-                    enemy->global_target = world->player.pos;
-                    enemy->path = build_path(enemy);
-                    enemy->local_target_id = 0;
-                    enemy->last_player_pos = world->player.pos;
-                }
+            }
+        }
+        else if (enemy->type == hound && !is_in_circle(enemy->pos, world->player.pos, 0.5)) {
+            double delta = get_distance_from_pos1_to_pos2(world->player.pos, enemy->last_player_pos);
+            if (delta >= 0.5) {
+                enemy->global_target = world->player.pos;
+                enemy->path = build_path(enemy);
+                enemy->local_target_id = 0;
+                enemy->last_player_pos = world->player.pos;
+                update_position = 1;
             }
         }
         if (update_position) {
@@ -165,14 +223,17 @@ void enemy_movement(world_t* world, float time_elapsed) {
 }
 
 void enemy_destruct(world_t* world, int index) {
+    add_drop(world, get_rand_pos_on_floor(world, 0.5));
     for (int i = index; i < world->enemy_array.len - 1; i++) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
     world->enemy_array.len--;
+    olc_play_sound(world->sound_effects.caco_death_sound_id);
 }
 
 void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);
+    olc_play_sound(world->sound_effects.caco_pain_sound_id);
 }

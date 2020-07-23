@@ -29,3 +29,8 @@ void player_hit(double damage) {
     world->player.health -= damage;
 }
 
+void player_regen(double time_elapsed) {
+    world_t* world = get_world();
+    world->player.health += world->player.regen * time_elapsed;
+}
+
