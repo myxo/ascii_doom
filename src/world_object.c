@@ -97,6 +97,8 @@ void init_sound_effects() {
     world_global->sound_effects.caco_fire_sound_id = olc_load_sound("dsfirshot.wav");
     world_global->sound_effects.caco_death_sound_id = olc_load_sound("dscacdth.wav");
     world_global->sound_effects.caco_pain_sound_id = olc_load_sound("dsdmpain.wav");
+    world_global->sound_effects.item_pickup_id = olc_load_sound("dsitemup.wav");
+    world_global->sound_effects.item_spawn_id = olc_load_sound("dsitmbk.wav");
 }
   
 void init_drop_array(world_t* world, int capacity) {
