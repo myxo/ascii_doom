@@ -8,6 +8,10 @@ typedef enum  {
     kBulletRadius,
     kAngleOfView,
     kRayTraceStep,
+    kFirstAidHeal,
+    kPistolAmmo,
+    kRifleAmmo,
+    kRocketAmmo,
     kConfigItemCount
 }config_item_t;
 

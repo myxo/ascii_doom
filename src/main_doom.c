@@ -7,9 +7,12 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "player.h"
+#include "drop.h"
+#include "map_generator.h"
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -86,13 +89,12 @@ int update(float time_elapsed) {
         return 0;
     }
     world_t* world = get_world();
-
     if (world->player.health <= 0) {
         update_dead_screen();
-
     } else {
         if (get_world()->enemy_array.len == 0) {
-            add_enemy(get_world());
+            add_enemy(get_world(), hound);
+            add_enemy(get_world(), shooter);
         }
 
         handle_config_ui_keypress();
@@ -103,14 +105,18 @@ int update(float time_elapsed) {
         bullets_movement(world, time_elapsed);
         rockets_movement(world, time_elapsed);
         enemy_movement(world, time_elapsed);
+        drop_check(world);
 
+        update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
+        player_regen(time_elapsed);
 
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();
+        draw_bullets_counter(world);
     }
     return 1;
 }
@@ -122,7 +128,7 @@ int main() {
 	}
 	olc_register_create(&create);
     olc_register_update(&update);
-
+    olc_enable_sound();
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();

@@ -25,6 +25,12 @@ void olc_draw(int x, int y, short ch, short col);
 void olc_fill(int x1, int y1, int x2, int y2, short ch, short col);
 void olc_draw_string(int x, int y, const char* str, short col);
 
+int olc_load_sound(const char* str);
+
+void olc_enable_sound();
+
+void olc_play_sound(int id);
+
 /**
  * @brief Получение состояния клавиши
  * @param id Идентификатор клавиши (https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)

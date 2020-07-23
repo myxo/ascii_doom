@@ -38,5 +38,4 @@ void set_sprite_color(int x, int y, sprite_t* sprite, short color, int texture_i
 char get_sprite_glyph(int x, int y, sprite_t* sprite, int texture_index);
 char sample_sprite_glyph(double x, double y, sprite_t* sprite, int texture_index);
 void set_sprite_glyph(int x, int y, sprite_t* sprite, char glyph, int texture_index);
-
 #endif

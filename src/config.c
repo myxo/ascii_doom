@@ -24,7 +24,11 @@ config_description_t config_description[kConfigItemCount] = {
     {kBulletSpeed, "bullet_speed"},
     {kBulletRadius, "bullet_radius"},
     {kAngleOfView, "angle_of_view"},
-    {kRayTraceStep, "ray_trace_step"}
+    {kRayTraceStep, "ray_trace_step"},
+    {kFirstAidHeal, "first_aid_heal"},
+    {kPistolAmmo, "pistol_bullets"},
+    {kRifleAmmo, "rifle_bullets"},
+    {kRocketAmmo, "rockets"}
 };
 
 void read_config_from_file(const char* filename) {

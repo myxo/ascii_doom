@@ -1,5 +1,4 @@
 #include "olc/olc.h"
-
 #include "sprite.h"
 #include "world_object.h"
 #include "render.h"
@@ -85,6 +84,20 @@ void draw_enemies(world_t* world) {
     }
 }
 
+void draw_drop(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->drop_array.len; i++) {
+        drop_t* drop = &world->drop_array.array[i];
+        sprite_t* sprite;
+        if (drop->type == 0) {
+            sprite = world->sprites.drop1;
+        } else {
+            sprite = world->sprites.drop2;
+        }
+        draw_sprite(sprite, 0, drop->pos, drop->radius, 40);
+    }
+}
+
 void draw_bullets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->bullet_array.len; i++) {
@@ -161,6 +174,7 @@ void draw_screen(world_t* world) {
     }
     draw_enemies(world);
     draw_bullets(world);
+    draw_drop(world);
     draw_rockets(world);
     draw_explosions(world);
 }
@@ -207,19 +221,40 @@ void draw_minimap(world_t* world) {
             }
         }
     }
+
     olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
+
     for (int i = 0; i < world->enemy_array.len; i++) {
-        olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
+        enemy_t * enemy = &world->enemy_array.array[i];
+        short color = enemy->type == shooter ? FG_GREEN : FG_RED;
+        olc_draw((int)enemy->pos.x, world->map_width - (int)enemy->pos.y - 1, '%', color);
     }
 }
 
 void draw_hp(world_t* world) {
-    int height = olc_screen_height() / 8;
+    int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
-    world->player.health;
     double hp1 = (world->player.health * width) / world->player.maxhealth;
     olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
+}
+void draw_bullets_counter(world_t* world) {
+    int height = olc_screen_height() / 16;
+    int width = olc_screen_width() / 3;
+    double bullet;
+    if (world->weapon_list->active_weapon == PISTOL) {
+        bullet = (world->weapon_list->pistol->bullets * width) / 20;
+    }
+    else if (world->weapon_list->active_weapon == RIFLE){
+        bullet = (world->weapon_list->rifle->bullets * width) / 50;
+    }
+    else {
+        bullet = (world->weapon_list->rocket_launcher->bullets * width) / 10;
+    }
+    if (bullet > width) {
+        bullet = width;
+    }
+    olc_fill(0, olc_screen_height() - (height * 2), (int)round(bullet), olc_screen_height() - height, ' ', BG_YELLOW);
 }
 
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
