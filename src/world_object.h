@@ -19,12 +19,6 @@ typedef enum type_of_enemy {
     shooter
 } type_of_enemy_t;
 
-typedef enum {
-    kBulletPlayer,
-    kBulletEnemy
-} bullet_host_t;
-
-
 typedef struct {
     double x;
     double y;
@@ -61,7 +55,9 @@ typedef struct {
 
 typedef struct {
     sprite_t* wall;
-    sprite_t* bullet;
+    sprite_t* bullet_pistol;
+    sprite_t* bullet_rifle;
+    sprite_t* bullet_caco;
     sprite_t* mob1;
     sprite_t* mob1_back;
     sprite_t* mob1_side1;
@@ -88,6 +84,23 @@ typedef struct {
 } enemy_t;
 
 typedef struct {
+    enemy_t* array;
+    int len;
+    int capacity;
+} enemy_array_t;
+
+typedef enum bullet_host {
+    kBulletPlayer,
+    kBulletEnemy
+} bullet_host_t;
+
+typedef enum bullet_type {
+    CACODEMON,
+    PLAYER_PISTOL,
+    PLAYER_RIFLE
+} bullet_type_t;
+
+typedef struct {
     sprite_t sprite;
     bullet_host_t host;
     enum GUN label;
@@ -100,18 +113,13 @@ typedef struct {
 } weapon_t;
 
 typedef struct {
-    enemy_t* array;
-    int len;
-    int capacity;
-} enemy_array_t;
-
-typedef struct {
     point_t pos;
     double angle;
     double speed;
     double radius;
     int host;
     double damage;
+    bullet_type_t type;
 } bullet_t;
 
 typedef struct {
