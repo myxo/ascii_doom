@@ -24,6 +24,7 @@ PRIVATE
     src/render.c
     src/bullet.c
     src/enemy.c
+    src/drop.c
     src/sprite.c
     src/player.c
     src/structs_of_data.c
@@ -32,7 +33,8 @@ PRIVATE
     src/weapon.c
     src/rocket.c
     src/explosion.c
-    src/barrel.c)
+    src/barrel.c
+    src/music.c)
 
 add_executable(sprite_editor)
 target_sources(sprite_editor

@@ -22,7 +22,6 @@ void point_queue_push_back(point_queue_t* q, point_t point)
     temp->point = point;
     temp->ptr = NULL;
 }
-
 void point_queue_push_front(point_queue_t* q, point_t point)
 {
     point_list_t* temp = malloc(sizeof(point_list_t));

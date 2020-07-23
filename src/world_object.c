@@ -7,6 +7,7 @@
 #include "sprite.h"
 #include "config.h"
 #include "barrel.h"
+#include "map_generator.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,10 +15,33 @@
 
 world_t* world_global = NULL;
 
+void init_music_array() {
+    world_global->music.music_array = malloc(2 * sizeof(int));
+    world_global->music.duration_array = malloc(2 * sizeof(float));
+
+    world_global->music.music_array[0] = olc_load_sound("E1M1.wav");
+    world_global->music.duration_array[0] = 95;
+
+    world_global->music.music_array[1] = olc_load_sound("E1M2.wav");
+    world_global->music.duration_array[1] = 154;
+
+    world_global->music.len = 2;
+
+    world_global->music.current_index = 1;
+    world_global->music.current_music_time = 0;
+    olc_play_sound(world_global->music.music_array[world_global->music.current_index]);
+}
+
+void deinit_music_array() {
+    free(world_global->music.music_array);
+    free(world_global->music.duration_array);
+}
+
 void init_explosion_array() {
     world_global->explosion_array.capacity = 5;
     world_global->explosion_array.len = 0;
     world_global->explosion_array.array = malloc(world_global->explosion_array.capacity * sizeof(explosion_t));
+    world_global->explosion_array.explosion_sound = olc_load_sound("dsexplosion.wav");
 }
 
 void deinit_explosion_array() {
@@ -63,10 +87,22 @@ void spawn_barrels() {
         double x_float = (rand() % 10) / 10;
         double y_float = (rand() % 10) / 10;
         if (!is_wall(new_x + x_float, new_y + y_float)) {
-            point_t point = {new_x + x_float, new_y + y_float};
+            point_t point = { new_x + x_float, new_y + y_float };
             add_barrel(world_global, point, 2, 3, 0.1);
         }
     }
+}
+
+void init_sound_effects() {
+    world_global->sound_effects.caco_fire_sound_id = olc_load_sound("dsfirshot.wav");
+    world_global->sound_effects.caco_death_sound_id = olc_load_sound("dscacdth.wav");
+    world_global->sound_effects.caco_pain_sound_id = olc_load_sound("dsdmpain.wav");
+}
+  
+void init_drop_array(world_t* world, int capacity) {
+    world_global->drop_array.capacity = capacity;
+    world_global->drop_array.len = 0;
+    world_global->drop_array.array = malloc(world_global->drop_array.capacity * sizeof(drop_t));
 }
 
 point_array_t init_point_array(int capacity) {
@@ -85,25 +121,36 @@ void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.drop1 = malloc(sizeof(sprite_t));
+    world_global->sprites.drop2 = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.drop1);
+    init_sprite(world_global->sprites.drop2);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    load_texture_from_file("first_aid.tex", &world->textures.drop1);
+    attach_texture_to_sprite(world->sprites.drop1, world->textures.drop1);
+    load_texture_from_file("ammo.tex", &world->textures.drop2);
+    attach_texture_to_sprite(world->sprites.drop2, world->textures.drop2);
+}
+
+void init_player(world_t* world) {
+    world->player.health = 100;
+    world_global->player.maxhealth = (int)world_global->player.health;
+    world_global->player.regen = 1;
+    world->player.radius = 0.2;
+    world->player.angle = M_PI_4;
 }
 
 int init_world_object() {
     world_global = malloc(sizeof(world_t));
     update_world_from_config();
-
-    world_global->player.health = 3;
-    world_global->player.maxhealth = 3;
-    world_global->player.angle = M_PI_4;
-    world_global->player.radius = 0.2;
 
     world_global->weapon_list = malloc(sizeof(std_weapon_list_t));
     init_std_weapon_list(world_global->weapon_list);
@@ -112,10 +159,16 @@ int init_world_object() {
 
     init_bullet_array(world_global, 5);
     init_enemy_array(world_global, 5);
+    init_drop_array(world_global, 5);
     init_rocket_array(5);
     init_explosion_array();
     init_barrel_array();
-    return read_map_for_file();
+    init_music_array();
+    init_sound_effects();
+    create_map(world_global);
+
+    init_player(world_global);
+    return 1;
 }
 
 void deinit_world_object() {
@@ -130,6 +183,7 @@ void deinit_world_object() {
     deinit_barrel_array();
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
+    deinit_music_array();
     free(world_global);
 }
 
@@ -162,6 +216,12 @@ int is_wall(double x, double y) {
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
     return world_global->map[(int)x][(int)y] == '#';
+}
+
+int is_wall_in_radius(double x, double y, double radius) {
+    int result = is_wall(x + radius, y - radius) || is_wall(x - radius, y + radius)
+        || is_wall(x + radius, y + radius) || is_wall(x - radius, y - radius);
+    return result;
 }
 
 int read_map_for_file() {
@@ -233,12 +293,12 @@ int is_barrel(point_t pos, int* index){
     return 0;
 }
 
-point_t get_rand_pos_on_floor(world_t* world) {
+point_t get_rand_pos_on_floor(world_t* world, double radius) {
     point_t pos;
     do {
         pos.x = rand() % world->map_width;
         pos.y = rand() % world->map_height;
-    } while (is_wall(pos.x, pos.y));
+    } while (is_wall_in_radius(pos.x, pos.y, radius));
     return pos;
 }
 
@@ -274,4 +334,8 @@ void update_world_from_config() {
     world_global->player.speed = get_config_value(kPlayerSpeed);
     world_global->player.angle_of_vision = get_config_value(kAngleOfView);
     world_global->player.angular_speed = get_config_value(kPlayerAngularSpeed);
+    world_global->first_aid_heal = get_config_value(kFirstAidHeal);
+    world_global->pistol_ammo = get_config_value(kPistolAmmo);
+    world_global->rifle_ammo = get_config_value(kRifleAmmo);
+    world_global->rocket_ammo = get_config_value(kRocketAmmo);
 }

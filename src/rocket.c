@@ -25,27 +25,24 @@ void rockets_movement(world_t* world, float time_elapsed) {
         new_x += time_elapsed * world->rocket_array.array[i].speed * sin(world->rocket_array.array[i].angle);
         double new_y = world->rocket_array.array[i].pos.y;
         new_y += time_elapsed * world->rocket_array.array[i].speed * cos(world->rocket_array.array[i].angle);
+        int explode = 0;
         if (!is_wall(new_x, new_y)) {
             world->rocket_array.array[i].pos.x = new_x;
             world->rocket_array.array[i].pos.y = new_y;
         }
         else {
-            point_t expl_point = { new_x, new_y };
-            make_explosion(world, expl_point, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
-            rocket_destruct(world, i);
+            explode = 1;
         }
         int index;
         if (is_enemy(world->rocket_array.array[i].pos.x, world->rocket_array.array[i].pos.y, &index)) {
-            if (world->rocket_array.array[i].host == kBulletPlayer) {
-                make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
-                rocket_destruct(world, i);
-            }
+            explode = 1;
         }
         if (is_player(world->rocket_array.array[i].pos.x, world->rocket_array.array[i].pos.y)) {
-            if (world->rocket_array.array[i].host == kBulletEnemy) {
-                make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
-                rocket_destruct(world, i);
-            }
+            explode = 1;
+        }
+        if (explode) {
+            make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
+            rocket_destruct(world, i);
         }
         if (is_barrel(world->rocket_array.array[i].pos, &index)) {
             blow_barrel(world, index);

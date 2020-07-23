@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
+#include <string.h>
 
 void increase_arr_next_nodes_capacity(node_of_room_t* node) {
     node->capacity_nexts = node->capacity_nexts * 2;
@@ -107,11 +108,23 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     for (int i = 0; i < n + 1; i++)
         is_exist[i] = 0;
     int pred_id, next_id;
-    fscanf(fgraph, "%d %d", &pred_id, &next_id);
+    char str_temp[128];
+    char name_type[64];
+    char name_second[64];
+    fgets(str_temp, 128, fgraph);
+    fgets(str_temp, 128, fgraph);
     node_of_room_t* temp_node = init_room_node(3);
-    temp_node->type_of_room = type_of_room;
     node_of_room_t* temp_node_second = init_room_node(3);
-    temp_node_second->type_of_room = type_of_room;
+    sscanf(str_temp, "%d %d %s %s", &pred_id, &next_id, name_type, name_second);
+    strcat(name_type, ".txt");
+    strcat(name_second, ".txt");
+    temp_node->type_of_room = read_room_for_file(name_type);
+    strcpy(temp_node->type_of_room.name, name_type);
+    if (!strcmp(name_type, name_second))
+        temp_node_second->type_of_room = temp_node->type_of_room;
+    else
+        temp_node_second->type_of_room = read_room_for_file(name_second);
+    strcpy(temp_node_second->type_of_room.name, name_second);
     graph_of_rooms_t graph;
     graph.start = temp_node;
     temp_node->next_nodes[temp_node->len_nexts++] = temp_node_second;
@@ -120,7 +133,8 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     array_of_rooms[next_id] = temp_node_second;
     is_exist[next_id] = 1;
     for (int i = 1; i  < n; i++) {
-        fscanf(fgraph, "%d %d", &pred_id, &next_id);
+        fscanf(fgraph, "%d %d %s", &pred_id, &next_id, name_type);
+        strcat(name_type, ".txt");
         if (array_of_rooms[pred_id]->len_nexts >= array_of_rooms[pred_id]->capacity_nexts)
             increase_arr_next_nodes_capacity(array_of_rooms[pred_id]);
         if (is_exist[next_id]) {
@@ -128,7 +142,18 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
         }
         else {
             node_of_room_t* temp = init_room_node(3);
-            temp->type_of_room = type_of_room;
+            int is_type = 0;
+            for (int j = 0; j < n; j++) {
+                if (is_exist[j]) {
+                    if (!strcmp(array_of_rooms[j]->type_of_room.name, name_type)) {
+                        temp->type_of_room = array_of_rooms[j]->type_of_room;
+                        is_type = 1;
+                        break;
+                    }
+                }
+            }
+            if (!is_type)
+                temp->type_of_room = read_room_for_file(name_type);
             array_of_rooms[pred_id]->next_nodes[array_of_rooms[pred_id]->len_nexts++] = temp;
             array_of_rooms[next_id] = temp;
             is_exist[next_id] = 1;
@@ -172,10 +197,12 @@ void set_node_near(graph_of_rooms_t* graph, node_of_room_t* parent, node_of_room
 char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_room, node_of_room_t* stop_room, double shift_y, double shift_x, double map_width, double map_height) {
     char ch_door_start = '0', ch_door_stop = '0';
     for (int i = 0; i < g->n_nodes; i++) {
-        if (g->array_of_rooms[i] == start_room)
-            ch_door_start = '0' + i;
-        if (g->array_of_rooms[i] == stop_room)
-            ch_door_start = '0' + i;
+        if (g->is_exist[i]) {
+            if (g->array_of_rooms[i] == start_room)
+                ch_door_start = '0' + i;
+            if (g->array_of_rooms[i] == stop_room)
+                ch_door_stop = '0' + i;
+        }
     }
 
     point_queue_t q = point_queue_init();
@@ -200,38 +227,60 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         pred[(int)temp.x][(int)temp.y] = null;
     }
     point_t stop_door = {0, 0};
+    int found_corridor = 0;
     while (!isempty_point_queue(q)) {
         point_t cur = point_queue_pop(&q);
+        int near_corridor = 0;
         int x_move[4] = { -1, 0,  0, 1 };
         int y_move[4] = { 0, 1, -1, 0 };
         for (int i = 0; i < 4; i++) {
             int x = (int)cur.x + x_move[i];
             int y = (int)cur.y + y_move[i];
-            if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] != '|'){
-                point_t to = { x, y };
-                if (!used[x][y]) {
-                    used[x][y] = 1;
-                    pred[x][y] = cur;
-                    for (int j = 0; j < stop_room->type_of_room.doors.len; j++) {
-                        stop_door.y = stop_room->center_on_map.y + stop_room->type_of_room.doors.array[j].y - stop_room->type_of_room.center.y + shift_y;
-                        stop_door.x = stop_room->center_on_map.x + stop_room->type_of_room.doors.array[j].x - stop_room->type_of_room.center.x + shift_x;
-                        if (x == (int)stop_door.x && y == (int)stop_door.y) {
+            if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] == '.') {
+                near_corridor = 1;
+                break;
+            }
+        }
+        if (!near_corridor) {
+            for (int i = 0; i < 4; i++) {
+                int x = (int)cur.x + x_move[i];
+                int y = (int)cur.y + y_move[i];
+                if (x >= 0 && y >= 0 && x < map_width && y < map_height && map[y][x] != '|') {
+                    point_t to = { x, y };
+                    if (!used[x][y]) {
+                        used[x][y] = 1;
+                        pred[x][y] = cur;
+                        if (map[y][x] == ch_door_stop) {
+                            stop_door.y = y;
+                            stop_door.x = x;
+                            found_corridor = 1;
                             break;
                         }
+                        if (map[y][x] == '#')
+                            point_queue_push_back(&q, to);
                     }
-                    if (map[y][x] != ' ' && map[y][x] != '#' && map[y][x] != ch_door_start && map[y][x] != ch_door_stop)
-                        continue;
-                    point_queue_push_back(&q, to);
                 }
             }
         }
+        if (found_corridor)
+            break;
     }
-    for (point_t cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
+    point_t cur;
+    char marker = ' ';
+    for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
             break;
-        map[(int)cur.y][(int)cur.x] = '.';
+        if (map[(int)cur.y][(int)cur.x] == ch_door_stop) {
+            marker = '.';
+            map[(int)cur.y][(int)cur.x] = marker;
+        }else if (map[(int)cur.y][(int)cur.x] == ch_door_start) {
+            map[(int)cur.y][(int)cur.x] = marker;
+            marker = ' ';
+        }
+        else {
+            map[(int)cur.y][(int)cur.x] = marker;
+        }
     }
-    
     return map;
 }
 
@@ -298,6 +347,7 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
             int x = (int)(node_room.center_on_map.x + node_room.type_of_room.doors.array[i].x - node_room.type_of_room.center.x + shift_x);
             map[y][x] = '0' + node_room_index;
         }
+        //map[(int)(node_room.center_on_map.y + shift_y)][(int)(node_room.center_on_map.x + shift_x)] = '0' + node_room_index;
     }
     for (int i = 0; i < graph->n_nodes; i++) {
         if (graph->is_exist[i])
@@ -309,12 +359,12 @@ char** put_node_rooms_on_map_from_graph(graph_of_rooms_t* graph, int* width, int
         for (int x = 0; x < *width; x++) {
             if (map[y][x] == '.')
                 map[y][x] = ' ';
-            if (map[y][x] != ' ')
+            if (map[y][x] != ' ')// && map[y][x] < '0'&& map[y][x] > '0')
                 map[y][x] = '#';
         }
     }
-    player_pos->x = graph->start->center_on_map.y + shift_y;
-    player_pos->y = graph->start->center_on_map.x + shift_x;
+    player_pos->x = (int)(graph->start->center_on_map.y + shift_y + 0.5);
+    player_pos->y = (int)(graph->start->center_on_map.x + shift_x + 0.5);
     return map;
 }
 
