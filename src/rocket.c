@@ -2,6 +2,8 @@
 #include "rocket.h"
 #include "render.h"
 #include "explosion.h"
+#include "barrel.h"
+
 #include <stdlib.h>
 #include <math.h>
 
@@ -41,6 +43,9 @@ void rockets_movement(world_t* world, float time_elapsed) {
         if (explode) {
             make_explosion(world, world->rocket_array.array[i].pos, world->rocket_array.array[i].damage, world->rocket_array.array[i].explosive_radius);
             rocket_destruct(world, i);
+        }
+        if (is_barrel(world->rocket_array.array[i].pos, &index)) {
+            blow_barrel(world, index);
         }
     }
 }

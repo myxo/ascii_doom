@@ -4,6 +4,10 @@
 
 #include "sprite.h"
 
+enum PLACE_ON_SCREEN {
+    FLOOR,
+    AIR
+};
 enum GUN {
     PISTOL,
     RIFLE,
@@ -36,6 +40,8 @@ typedef struct {
     double angular_speed;
     double radius;
     double regen;
+    double angular_speed_multi;
+    double angular_acceleration;
 } player_t;
 
 typedef struct {
@@ -44,6 +50,7 @@ typedef struct {
     texture_t mob1;
     texture_t drop1;
     texture_t drop2;
+    texture_t barrel;
 } game_textures_t;
 
 typedef struct {
@@ -52,8 +59,12 @@ typedef struct {
     sprite_t* bullet_rifle;
     sprite_t* bullet_caco;
     sprite_t* mob1;
+    sprite_t* mob1_back;
+    sprite_t* mob1_side1;
+    sprite_t* mob1_side2;
     sprite_t* drop1;
     sprite_t* drop2;
+    sprite_t* barrel;
 } game_sprites_t;
 
 
@@ -125,6 +136,19 @@ typedef struct {
 
 typedef struct {
     point_t pos;
+    double expl_radius;
+    double damage;
+    double radius;
+} barrel_t;
+
+typedef struct {
+    barrel_t* array;
+    int len;
+    int capacity;
+} barrel_array_t;
+
+typedef struct {
+    point_t pos;
     double angle;
     double speed;
     double radius;
@@ -191,6 +215,7 @@ typedef struct {
     explosion_array_t explosion_array;
     enemy_array_t enemy_array;
     std_weapon_list_t* weapon_list;
+    barrel_array_t barrel_array;
     int map_width;
     int map_height;
     double** z_buffer;
@@ -219,10 +244,12 @@ int is_wall_in_radius(double x, double y, double radius);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
 int is_enemy(double x, double y, int* enemy_index);
+int is_barrel(point_t pos, int* index);
 point_t get_rand_pos_on_floor(world_t* world, double radius);
 double get_angle_from_pos1_to_pos2(point_t pos1, point_t pos2);
 double get_distance_from_pos1_to_pos2(point_t pos1, point_t pos2);
 int has_wall_between(point_t pos1, point_t pos2);
+void spawn_barrels();
 point_array_t init_point_array(int capacity);
 void increase_arr_point_capacity(point_array_t* point_array);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance);
