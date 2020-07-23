@@ -7,9 +7,12 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "player.h"
+#include "drop.h"
+#include "map_generator.h"
 #include "weapon.h"
 #include "rocket.h"
 #include "explosion.h"
+#include "music.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -43,6 +46,12 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key(VK_RIGHT).held) {
         turn_player(1, time_elapsed);
     }
+    if (olc_get_key(VK_LEFT).released) {
+        reset_player_angular_speed();
+    }
+    if (olc_get_key(VK_RIGHT).released) {
+        reset_player_angular_speed();
+    }
     if (olc_get_key('W').held) {
         move_vec_x += 1;
     }
@@ -64,10 +73,16 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('3').pressed) {
         set_active_weapon(get_world(), ROCKET_LAUNCHER);
     }
-    move_player(move_vec_x, move_vec_y, time_elapsed);
-    if (olc_get_key(VK_SPACE).held) {
-        shoot_from_active_weapon(get_world());
+    if (get_world()->weapon_list->is_reloading != 1) {
+        if (olc_get_key('R').held) {
+            get_world()->weapon_list->time_since_last_reload = 0;
+            get_world()->weapon_list->is_reloading = 1;
+        }
+        if (olc_get_key(VK_SPACE).held) {
+            shoot_from_active_weapon(get_world());
+        }
     }
+    move_player(move_vec_x, move_vec_y, time_elapsed);
 }
 
 
@@ -86,13 +101,16 @@ int update(float time_elapsed) {
         return 0;
     }
     world_t* world = get_world();
-
     if (world->player.health <= 0) {
         update_dead_screen();
-
-    } else {
+    }
+    else {
         if (get_world()->enemy_array.len == 0) {
-            add_enemy(get_world());
+            add_enemy(get_world(), hound);
+            add_enemy(get_world(), shooter);
+        }
+        if (world->barrel_array.len == 0) {
+            spawn_barrels();
         }
 
         handle_config_ui_keypress();
@@ -103,14 +121,24 @@ int update(float time_elapsed) {
         bullets_movement(world, time_elapsed);
         rockets_movement(world, time_elapsed);
         enemy_movement(world, time_elapsed);
+        drop_check(world);
 
+        update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
-
+        if (world->player.health < world->player.maxhealth) {
+            player_regen(time_elapsed);
+        }
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();
+        drop_check(world);
+        draw_bullets_counter(world);
+        if (world->weapon_list->is_reloading == 1) {
+            update_time_since_reload(world, time_elapsed);
+            reload_active_weapon(world);
+        }
     }
     return 1;
 }
@@ -122,7 +150,7 @@ int main() {
 	}
 	olc_register_create(&create);
     olc_register_update(&update);
-
+    olc_enable_sound();
     olc_start(); // block until update return 0
     olc_deinitialize();
     log_deinit();

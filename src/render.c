@@ -1,5 +1,4 @@
 #include "olc/olc.h"
-
 #include "sprite.h"
 #include "world_object.h"
 #include "render.h"
@@ -17,8 +16,7 @@ double normilize_angle(double angle) {
     while (angle >= pi2) { angle -= pi2; }
     return angle;
 }
-
-screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height) {
+screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_radis, double obj_height, enum PLACE_ON_SCREEN place) {
     double angle_from_player_to_obj = normilize_angle(get_angle_from_pos1_to_pos2(player->pos, obj_pos));
     double player_angle = normilize_angle(player->angle);
     double player_aov = player->angle_of_vision;
@@ -43,8 +41,26 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     int lrow_left = (int)(olc_screen_width() * left_angle / player_aov + 0.5);
     int lrow_right = (int)(olc_screen_width() * right_angle / player_aov + 0.5);
 
-    int lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
-    int lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    int lline_start = 0;
+    int lline_end = 0;
+
+    if (place == AIR) {
+        lline_start = (int)(olc_screen_height() / 2 - obj_height + 0.5);
+        lline_end = (int)(olc_screen_height() / 2 + obj_height + 0.5);
+    }
+    else {
+        double dist_rate = 1 / distance;
+        if (dist_rate > 1) {
+            dist_rate = 1;
+        }
+        double dist_on_screen = (olc_screen_height() / 2) * dist_rate;
+        if (dist_on_screen > olc_screen_height()) {
+            dist_on_screen = olc_screen_height();
+        }
+        int center = olc_screen_height() / 2 + (int)dist_on_screen;
+        lline_start = center - (int)obj_height;
+        lline_end = center;
+    }
 
     screen_obj_t res;
     res.on_screen = 1;
@@ -56,8 +72,9 @@ screen_obj_t get_object_on_screen(player_t* player, point_t obj_pos, double obj_
     return res;
 }
 
-void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height) {
-    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height);
+
+void draw_object(player_t* player, point_t obj_pos, double obj_radis, char ch, enum COLOR col, int obj_height, enum PLACE_ON_SCREEN place) {
+    screen_obj_t obj = get_object_on_screen(player, obj_pos, obj_radis, obj_height, place);
     if (!obj.on_screen) {
         return;
     }
@@ -81,7 +98,36 @@ void draw_enemies(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
-        draw_sprite(world->sprites.mob1, 0, enemy->pos, enemy->radius, 40);
+        sprite_t* mob = world->sprites.mob1_back;
+        double d_angle = normilize_angle(enemy->angle - player->angle);
+        if (fabs(d_angle) > M_PI) {
+            d_angle = 2 * M_PI - d_angle;
+            d_angle *= (-1);
+        }
+        if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
+            mob = world->sprites.mob1_side2;
+        }
+        else if (d_angle >= -M_PI_4 - M_PI_2 && d_angle <= -M_PI_4) {
+            mob = world->sprites.mob1_side1;
+        }
+        else if ((d_angle >= M_PI_4 + M_PI_2 && d_angle <= M_PI) || (d_angle <= -M_PI_4 - M_PI_2 && d_angle >= -M_PI)) {
+            mob = world->sprites.mob1;
+        }
+        draw_sprite(mob, 0, enemy->pos, enemy->radius, 40, AIR);
+    }
+}
+
+void draw_drop(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->drop_array.len; i++) {
+        drop_t* drop = &world->drop_array.array[i];
+        sprite_t* sprite;
+        if (drop->type == 0) {
+            sprite = world->sprites.drop1;
+        } else {
+            sprite = world->sprites.drop2;
+        }
+        draw_sprite(sprite, 0, drop->pos, drop->radius, 60, FLOOR);
     }
 }
 
@@ -89,7 +135,13 @@ void draw_bullets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->bullet_array.len; i++) {
         bullet_t* bullet = &world->bullet_array.array[i];
-        draw_sprite(world->sprites.bullet, 0, bullet->pos, 2 * bullet->radius, 300 * bullet->radius);
+        sprite_t* bullet_sprite = world->sprites.bullet_pistol;
+        if (bullet->type == PLAYER_RIFLE) {
+            bullet_sprite = world->sprites.bullet_rifle;
+        }else if (bullet->type == CACODEMON){
+            bullet_sprite = world->sprites.bullet_caco;
+        }
+        draw_sprite(bullet_sprite, 0, bullet->pos, 2 * bullet->radius, 300 * bullet->radius, AIR);
     }
 }
 
@@ -97,7 +149,15 @@ void draw_rockets(world_t* world) {
     player_t* player = &world->player;
     for (int i = 0; i < world->rocket_array.len; i++) {
         rocket_t* rocket = &world->rocket_array.array[i];
-        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED | BG_BLACK, 4);
+        draw_object(player, rocket->pos, rocket->radius, '*', FG_RED, 4, AIR);
+    }
+}
+
+void draw_barrels(world_t* world) {
+    player_t* player = &world->player;
+    for (int i = 0; i < world->barrel_array.len; i++) {
+        barrel_t* barrel = &world->barrel_array.array[i];
+        draw_sprite(world->sprites.barrel, 0, barrel->pos, barrel->radius, 60, FLOOR);
     }
 }
 
@@ -173,8 +233,10 @@ void draw_screen(world_t* world) {
     }
     draw_enemies(world);
     draw_bullets(world);
+    draw_drop(world);
     draw_rockets(world);
     draw_explosions(world);
+    draw_barrels(world);
 }
 
 void draw_minimap(world_t* world) {
@@ -194,6 +256,7 @@ void draw_minimap(world_t* world) {
             olc_draw(i, world->map_width - j - 1, sym, sym_col_FG + sym_col_BG);
         }
     }
+
     double d_angle = world->player.angle_of_vision / olc_screen_width();
     double ray_angle = world->player.angle - world->player.angle_of_vision / 2;
     double d_distance = 0.1;
@@ -219,9 +282,13 @@ void draw_minimap(world_t* world) {
             }
         }
     }
+
     olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
+
     for (int i = 0; i < world->enemy_array.len; i++) {
-        olc_draw((int)world->enemy_array.array[i].pos.x, world->map_width - (int)world->enemy_array.array[i].pos.y - 1, '%', FG_GREEN);
+        enemy_t * enemy = &world->enemy_array.array[i];
+        short color = enemy->type == shooter ? FG_GREEN : FG_RED;
+        olc_draw((int)enemy->pos.x, world->map_width - (int)enemy->pos.y - 1, '%', color);
     }
     for (int i = 0; i < world->door_array.len; i++) {
         olc_draw((int)world->door_array.array[i].pos.y, world->map_width - (int)world->door_array.array[i].pos.x - 1, '8', FG_MAGENTA + BG_MAGENTA);
@@ -229,17 +296,41 @@ void draw_minimap(world_t* world) {
 }
 
 void draw_hp(world_t* world) {
-    int height = olc_screen_height() / 8;
+    int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
-    world->player.health;
     double hp1 = (world->player.health * width) / world->player.maxhealth;
     olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
 }
+void draw_bullets_counter(world_t* world) {
+    int height = olc_screen_height() / 16;
+    int width = olc_screen_width() / 3;
+    double bullet;
+    weapon_t* weapon;
+    if (world->weapon_list->active_weapon == PISTOL) {
+        weapon = world->weapon_list->pistol;
+    }
+    else if (world->weapon_list->active_weapon == RIFLE){
+        weapon = world->weapon_list->rifle;
+    }
+    else {
+        weapon = world->weapon_list->rocket_launcher;
+    }
+    bullet = (weapon->magazine_bullets * width) / weapon->max_magazine_bullets;
+    if (bullet > width) {
+        bullet = width;
+    }
+    olc_fill(0, olc_screen_height() - (height * 2), (int)round(bullet), olc_screen_height() - height, ' ', BG_YELLOW);
+    bullet = (weapon->bullets * width) / (weapon->max_magazine_bullets * 10);
+    if (bullet > width) {
+        bullet = width;
+    }
+    olc_fill(0, olc_screen_height() - (int)round(height * 2.5), (int)round(bullet), olc_screen_height() - (height * 2), ' ', BG_BLUE);
+}
 
-void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {
+void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height, enum PLACE_ON_SCREEN place) {
     player_t player = get_world()->player;
-    screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height);
+    screen_obj_t obj = get_object_on_screen(&player, pos, obj_radis, obj_height, place);
     if (!obj.on_screen) {
         return;
     }
@@ -274,7 +365,7 @@ void draw_explosions(world_t* world) {
 }
 
 void draw_explosion(world_t* world, point_t pos, double radius, double life_time) {
-    screen_obj_t expl = get_object_on_screen(&get_world()->player, pos, 1, 1);
+    screen_obj_t expl = get_object_on_screen(&get_world()->player, pos, 1, 1, AIR);
     point_t expl_center;
     expl_center.x = (expl.row_left + expl.row_right) / 2;
     expl_center.y = (expl.line_start + expl.line_end) / 2;

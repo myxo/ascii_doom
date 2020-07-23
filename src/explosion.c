@@ -2,6 +2,8 @@
 #include "player.h"
 #include "enemy.h"
 #include "explosion.h"
+#include "barrel.h"
+#include "olc/olc.h"
 
 #include <stdlib.h>
 
@@ -28,19 +30,25 @@ void remove_explosion(world_t* world, int index) {
 }
 
 void make_explosion(world_t* world, point_t pos, double std_damage, double radius) {
-    if (is_in_circle(get_world()->player.pos, pos, radius)) {
-        double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(get_world()->player.pos, pos)) / radius;
+    if (is_in_circle(world->player.pos, pos, radius)) {
+        double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(world->player.pos, pos)) / radius;
         double damage = std_damage * rate_of_damage;
         player_hit(damage);
     }
-    for (int i = 0; i < get_world()->enemy_array.len; i++) {
-        if (is_in_circle(get_world()->enemy_array.array[i].pos, pos, radius)) {
-            double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(get_world()->enemy_array.array[i].pos, pos)) / radius;
+    for (int i = 0; i < world->enemy_array.len; i++) {
+        if (is_in_circle(world->enemy_array.array[i].pos, pos, radius)) {
+            double rate_of_damage = (radius - get_distance_from_pos1_to_pos2(world->enemy_array.array[i].pos, pos)) / radius;
             double damage = std_damage * rate_of_damage;
-            enemy_hit(get_world(), i, damage);
+            enemy_hit(world, i, damage);
+        }
+    }
+    for (int i = 0; i < world->barrel_array.len; i++) {
+        if (is_in_circle(world->barrel_array.array[i].pos, pos, radius)) {
+            blow_barrel(world, i);
         }
     }
     add_explosion(world, pos, radius, 0.2);
+    olc_play_sound(world->explosion_array.explosion_sound);
 }
 
 void update_life_time(world_t* world, float time_elapsed) {
