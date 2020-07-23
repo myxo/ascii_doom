@@ -26,7 +26,7 @@ void init_music_array() {
 
     world_global->music.len = 2;
 
-    world_global->music.current_index = 1;
+    world_global->music.current_index = 0;
     world_global->music.current_music_time = 0;
     olc_play_sound(world_global->music.music_array[world_global->music.current_index]);
 }
@@ -98,17 +98,29 @@ void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
     world_global->sprites.bullet = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_back = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_side1 = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_side2 = malloc(sizeof(sprite_t));
     world_global->sprites.drop1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop2 = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.mob1_back);
+    init_sprite(world_global->sprites.mob1_side1);
+    init_sprite(world_global->sprites.mob1_side2);
     init_sprite(world_global->sprites.drop1);
     init_sprite(world_global->sprites.drop2);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("mob1_back.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_back, world->textures.mob1);
+    load_texture_from_file("mob1_side1.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_side1, world->textures.mob1);
+    load_texture_from_file("mob1_side2.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_side2, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
     load_texture_from_file("first_aid.tex", &world->textures.drop1);
@@ -157,6 +169,11 @@ void deinit_world_object() {
     deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
+    deinit_sprite(world_global->sprites.mob1);
+    deinit_sprite(world_global->sprites.mob1_back);
+    deinit_sprite(world_global->sprites.mob1_side1);
+    deinit_sprite(world_global->sprites.mob1_side2);
+    deinit_sprite(world_global->sprites.bullet);
     deinit_rocket_array(5);
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();

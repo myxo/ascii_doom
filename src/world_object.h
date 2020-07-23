@@ -10,7 +10,6 @@ enum GUN {
     ROCKET_LAUNCHER
 };
 
-
 typedef enum type_of_enemy {
     hound,
     shooter
@@ -59,6 +58,9 @@ typedef struct {
     sprite_t* wall;
     sprite_t* bullet;
     sprite_t* mob1;
+    sprite_t* mob1_back;
+    sprite_t* mob1_side1;
+    sprite_t* mob1_side2;
     sprite_t* drop1;
     sprite_t* drop2;
 } game_sprites_t;
