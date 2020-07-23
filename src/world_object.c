@@ -6,6 +6,7 @@
 #include "weapon.h"
 #include "sprite.h"
 #include "config.h"
+#include "barrel.h"
 #include "map_generator.h"
 
 #include <stdlib.h>
@@ -26,7 +27,7 @@ void init_music_array() {
 
     world_global->music.len = 2;
 
-    world_global->music.current_index = 1;
+    world_global->music.current_index = 0;
     world_global->music.current_music_time = 0;
     olc_play_sound(world_global->music.music_array[world_global->music.current_index]);
 }
@@ -69,6 +70,28 @@ void init_enemy_array(world_t* world, int capacity) {
     world_global->enemy_array.array = malloc(world_global->enemy_array.capacity * sizeof(enemy_t));
 }
 
+void init_barrel_array() {
+    world_global->barrel_array.capacity = 5;
+    world_global->barrel_array.len = 0;
+    world_global->barrel_array.array = malloc(world_global->barrel_array.capacity * sizeof(barrel_t));
+}
+
+void deinit_barrel_array() {
+    free(world_global->barrel_array.array);
+}
+
+void spawn_barrels() {
+    while (world_global->barrel_array.len < 5) {
+        int new_x = rand() % world_global->map_height;
+        int new_y = rand() % world_global->map_width;
+        double x_float = (1 + rand() % 9) / 10.0;
+        double y_float = (1 + rand() % 9) / 10.0;
+        if (!is_wall(new_x + x_float, new_y + y_float)) {
+            point_t point = { new_x + x_float, new_y + y_float };
+            add_barrel(world_global, point, 2, 3, 0.15);
+        }
+    }
+}
 
 void init_sound_effects() {
     world_global->sound_effects.caco_fire_sound_id = olc_load_sound("dsfirshot.wav");
@@ -96,25 +119,49 @@ void increase_arr_point_capacity(point_array_t* point_array) {
 }
 void init_sprites(world_t* world) {
     world_global->sprites.wall = malloc(sizeof(sprite_t));
-    world_global->sprites.bullet = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_pistol = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_rifle = malloc(sizeof(sprite_t));
+    world_global->sprites.bullet_caco = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_back = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_side1 = malloc(sizeof(sprite_t));
+    world_global->sprites.mob1_side2 = malloc(sizeof(sprite_t));
     world_global->sprites.drop1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop2 = malloc(sizeof(sprite_t));
+    world_global->sprites.barrel = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
-    init_sprite(world_global->sprites.bullet);
+    init_sprite(world_global->sprites.bullet_pistol);
+    init_sprite(world_global->sprites.bullet_rifle);
+    init_sprite(world_global->sprites.bullet_caco);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.mob1_back);
+    init_sprite(world_global->sprites.mob1_side1);
+    init_sprite(world_global->sprites.mob1_side2);
     init_sprite(world_global->sprites.drop1);
     init_sprite(world_global->sprites.drop2);
+    init_sprite(world_global->sprites.barrel);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1, world->textures.mob1);
+    load_texture_from_file("mob1_back.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_back, world->textures.mob1);
+    load_texture_from_file("mob1_side1.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_side1, world->textures.mob1);
+    load_texture_from_file("mob1_side2.tex", &world->textures.mob1);
+    attach_texture_to_sprite(world->sprites.mob1_side2, world->textures.mob1);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
-    attach_texture_to_sprite(world->sprites.bullet, world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_pistol, world->textures.bullet);
+    load_texture_from_file("bullet2.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_rifle, world->textures.bullet);
+    load_texture_from_file("bullet_mob.tex", &world->textures.bullet);
+    attach_texture_to_sprite(world->sprites.bullet_caco, world->textures.bullet);
     load_texture_from_file("first_aid.tex", &world->textures.drop1);
     attach_texture_to_sprite(world->sprites.drop1, world->textures.drop1);
     load_texture_from_file("ammo.tex", &world->textures.drop2);
     attach_texture_to_sprite(world->sprites.drop2, world->textures.drop2);
+    load_texture_from_file("barrel.tex", &world->textures.barrel);
+    attach_texture_to_sprite(world->sprites.barrel, world->textures.barrel);
 }
 
 void init_player(world_t* world) {
@@ -141,6 +188,7 @@ int init_world_object() {
     init_drop_array(world_global, 5);
     init_rocket_array(5);
     init_explosion_array();
+    init_barrel_array();
     init_music_array();
     init_sound_effects();
     create_map(world_global);
@@ -157,7 +205,15 @@ void deinit_world_object() {
     deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
+    deinit_sprite(world_global->sprites.bullet_pistol);
+    deinit_sprite(world_global->sprites.bullet_rifle);
+    deinit_sprite(world_global->sprites.bullet_caco);
+    deinit_sprite(world_global->sprites.mob1);
+    deinit_sprite(world_global->sprites.mob1_back);
+    deinit_sprite(world_global->sprites.mob1_side1);
+    deinit_sprite(world_global->sprites.mob1_side2);
     deinit_rocket_array(5);
+    deinit_barrel_array();
     deinit_texture(&world_global->textures.wall);
     deinit_z_buffer();
     deinit_music_array();
@@ -260,6 +316,16 @@ int is_enemy(double x, double y, int* enemy_index) {
     return 0;
 }
 
+int is_barrel(point_t pos, int* index){
+    for (int i = 0; i < world_global->barrel_array.len; i++) {
+        if (is_in_circle(pos, world_global->barrel_array.array[i].pos, world_global->barrel_array.array[i].radius)) {
+            *index = i;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 point_t get_rand_pos_on_floor(world_t* world, double radius) {
     point_t pos;
     do {
@@ -292,7 +358,6 @@ int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d
     }
     return 1;
 }
-
 
 int has_wall_between(point_t pos1, point_t pos2) {
     return has_wall_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);

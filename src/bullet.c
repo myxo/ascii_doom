@@ -5,6 +5,7 @@
 #include "enemy.h"
 #include "bullet.h"
 #include "player.h"
+#include "barrel.h"
 
 void increase_arr_bullets_capacity(world_t* world) {
     world->bullet_array.capacity = world->bullet_array.capacity * 2;
@@ -44,10 +45,13 @@ void bullets_movement(world_t* world, float time_elapsed) {
                 bullet_destruct(get_world(), i);
             }
         }
+        if (is_barrel(world->bullet_array.array[i].pos, &index)) {
+            blow_barrel(world, index);
+        }
     }
 }
 
-void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host, double damage) {
+void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed, bullet_host_t host, double damage, bullet_type_t type) {
     if (world->bullet_array.len >= world->bullet_array.capacity)
         increase_arr_bullets_capacity(world);
     pos.x += 0.4 * sin(angle);
@@ -58,5 +62,6 @@ void shoot_bullet(world_t* world, point_t pos, double angle, float time_elapsed,
     world->bullet_array.array[world->bullet_array.len].radius = 0.01;
     world->bullet_array.array[world->bullet_array.len].host = host;
     world->bullet_array.array[world->bullet_array.len].damage = damage;
+    world->bullet_array.array[world->bullet_array.len].type = type;
     world->bullet_array.len++;
 }
