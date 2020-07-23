@@ -82,20 +82,12 @@ void draw_enemies(world_t* world) {
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t* enemy = &world->enemy_array.array[i];
         int tex_id = 1;
-        double d_angle = enemy->angle - player->angle;
-        while (fabs(d_angle) > 2 * M_PI) {
-            if (d_angle > 0) {
-                d_angle -= 2 * M_PI;
-            }
-            else {
-                d_angle += 2 * M_2_PI;
-            }
-        }
-        add_watch("d_angle", d_angle);
+        double d_angle = normilize_angle(enemy->angle - player->angle);
         if (fabs(d_angle) > M_PI) {
             d_angle = 2 * M_PI - d_angle;
             d_angle *= (-1);
         }
+        add_watch("d_angle", d_angle);
 
         if (d_angle <= M_PI_4 + M_PI_2 && d_angle >= M_PI_4){
             tex_id = 3;
