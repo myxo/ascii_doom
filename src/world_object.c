@@ -123,6 +123,8 @@ void init_player(world_t* world) {
     world_global->player.regen = 1;
     world->player.radius = 0.2;
     world->player.angle = M_PI_4;
+    world->player.angular_speed_multi = 1;
+    world->player.angular_acceleration = 2;
 }
 
 int init_world_object() {

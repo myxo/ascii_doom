@@ -21,7 +21,14 @@ void move_player(int forward, int right, float time_elapsed) {
 
 void turn_player(int dir, double time_elapsed) {
     world_t* world = get_world();
+    world->player.angular_speed *= world->player.angular_speed_multi;
     world->player.angle += dir * time_elapsed * world->player.angular_speed;
+    world->player.angular_speed_multi += time_elapsed * world->player.angular_acceleration;
+}
+
+void reset_player_angular_speed() {
+    world_t* world = get_world();
+    world->player.angular_speed_multi = 1;
 }
 
 void player_hit(double damage) {

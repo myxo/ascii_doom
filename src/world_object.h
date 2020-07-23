@@ -43,6 +43,8 @@ typedef struct {
     double angular_speed;
     double radius;
     double regen;
+    double angular_speed_multi;
+    double angular_acceleration;
 } player_t;
 
 typedef struct {
