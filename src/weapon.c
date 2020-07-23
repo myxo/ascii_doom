@@ -80,7 +80,6 @@ void init_pistol(weapon_t* pistol) {
     pistol->shot_delay = 0;
     pistol->reload_delay = 4 / pistol->fire_rate;
     pistol->fire_sound = olc_load_sound("dspistol.wav");
-
 }
 
 void init_rifle(weapon_t* rifle) {
