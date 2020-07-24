@@ -48,6 +48,7 @@ typedef struct {
     texture_t wall;
     texture_t bullet;
     texture_t mob1;
+    texture_t door;
     texture_t drop1;
     texture_t drop2;
     texture_t barrel;
@@ -59,6 +60,7 @@ typedef struct {
     sprite_t* bullet_rifle;
     sprite_t* bullet_caco;
     sprite_t* mob1;
+    sprite_t* door;
     sprite_t* mob1_back;
     sprite_t* mob1_side1;
     sprite_t* mob1_side2;
@@ -93,6 +95,11 @@ typedef enum bullet_host {
     kBulletPlayer,
     kBulletEnemy
 } bullet_host_t;
+
+typedef enum door_status {
+    DOOR_OPEN,
+    DOOR_CLOSE
+} door_status_t;
 
 typedef enum bullet_type {
     CACODEMON,
@@ -149,6 +156,19 @@ typedef struct {
     int len;
     int capacity;
 } barrel_array_t;
+
+typedef struct {
+    point_t pos;
+    door_status_t status;
+    double speed_shift_movement_x;
+    double speed_shift_movement_y;
+} door_t;
+
+typedef struct {
+    door_t* array;
+    int len;
+    int capacity;
+} door_array_t;
 
 typedef struct {
     point_t pos;
@@ -211,6 +231,8 @@ typedef struct {
     int caco_death_sound_id;
     int item_pickup_id;
     int item_spawn_id;
+    int door_open_id;
+    int door_close_id;
 } sound_effects_t;
 
 typedef struct {
@@ -227,6 +249,7 @@ typedef struct {
     double** z_buffer;
     game_textures_t textures;
     game_sprites_t sprites;
+    door_array_t door_array;
     music_array_t music;
     sound_effects_t sound_effects;
     int is_mute;
@@ -236,10 +259,13 @@ typedef struct {
     double pistol_ammo;
     double rifle_ammo;
     double rocket_ammo;
+    double** door_shift_map_x;
+    double** door_shift_map_y;
 } world_t;
 
 void init_player(world_t* world);
 int init_world_object();
+void init_door_array(world_t* world, int capacity);
 void deinit_world_object();
 void init_z_buffer();
 void deinit_z_buffer();
@@ -247,6 +273,7 @@ world_t* get_world();
 int read_map_for_file();
 int is_in_circle(point_t pos, point_t circle_center, double radius);
 int is_wall(double x, double y);
+int is_door(double x, double y);
 int is_wall_in_radius(double x, double y, double radius);
 int is_bullet(double x, double y);
 int is_player(double x, double y);
@@ -260,7 +287,10 @@ void spawn_barrels();
 point_array_t init_point_array(int capacity);
 void increase_arr_point_capacity(point_array_t* point_array);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance);
+int has_door_between(point_t pos1, point_t pos2);
+int is_door_in_radius(double x, double y, double radius);
 void update_world_from_config();
+void update_doors_status(world_t* world);
 void play_sound(int id);
 
 #endif

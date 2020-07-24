@@ -184,7 +184,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         if (enemy->type == shooter) {
             if (angle_to_player > start_enemy_view_angle && angle_to_player < stop_enemy_view_angle) {
                 double distance_to_player = get_distance_from_pos1_to_pos2(enemy->pos, world->player.pos);
-                if (!has_wall_between(enemy->pos, world->player.pos)) {
+                if (!has_door_between(enemy->pos, world->player.pos)) {
                     if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                         enemy->time_from_last_shot = 0;
                         shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34, CACODEMON);
@@ -215,7 +215,8 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall(new_pos.x, new_pos.y)) {
+            int reach_local_target = is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius);
+            if (!is_wall(new_pos.x, new_pos.y) && !reach_local_target && (!is_door(new_pos.x, new_pos.y) && !reach_local_target || enemy->type == hound)) {
                 enemy->pos = new_pos;
             } else {
                 // Dirty hack. Push enemy to the center of tile, there is no wall it want to go through
@@ -223,7 +224,6 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 enemy->pos.y = (int)enemy->pos.y + 0.5;
             }
 
-            int reach_local_target = is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius);
             if (reach_local_target) {
                 enemy->local_target_id++;
             }

@@ -103,6 +103,7 @@ graph_of_rooms_t read_graph_from_file(char* name_file) {
     FILE* fgraph = fopen(name_file, "r");
     int n;
     fscanf(fgraph, "%d", &n);
+    init_door_array(get_world(), n * 2);
     node_of_room_t** array_of_rooms = malloc((n + 1) * sizeof(node_of_room_t*));
     int* is_exist = malloc((n + 1) * sizeof(int));
     for (int i = 0; i < n + 1; i++)
@@ -267,6 +268,19 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     }
     point_t cur;
     char marker = ' ';
+    door_t temp_door;
+    temp_door.pos.x = (int)stop_door.y;
+    temp_door.pos.y = (int)stop_door.x;
+    if (temp_door.pos.x <= 0 || temp_door.pos.x >= get_world()->map_height || map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
+        temp_door.speed_shift_movement_x = 0.1;
+        temp_door.speed_shift_movement_y = 0;
+    }
+    else if (temp_door.pos.y <= 0 || temp_door.pos.y >= get_world()->map_height || map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
+        temp_door.speed_shift_movement_x = 0;
+        temp_door.speed_shift_movement_y = 0.1;
+    }
+    temp_door.status = DOOR_CLOSE;
+    get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
     for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
             break;
@@ -279,6 +293,21 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         }
         else {
             map[(int)cur.y][(int)cur.x] = marker;
+        }
+        if (pred[(int)cur.x][(int)cur.y].x == -1 && pred[(int)cur.x][(int)cur.y].y == -1) {
+            temp_door;
+            temp_door.pos.x = (int)cur.y;
+            temp_door.pos.y = (int)cur.x;
+            if (map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
+                temp_door.speed_shift_movement_x = 0.1;
+                temp_door.speed_shift_movement_y = 0;
+            }
+            else if (map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
+                temp_door.speed_shift_movement_x = 0;
+                temp_door.speed_shift_movement_y = 0.1;
+            }
+            temp_door.status = DOOR_CLOSE;
+            get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
         }
     }
     return map;
@@ -375,7 +404,24 @@ void create_map(world_t* world) {
     for (int i = 0; i < height; i++) {
         fprintf(log_file(), "%s\n", map[i]);
     }
+    for (int i = 0; i < world->door_array.len; i++) {
+        map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 'd';
+    }
     world->map = map;
     world->map_height = height;
     world->map_width = width;
+    world->door_shift_map_x = malloc(world->map_height * sizeof(double*));
+    for (int i = 0; i < world->map_height; i++) {
+        world->door_shift_map_x[i] = malloc(world->map_width * sizeof(double));
+        for (int j = 0; j < world->map_width; j++) {
+            world->door_shift_map_x[i][j] = 0;
+        }
+    }
+    world->door_shift_map_y = malloc(world->map_height * sizeof(double*));
+    for (int i = 0; i < world->map_height; i++) {
+        world->door_shift_map_y[i] = malloc(world->map_width * sizeof(double));
+        for (int j = 0; j < world->map_width; j++) {
+            world->door_shift_map_y[i][j] = 0;
+        }
+    }
 }

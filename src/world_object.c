@@ -57,6 +57,12 @@ void init_bullet_array(world_t* world, int capacity) {
     world_global->bullet_array.array = malloc(world_global->bullet_array.capacity * sizeof(bullet_t));
 }
 
+void init_door_array(world_t* world, int capacity) {
+    world_global->door_array.capacity = capacity;
+    world_global->door_array.len = 0;
+    world_global->door_array.array = malloc(world_global->door_array.capacity * sizeof(door_t));
+}
+
 void init_rocket_array(int capacity) {
     world_global->rocket_array.capacity = capacity;
     world_global->rocket_array.len = 0;
@@ -102,6 +108,8 @@ void init_sound_effects() {
     world_global->sound_effects.caco_pain_sound_id = olc_load_sound("dsdmpain.wav");
     world_global->sound_effects.item_pickup_id = olc_load_sound("dsitemup.wav");
     world_global->sound_effects.item_spawn_id = olc_load_sound("dsitmbk.wav");
+    world_global->sound_effects.door_open_id = olc_load_sound("dsbdopn.wav");
+    world_global->sound_effects.door_close_id = olc_load_sound("dsbdcls.wav");
 }
   
 void init_drop_array(world_t* world, int capacity) {
@@ -128,6 +136,7 @@ void init_sprites(world_t* world) {
     world_global->sprites.bullet_rifle = malloc(sizeof(sprite_t));
     world_global->sprites.bullet_caco = malloc(sizeof(sprite_t));
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
+    world_global->sprites.door = malloc(sizeof(sprite_t));
     world_global->sprites.mob1_back = malloc(sizeof(sprite_t));
     world_global->sprites.mob1_side1 = malloc(sizeof(sprite_t));
     world_global->sprites.mob1_side2 = malloc(sizeof(sprite_t));
@@ -139,6 +148,7 @@ void init_sprites(world_t* world) {
     init_sprite(world_global->sprites.bullet_rifle);
     init_sprite(world_global->sprites.bullet_caco);
     init_sprite(world_global->sprites.mob1);
+    init_sprite(world_global->sprites.door);
     init_sprite(world_global->sprites.mob1_back);
     init_sprite(world_global->sprites.mob1_side1);
     init_sprite(world_global->sprites.mob1_side2);
@@ -155,6 +165,8 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.mob1_side1, world->textures.mob1);
     load_texture_from_file("mob1_side2.tex", &world->textures.mob1);
     attach_texture_to_sprite(world->sprites.mob1_side2, world->textures.mob1);
+    load_texture_from_file("door1.tex", &world->textures.door);
+    attach_texture_to_sprite(world->sprites.door, world->textures.door);
     load_texture_from_file("bullet1.tex", &world->textures.bullet);
     attach_texture_to_sprite(world->sprites.bullet_pistol, world->textures.bullet);
     load_texture_from_file("bullet2.tex", &world->textures.bullet);
@@ -207,6 +219,12 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
+    for (int i = 0; i < world_global->map_height; i++) {
+        free(world_global->door_shift_map_x[i]);
+        free(world_global->door_shift_map_y[i]);
+    }
+    free(world_global->door_shift_map_x);
+    free(world_global->door_shift_map_y);
     deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
@@ -256,9 +274,25 @@ int is_wall(double x, double y) {
     return world_global->map[(int)x][(int)y] == '#';
 }
 
+int is_door(double x, double y) {
+    if (x < 0 || y < 0)
+        return 1;
+    if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
+        return 1;
+    double shift_x = world_global->door_shift_map_x[(int)x][(int)y];
+    double shift_y = world_global->door_shift_map_y[(int)x][(int)y];
+    return world_global->map[(int)(x + shift_x)][(int)(y + shift_y)] == 'd';
+}
+
 int is_wall_in_radius(double x, double y, double radius) {
     int result = is_wall(x + radius, y - radius) || is_wall(x - radius, y + radius)
         || is_wall(x + radius, y + radius) || is_wall(x - radius, y - radius);
+    return result;
+}
+
+int is_door_in_radius(double x, double y, double radius) {
+    int result = is_door(x + radius, y - radius) || is_door(x - radius, y + radius)
+        || is_door(x + radius, y + radius) || is_door(x - radius, y - radius);
     return result;
 }
 
@@ -364,8 +398,73 @@ int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d
     return 1;
 }
 
+int has_door_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance) {
+    double x = pos1.x;
+    double y = pos1.y;
+    while (!is_door(x, y)) {
+        x += d_distance * sin(angle);
+        y += d_distance * cos(angle);
+        point_t pos = { x, y };
+        if (is_in_circle(pos, pos2, 0.1)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int has_wall_between(point_t pos1, point_t pos2) {
     return has_wall_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);
+}
+
+int has_door_between(point_t pos1, point_t pos2) {
+    return has_door_between_by_angle(pos1, pos2, get_angle_from_pos1_to_pos2(pos1, pos2), 0.1);
+}
+
+void update_doors_status(world_t* world) {
+    for (int i = 0; i < world->door_array.len; i++) {
+        int nobody_near = 1;
+        for (int en = 0; en < world->enemy_array.len; en++) {
+            if (world->enemy_array.array[en].type == hound && is_in_circle(world->enemy_array.array[en].pos, world->door_array.array[i].pos, 2)) {
+                if (world->door_array.array[i].status == DOOR_CLOSE)
+                    olc_play_sound(world->sound_effects.door_open_id);
+                world->door_array.array[i].status = DOOR_OPEN;
+                nobody_near = 0;
+            }
+        }
+        if (is_in_circle(world->player.pos, world->door_array.array[i].pos, 2)) {
+            if (world->door_array.array[i].status == DOOR_CLOSE)
+                olc_play_sound(world->sound_effects.door_open_id);
+            world->door_array.array[i].status = DOOR_OPEN;
+            nobody_near = 0;
+        }
+        if (nobody_near) {
+            if (world->door_array.array[i].status == DOOR_OPEN)
+                olc_play_sound(world->sound_effects.door_close_id);
+            world->door_array.array[i].status = DOOR_CLOSE;
+        }
+        int  x = (int)world->door_array.array[i].pos.x;
+        int  y = (int)world->door_array.array[i].pos.y;
+        if (world->door_array.array[i].status == DOOR_CLOSE) {
+            if (world->door_shift_map_x[x][y] > 0.1)
+                world->door_shift_map_x[x][y] -= world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[x][y] > 0.1)
+                world->door_shift_map_y[x][y] -= world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[x][y] <= 0.1)
+                world->door_shift_map_x[x][y] = 0;
+            if (world->door_shift_map_y[x][y] <= 0.1)
+                world->door_shift_map_y[x][y] = 0;
+        }
+        if (world->door_array.array[i].status == DOOR_OPEN) {
+            if (world->door_shift_map_x[x][y] < 0.9)
+                world->door_shift_map_x[x][y] += world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[x][y] < 0.9)
+                world->door_shift_map_y[x][y] += world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[x][y] >= 0.9)
+                world->door_shift_map_x[x][y] = 1;
+            if (world->door_shift_map_y[x][y] >= 0.9)
+                world->door_shift_map_y[x][y] = 1;
+        }
+    }
 }
 
 void update_world_from_config() {

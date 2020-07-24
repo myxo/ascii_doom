@@ -176,10 +176,22 @@ void draw_screen(world_t* world) {
         double ray_sin = sin(ray_angle);
         double ray_cos = cos(ray_angle);
         int bullet_height = 0;
-        while (!is_wall(x, y)) {
+        enum ray_target_e {
+            wall,
+            door
+        } ray_target;
+        while (1) {
             x += d_distance * ray_sin;
             y += d_distance * ray_cos;
             distance += d_distance;
+            if (is_wall(x, y)) {
+                ray_target = wall;
+                break;
+            }
+            if (is_door(x, y)) {
+                ray_target = door;
+                break;
+            }
         }
         int num_of_wall_sym = (int)(height * (1 / (distance)));
         if (num_of_wall_sym > height)
@@ -191,12 +203,15 @@ void draw_screen(world_t* world) {
         double sprite_x;
         if (dy > dx) {
             sprite_x = fabs(y - (int)(y));
-            if (is_wall(x - 0.2, y)) {
+            if (ray_target == wall && is_wall(x - 0.2, y)) {
+                sprite_x = 1 - sprite_x;
+            }
+            if (ray_target == door && is_door(x - 0.2, y)) {
                 sprite_x = 1 - sprite_x;
             }
         } else {
             sprite_x = fabs(x - (int)(x));
-            if (is_wall(x, y + 0.2)) {
+            if (ray_target == door && is_door(x, y + 0.2)) {
                 sprite_x = 1 - sprite_x;
             }
         }
@@ -205,7 +220,10 @@ void draw_screen(world_t* world) {
         }
         for (int i = ceiling_level; i < floor_level; i++) {
             double sprite_y = (i - ceiling_level) / (double)num_of_wall_sym;
-            olc_draw(row, i, '#', sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
+            if (ray_target == wall)
+                olc_draw(row, i, '#', sample_sprite_color(sprite_x, sprite_y, world->sprites.wall, 0));
+            if (ray_target == door)
+                olc_draw(row, i, '#', sample_sprite_color(sprite_x, sprite_y, world->sprites.door, 0));
             world->z_buffer[row][i] = distance;
         }
         for (int i = floor_level; i < height; i++) {
@@ -268,6 +286,9 @@ void draw_minimap(world_t* world) {
 
     olc_draw((int)world->player.pos.x, world->map_width - (int)world->player.pos.y - 1, '@', FG_GREEN);
 
+    for (int i = 0; i < world->door_array.len; i++) {
+        olc_draw((int)world->door_array.array[i].pos.x, world->map_width - (int)world->door_array.array[i].pos.y - 1, '8', FG_MAGENTA + BG_MAGENTA);
+    }
     for (int i = 0; i < world->enemy_array.len; i++) {
         enemy_t * enemy = &world->enemy_array.array[i];
         short color = enemy->type == shooter ? FG_GREEN : FG_RED;

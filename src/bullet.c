@@ -25,7 +25,7 @@ void bullets_movement(world_t* world, float time_elapsed) {
         new_x += time_elapsed * world->bullet_array.array[i].speed * sin(world->bullet_array.array[i].angle);
         double new_y = world->bullet_array.array[i].pos.y;
         new_y += time_elapsed * world->bullet_array.array[i].speed * cos(world->bullet_array.array[i].angle);
-        if (!is_wall(new_x, new_y)) {
+        if (!is_wall(new_x, new_y) && !is_door(new_x, new_y)) {
             world->bullet_array.array[i].pos.x = new_x;
             world->bullet_array.array[i].pos.y = new_y;
         }
