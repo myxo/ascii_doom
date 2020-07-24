@@ -74,7 +74,7 @@ void handle_player_movement(float time_elapsed) {
         set_active_weapon(get_world(), ROCKET_LAUNCHER);
     }
     if (get_world()->weapon_list->is_reloading != 1) {
-        if (olc_get_key('R').held) {
+        if (olc_get_key('R').held || (get_active_weapon(get_world())->magazine_bullets <= 0 && get_active_weapon(get_world())->bullets > 0)) {
             get_world()->weapon_list->time_since_last_reload = 0;
             get_world()->weapon_list->is_reloading = 1;
         }

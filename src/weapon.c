@@ -151,3 +151,16 @@ void update_time_since_reload(world_t* world, float time_elapsed) {
 void set_active_weapon(world_t* world, enum GUN weapon) {
     world->weapon_list->active_weapon = weapon;
 }
+
+weapon_t* get_active_weapon(world_t* world) {
+    if (world->weapon_list->active_weapon == PISTOL) {
+        return world->weapon_list->pistol;
+    }
+    else if (world->weapon_list->active_weapon == RIFLE) {
+        return world->weapon_list->rifle;
+    }
+    else if (world->weapon_list->active_weapon == ROCKET_LAUNCHER) {
+        return world->weapon_list->rocket_launcher;
+    }
+    return world->weapon_list->rocket_launcher;
+}
