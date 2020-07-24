@@ -215,7 +215,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall_in_radius(new_pos.x, new_pos.y, enemy->radius)) {
+            if (!is_wall(new_pos.x, new_pos.y)) {
                 enemy->pos = new_pos;
             } else {
                 // Dirty hack. Push enemy to the center of tile, there is no wall it want to go through
