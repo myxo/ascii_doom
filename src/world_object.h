@@ -53,6 +53,13 @@ typedef struct {
     texture_t mob1;
     texture_t drop1;
     texture_t drop2;
+    texture_t Aletter;
+    texture_t Mletter;
+    texture_t Oletter;
+    texture_t Hletter;
+    texture_t Eletter;
+    texture_t Lletter;
+    texture_t Tletter;
 } game_textures_t;
 
 typedef struct {
@@ -61,6 +68,13 @@ typedef struct {
     sprite_t* mob1;
     sprite_t* drop1;
     sprite_t* drop2;
+    sprite_t* Aletter;
+    sprite_t* Mletter;
+    sprite_t* Oletter;
+    sprite_t* Hletter;
+    sprite_t* Eletter;
+    sprite_t* Lletter;
+    sprite_t* Tletter;
 } game_sprites_t;
 
 

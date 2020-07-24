@@ -225,15 +225,29 @@ void draw_minimap(world_t* world) {
     }
 }
 
+void draw_bottom_ui(world_t* world) {
+
+}
+
 void draw_hp(world_t* world) {
+   /* int x = 15;
+    int y = 5;
+    draw_pure_sprite(world->sprites.Hletter, 0, 0, olc_screen_height() - y - 8, 8, 8);
+    draw_pure_sprite(world->sprites.Eletter, 0, 9, olc_screen_height() - y - 8, 8, 8);
+    draw_pure_sprite(world->sprites.Aletter, 0, 18, olc_screen_height() - y - 8, 8, 8);
+    draw_pure_sprite(world->sprites.Lletter, 0, 27, olc_screen_height() - y - 8, 8, 8);
+    draw_pure_sprite(world->sprites.Tletter, 0, 36, olc_screen_height() - y - 8, 8, 8);
+    draw_pure_sprite(world->sprites.Hletter, 0, 45, olc_screen_height() - y - 8, 8, 8);
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
-    add_watch("width", width);
     double hp1 = (world->player.health * width) / world->player.maxhealth;
-    olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
-    olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
+    olc_fill(x, olc_screen_height() - height - y, width + x, olc_screen_height() - y, ' ', BG_RED);
+    olc_fill(x, olc_screen_height() - height - y, (int)round(hp1) + x, olc_screen_height() - y, ' ', BG_GREEN + FG_WHITE);*/
 }
+
 void draw_bullets_counter(world_t* world) {
+    /*int x = 15;
+    int y = olc_screen_height() / 16 + 10;
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
     double bullet;
@@ -249,7 +263,19 @@ void draw_bullets_counter(world_t* world) {
     if (bullet > width) {
         bullet = width;
     }
-    olc_fill(0, olc_screen_height() - (height * 2), (int)round(bullet), olc_screen_height() - height, ' ', BG_YELLOW);
+    olc_fill(x, olc_screen_height() - height - y, (int)round(bullet) + x, olc_screen_height() - y, ' ', BG_YELLOW);*/
+}
+
+void draw_pure_sprite(sprite_t* sprite, int texture_id, int x, int y, int height, int width) {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            double i_d = (double)i / (double)(width - 1);
+            double j_d = (double)j / (double)(width - 1);
+            char ch = sample_sprite_glyph(i_d, j_d, sprite, texture_id);
+            if (ch != 0)
+                olc_draw(x + i, y + j, ch, sample_sprite_color(i_d, j_d, sprite, texture_id));
+        }
+    }
 }
 
 void draw_sprite(sprite_t* sprite, int texture_index, point_t pos, double obj_radis, double obj_height) {

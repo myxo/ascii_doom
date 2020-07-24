@@ -23,8 +23,8 @@
 
 
 int width =  200;
-int height = 120;
-int glyph_size =  8;
+int height = 150;
+int glyph_size = 8;
 const char config_filename[50] = "cfg.txt";
 
 int create() {
@@ -116,10 +116,9 @@ int update(float time_elapsed) {
         update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
         player_regen(time_elapsed);
-        add_watch("x", world->player.pos.x);
 
         draw_screen(world);
-        draw_minimap(world);
+        //draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();

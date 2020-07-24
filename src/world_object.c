@@ -100,11 +100,25 @@ void init_sprites(world_t* world) {
     world_global->sprites.mob1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop1 = malloc(sizeof(sprite_t));
     world_global->sprites.drop2 = malloc(sizeof(sprite_t));
+    world_global->sprites.Aletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Mletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Oletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Hletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Eletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Lletter = malloc(sizeof(sprite_t));
+    world_global->sprites.Tletter = malloc(sizeof(sprite_t));
     init_sprite(world_global->sprites.wall);
     init_sprite(world_global->sprites.bullet);
     init_sprite(world_global->sprites.mob1);
     init_sprite(world_global->sprites.drop1);
     init_sprite(world_global->sprites.drop2);
+    init_sprite(world_global->sprites.Aletter);
+    init_sprite(world_global->sprites.Mletter);
+    init_sprite(world_global->sprites.Oletter);
+    init_sprite(world_global->sprites.Hletter);
+    init_sprite(world_global->sprites.Eletter);
+    init_sprite(world_global->sprites.Lletter);
+    init_sprite(world_global->sprites.Tletter);
     load_texture_from_file("wall1.tex", &world->textures.wall);
     attach_texture_to_sprite(world->sprites.wall, world->textures.wall);
     load_texture_from_file("mob1.tex", &world->textures.mob1);
@@ -115,6 +129,20 @@ void init_sprites(world_t* world) {
     attach_texture_to_sprite(world->sprites.drop1, world->textures.drop1);
     load_texture_from_file("ammo.tex", &world->textures.drop2);
     attach_texture_to_sprite(world->sprites.drop2, world->textures.drop2);
+    load_texture_from_file("Alatter.tex", &world->textures.Aletter);
+    attach_texture_to_sprite(world->sprites.Aletter, world->textures.Aletter);
+    load_texture_from_file("Mletter.tex", &world->textures.Mletter);
+    attach_texture_to_sprite(world->sprites.Mletter, world->textures.Mletter);
+    load_texture_from_file("Oletter.tex", &world->textures.Oletter);
+    attach_texture_to_sprite(world->sprites.Oletter, world->textures.Oletter);
+    load_texture_from_file("Hletter.tex", &world->textures.Hletter);
+    attach_texture_to_sprite(world->sprites.Hletter, world->textures.Hletter);
+    load_texture_from_file("Eletter.tex", &world->textures.Eletter);
+    attach_texture_to_sprite(world->sprites.Eletter, world->textures.Eletter);
+    load_texture_from_file("Lletter.tex", &world->textures.Lletter);
+    attach_texture_to_sprite(world->sprites.Lletter, world->textures.Lletter);
+    load_texture_from_file("Tletter.tex", &world->textures.Tletter);
+    attach_texture_to_sprite(world->sprites.Tletter, world->textures.Tletter);
 }
 
 void init_player(world_t* world) {
