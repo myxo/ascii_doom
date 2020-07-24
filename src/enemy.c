@@ -188,7 +188,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                     if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                         enemy->time_from_last_shot = 0;
                         shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34, CACODEMON);
-                        olc_play_sound(world->sound_effects.caco_fire_sound_id);
+                        play_sound(world->sound_effects.caco_fire_sound_id);
                     }
                     if (distance_to_player <= 4) {
                         update_position = 0;
@@ -237,12 +237,12 @@ void enemy_destruct(world_t* world, int index) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
     world->enemy_array.len--;
-    olc_play_sound(world->sound_effects.caco_death_sound_id);
+    play_sound(world->sound_effects.caco_death_sound_id);
 }
 
 void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);
-    olc_play_sound(world->sound_effects.caco_pain_sound_id);
+    play_sound(world->sound_effects.caco_pain_sound_id);
 }

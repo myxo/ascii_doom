@@ -64,6 +64,10 @@ void handle_player_movement(float time_elapsed) {
     if (olc_get_key('D').held) {
         move_vec_y += 1;
     }
+    if (olc_get_key('M').pressed) {
+        get_world()->is_mute = !get_world()->is_mute;
+        olc_stop_all_samples();
+    }
     if (olc_get_key('1').pressed) {
         set_active_weapon(get_world(), PISTOL);
     }
@@ -123,7 +127,7 @@ int update(float time_elapsed) {
         enemy_movement(world, time_elapsed);
         drop_check(world);
 
-        update_music(world, time_elapsed);
+        update_music(world);
         update_life_time(world, time_elapsed);
         player_regen(time_elapsed);
         draw_screen(world);

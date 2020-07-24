@@ -1121,8 +1121,25 @@ protected: // Audio Engine =====================================================
 
 	void StopSample(int id)
 	{
-
+        for (auto iter = listActiveSamples.begin(); iter != listActiveSamples.end(); iter++) {
+            if (iter->nAudioSampleID == id)
+                iter->bFinished = true;
+        }
 	}
+
+    void StopAllSamples() {
+        for (auto iter = listActiveSamples.begin(); iter != listActiveSamples.end(); iter++) {
+            iter->bFinished = true;
+        }
+    }
+
+    bool isSamplePlaying(int id) {
+        for (auto iter = listActiveSamples.begin(); iter != listActiveSamples.end(); iter++) {
+            if (iter->nAudioSampleID == id)
+                return true;
+        }
+        return false;
+    }
 
 	// The audio system uses by default a specific wave format
 	bool CreateAudio(unsigned int nSampleRate = 44100, unsigned int nChannels = 1,

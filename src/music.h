@@ -1,6 +1,6 @@
 #ifndef MUSIC_H_
 #define MUSIC_H_
 
-void update_music(world_t* world, float time_elapsed);
+void update_music(world_t* world);
 
 #endif // !MUSIC_H_
