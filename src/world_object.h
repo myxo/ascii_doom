@@ -232,6 +232,8 @@ typedef struct {
     int caco_death_sound_id;
     int item_pickup_id;
     int item_spawn_id;
+    int door_open_id;
+    int door_close_id;
 } sound_effects_t;
 
 typedef struct {

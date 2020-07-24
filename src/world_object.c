@@ -105,6 +105,8 @@ void init_sound_effects() {
     world_global->sound_effects.caco_pain_sound_id = olc_load_sound("dsdmpain.wav");
     world_global->sound_effects.item_pickup_id = olc_load_sound("dsitemup.wav");
     world_global->sound_effects.item_spawn_id = olc_load_sound("dsitmbk.wav");
+    world_global->sound_effects.door_open_id = olc_load_sound("dsbdopn.wav");
+    world_global->sound_effects.door_close_id = olc_load_sound("dsbdcls.wav");
 }
   
 void init_drop_array(world_t* world, int capacity) {
@@ -414,15 +416,21 @@ void update_doors_status(world_t* world) {
         int nobody_near = 1;
         for (int en = 0; en < world->enemy_array.len; en++) {
             if (world->enemy_array.array[en].type == hound && is_in_circle(world->enemy_array.array[en].pos, world->door_array.array[i].pos, 2)) {
+                if (world->door_array.array[i].status == door_close)
+                    olc_play_sound(world->sound_effects.door_open_id);
                 world->door_array.array[i].status = door_open;
                 nobody_near = 0;
             }
         }
         if (is_in_circle(world->player.pos, world->door_array.array[i].pos, 2)) {
+            if (world->door_array.array[i].status == door_close)
+                olc_play_sound(world->sound_effects.door_open_id);
             world->door_array.array[i].status = door_open;
             nobody_near = 0;
         }
         if (nobody_near) {
+            if (world->door_array.array[i].status == door_open)
+                olc_play_sound(world->sound_effects.door_close_id);
             world->door_array.array[i].status = door_close;
         }
         if (world->door_array.array[i].status == door_close) {
