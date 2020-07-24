@@ -10,5 +10,7 @@ enum types_of_crate {
 
 void add_drop(world_t* world, point_t pos);
 void drop_check(world_t* world);
+void init_drop_spawner(world_t* world);
+void drop_timer(world_t* world, double time_elapsed);
 
 #endif

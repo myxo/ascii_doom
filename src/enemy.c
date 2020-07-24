@@ -232,7 +232,6 @@ void enemy_movement(world_t* world, float time_elapsed) {
 }
 
 void enemy_destruct(world_t* world, int index) {
-    add_drop(world, get_rand_pos_on_floor(world, 0.5));
     for (int i = index; i < world->enemy_array.len - 1; i++) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
