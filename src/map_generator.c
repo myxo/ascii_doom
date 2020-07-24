@@ -279,7 +279,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         temp_door.speed_shift_movement_x = 0;
         temp_door.speed_shift_movement_y = 0.1;
     }
-    temp_door.status = door_close;
+    temp_door.status = DOOR_CLOSE;
     get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
     for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
         if (cur.x < 0 || cur.y < 0)
@@ -306,7 +306,7 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
                 temp_door.speed_shift_movement_x = 0;
                 temp_door.speed_shift_movement_y = 0.1;
             }
-            temp_door.status = door_close;
+            temp_door.status = DOOR_CLOSE;
             get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
         }
     }

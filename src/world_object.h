@@ -97,8 +97,8 @@ typedef enum bullet_host {
 } bullet_host_t;
 
 typedef enum door_status {
-    door_open,
-    door_close
+    DOOR_OPEN,
+    DOOR_CLOSE
 } door_status_t;
 
 typedef enum bullet_type {

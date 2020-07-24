@@ -216,6 +216,12 @@ void deinit_world_object() {
         free(world_global->map[i]);
     }
     free(world_global->map);
+    for (int i = 0; i < world_global->map_height; i++) {
+        free(world_global->door_shift_map_x[i]);
+        free(world_global->door_shift_map_y[i]);
+    }
+    free(world_global->door_shift_map_x);
+    free(world_global->door_shift_map_y);
     deinit_explosion_array();
     deinit_std_weapon_list(world_global->weapon_list);
     deinit_sprite(world_global->sprites.wall);
@@ -416,42 +422,44 @@ void update_doors_status(world_t* world) {
         int nobody_near = 1;
         for (int en = 0; en < world->enemy_array.len; en++) {
             if (world->enemy_array.array[en].type == hound && is_in_circle(world->enemy_array.array[en].pos, world->door_array.array[i].pos, 2)) {
-                if (world->door_array.array[i].status == door_close)
+                if (world->door_array.array[i].status == DOOR_CLOSE)
                     olc_play_sound(world->sound_effects.door_open_id);
-                world->door_array.array[i].status = door_open;
+                world->door_array.array[i].status = DOOR_OPEN;
                 nobody_near = 0;
             }
         }
         if (is_in_circle(world->player.pos, world->door_array.array[i].pos, 2)) {
-            if (world->door_array.array[i].status == door_close)
+            if (world->door_array.array[i].status == DOOR_CLOSE)
                 olc_play_sound(world->sound_effects.door_open_id);
-            world->door_array.array[i].status = door_open;
+            world->door_array.array[i].status = DOOR_OPEN;
             nobody_near = 0;
         }
         if (nobody_near) {
-            if (world->door_array.array[i].status == door_open)
+            if (world->door_array.array[i].status == DOOR_OPEN)
                 olc_play_sound(world->sound_effects.door_close_id);
-            world->door_array.array[i].status = door_close;
+            world->door_array.array[i].status = DOOR_CLOSE;
         }
-        if (world->door_array.array[i].status == door_close) {
-            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] > 0.1)
-                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] -= world->door_array.array[i].speed_shift_movement_x;
-            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] > 0.1)
-                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] -= world->door_array.array[i].speed_shift_movement_y;
-            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] <= 0.1)
-                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 0;
-            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] <= 0.1)
-                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 0;
+        int  x = (int)world->door_array.array[i].pos.x;
+        int  y = (int)world->door_array.array[i].pos.y;
+        if (world->door_array.array[i].status == DOOR_CLOSE) {
+            if (world->door_shift_map_x[x][y] > 0.1)
+                world->door_shift_map_x[x][y] -= world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[x][y] > 0.1)
+                world->door_shift_map_y[x][y] -= world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[x][y] <= 0.1)
+                world->door_shift_map_x[x][y] = 0;
+            if (world->door_shift_map_y[x][y] <= 0.1)
+                world->door_shift_map_y[x][y] = 0;
         }
-        if (world->door_array.array[i].status == door_open) {
-            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] < 0.9)
-                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] += world->door_array.array[i].speed_shift_movement_x;
-            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] < 0.9)
-                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] += world->door_array.array[i].speed_shift_movement_y;
-            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] >= 0.9)
-                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 1;
-            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] >= 0.9)
-                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 1;
+        if (world->door_array.array[i].status == DOOR_OPEN) {
+            if (world->door_shift_map_x[x][y] < 0.9)
+                world->door_shift_map_x[x][y] += world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[x][y] < 0.9)
+                world->door_shift_map_y[x][y] += world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[x][y] >= 0.9)
+                world->door_shift_map_x[x][y] = 1;
+            if (world->door_shift_map_y[x][y] >= 0.9)
+                world->door_shift_map_y[x][y] = 1;
         }
     }
 }
