@@ -126,7 +126,7 @@ void add_hound_enemy(world_t* world) {
     }
     enemy_t * enemy = &world->enemy_array.array[world->enemy_array.len++];
 
-    enemy->health = 3;
+    enemy->health = 100;
     enemy->radius = 0.2;
     enemy->pos = get_rand_pos_on_floor(world, 2 * enemy->radius);
     enemy->global_target = world->player.pos;
@@ -153,7 +153,7 @@ void add_enemy(world_t* world, type_of_enemy_t type) {
 }
 
 void bite_player(world_t* world, double damage) {
-    player_hit(1);
+    player_hit(damage);
 }
 
 void enemy_movement(world_t* world, float time_elapsed) {
@@ -170,7 +170,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 if (enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
                     if (is_in_circle(enemy->pos, world->player.pos, 1))
-                        bite_player(world, 1);
+                        bite_player(world, 50);
                 }
                 update_position = 0;
             }

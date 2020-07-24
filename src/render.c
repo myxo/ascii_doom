@@ -4,6 +4,7 @@
 #include "render.h"
 #include "config.h"
 #include "logging.h"
+#include "weapon.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -285,17 +286,7 @@ void draw_bullets_counter(world_t* world) {
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
     double bullet;
-    weapon_t* weapon;
-    world->weapon_list->time_since_last_reload;
-    if (world->weapon_list->active_weapon == PISTOL) {
-        weapon = world->weapon_list->pistol;
-    }
-    else if (world->weapon_list->active_weapon == RIFLE) {
-        weapon = world->weapon_list->rifle;
-    }
-    else {
-        weapon = world->weapon_list->rocket_launcher;
-    }
+    weapon_t* weapon = get_active_weapon(world);
     double reload_animation = 0;
     if (world->weapon_list->is_reloading == 1) {
         double is_not_reloaded = 1;
@@ -310,7 +301,7 @@ void draw_bullets_counter(world_t* world) {
         bullet = width;
     }
     olc_fill(0, olc_screen_height() - (height * 2), (int)round(bullet), olc_screen_height() - height, ' ', BG_YELLOW);
-    bullet = ((weapon->bullets - reload_animation) * width) / (weapon->max_magazine_bullets * 10);
+    bullet = ((weapon->bullets) * width) / (weapon->max_magazine_bullets * 10);
     if (bullet > width) {
         bullet = width;
     }

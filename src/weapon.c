@@ -164,3 +164,13 @@ weapon_t* get_active_weapon(world_t* world) {
     }
     return world->weapon_list->rocket_launcher;
 }
+
+void check_reload(weapon_t* weapon, world_t* world, double time_elapsed) {
+    if (weapon->magazine_bullets <= 0 && weapon->bullets > 0) {
+        world->weapon_list->is_reloading = 1;
+    }
+    if (world->weapon_list->is_reloading == 1) {
+        update_time_since_reload(world, time_elapsed);
+        reload_active_weapon(world);
+    }
+}
