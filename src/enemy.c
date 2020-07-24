@@ -211,7 +211,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
-            if (!is_wall(new_pos.x, new_pos.y) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
+            if (!is_wall_in_radius(new_pos.x, new_pos.y, enemy->radius) && !is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
                 enemy->pos = new_pos;
             }
             if (is_in_circle(enemy->path.array[enemy->local_target_id], enemy->pos, enemy->radius)) {
