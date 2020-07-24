@@ -26,7 +26,7 @@ void rockets_movement(world_t* world, float time_elapsed) {
         double new_y = world->rocket_array.array[i].pos.y;
         new_y += time_elapsed * world->rocket_array.array[i].speed * cos(world->rocket_array.array[i].angle);
         int explode = 0;
-        if (!is_wall(new_x, new_y)) {
+        if (!is_wall(new_x, new_y) && !is_door(new_x, new_y)) {
             world->rocket_array.array[i].pos.x = new_x;
             world->rocket_array.array[i].pos.y = new_y;
         }
