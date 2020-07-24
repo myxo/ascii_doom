@@ -208,10 +208,10 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (delta >= 0.5) {
                 enemy->global_target = world->player.pos;
                 enemy->path = build_path(enemy);
-                enemy->local_target_id = 0;
+                enemy->local_target_id = 1;
                 enemy->last_player_pos = world->player.pos;
-                update_position = 1;
             }
+            update_position = 1;
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
