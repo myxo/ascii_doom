@@ -116,6 +116,7 @@ int update(float time_elapsed) {
         update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
         player_regen(time_elapsed);
+        add_watch("x", world->player.pos.x);
 
         draw_screen(world);
         draw_minimap(world);
@@ -132,6 +133,7 @@ int main() {
 		fprintf(stderr, "Cannot initialize olc");
 		return 0;
 	}
+    log_init("log.txt");
 	olc_register_create(&create);
     olc_register_update(&update);
     olc_enable_sound();

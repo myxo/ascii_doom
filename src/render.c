@@ -228,6 +228,7 @@ void draw_minimap(world_t* world) {
 void draw_hp(world_t* world) {
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
+    add_watch("width", width);
     double hp1 = (world->player.health * width) / world->player.maxhealth;
     olc_fill(0, olc_screen_height() - height, width, olc_screen_height(), ' ', BG_RED);
     olc_fill(0, olc_screen_height() - height, (int)round(hp1), olc_screen_height(), ' ', BG_GREEN + FG_WHITE);
