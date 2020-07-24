@@ -31,6 +31,12 @@ void olc_enable_sound();
 
 void olc_play_sound(int id);
 
+void olc_stop_sound(int id);
+
+void olc_stop_all_samples();
+
+int olc_is_sample_playing(int id);
+
 /**
  * @brief Получение состояния клавиши
  * @param id Идентификатор клавиши (https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)

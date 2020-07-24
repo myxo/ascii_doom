@@ -200,11 +200,10 @@ typedef struct {
 
 typedef struct {
     int* music_array;
-    float* duration_array;
     int len;
-    float current_music_time;
     int current_index;
-}music_array_t;
+    int current_id;
+} music_array_t;
 
 typedef struct {
     int caco_fire_sound_id;
@@ -230,6 +229,7 @@ typedef struct {
     game_sprites_t sprites;
     music_array_t music;
     sound_effects_t sound_effects;
+    int is_mute;
 
     drop_array_t drop_array;
     double first_aid_heal;

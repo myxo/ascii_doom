@@ -48,7 +48,8 @@ void make_explosion(world_t* world, point_t pos, double std_damage, double radiu
         }
     }
     add_explosion(world, pos, radius, 0.2);
-    olc_play_sound(world->explosion_array.explosion_sound);
+    if (!world->is_mute)
+        olc_play_sound(world->explosion_array.explosion_sound);
 }
 
 void update_life_time(world_t* world, float time_elapsed) {

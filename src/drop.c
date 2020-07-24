@@ -23,7 +23,8 @@ void add_drop(world_t* world, point_t pos) {
     world->drop_array.array[world->drop_array.len].radius = 0.2;
     world->drop_array.array[world->drop_array.len].pos = pos;
     world->drop_array.len++;
-    olc_play_sound(world->sound_effects.item_spawn_id);
+    if (!world->is_mute)
+        olc_play_sound(world->sound_effects.item_spawn_id);
 }
 
 void take_drop(world_t* world, int index) {
@@ -48,7 +49,8 @@ void take_drop(world_t* world, int index) {
         world->drop_array.array[i] = world->drop_array.array[i + 1];
     }
     world->drop_array.len--;
-    olc_play_sound(world->sound_effects.item_pickup_id);
+    if (!world->is_mute)
+        olc_play_sound(world->sound_effects.item_pickup_id);
 }
 
 void drop_check(world_t* world) {
