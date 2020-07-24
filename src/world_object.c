@@ -268,7 +268,9 @@ int is_door(double x, double y) {
         return 1;
     if ((int)x >= get_world()->map_height || (int)y >= get_world()->map_width)
         return 1;
-    return world_global->map[(int)x][(int)y] == 'd';
+    double shift_x = world_global->door_shift_map_x[(int)x][(int)y];
+    double shift_y = world_global->door_shift_map_y[(int)x][(int)y];
+    return world_global->map[(int)(x + shift_x)][(int)(y + shift_y)] == 'd';
 }
 
 int is_wall_in_radius(double x, double y, double radius) {
@@ -423,10 +425,26 @@ void update_doors_status(world_t* world) {
         if (nobody_near) {
             world->door_array.array[i].status = door_close;
         }
-        if (world->door_array.array[i].status == door_close)
-            world->map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 'd';
-        if (world->door_array.array[i].status == door_open)
-            world->map[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = ' ';
+        if (world->door_array.array[i].status == door_close) {
+            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] > 0.1)
+                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] -= world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] > 0.1)
+                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] -= world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] <= 0.1)
+                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 0;
+            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] <= 0.1)
+                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 0;
+        }
+        if (world->door_array.array[i].status == door_open) {
+            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] < 0.9)
+                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] += world->door_array.array[i].speed_shift_movement_x;
+            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] < 0.9)
+                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] += world->door_array.array[i].speed_shift_movement_y;
+            if (world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] >= 0.9)
+                world->door_shift_map_x[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 1;
+            if (world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] >= 0.9)
+                world->door_shift_map_y[(int)world->door_array.array[i].pos.x][(int)world->door_array.array[i].pos.y] = 1;
+        }
     }
 }
 

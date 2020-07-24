@@ -269,8 +269,16 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     point_t cur;
     char marker = ' ';
     door_t temp_door;
-    temp_door.pos.x = stop_door.y;
-    temp_door.pos.y = stop_door.x;
+    temp_door.pos.x = (int)stop_door.y;
+    temp_door.pos.y = (int)stop_door.x;
+    if (map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
+        temp_door.speed_shift_movement_x = 0.1;
+        temp_door.speed_shift_movement_y = 0;
+    }
+    else if (map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
+        temp_door.speed_shift_movement_x = 0;
+        temp_door.speed_shift_movement_y = 0.1;
+    }
     temp_door.status = door_close;
     get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
     for (cur = stop_door; !(cur.x == -1 && cur.y == -1); cur = pred[(int)cur.x][(int)cur.y]) {
@@ -288,8 +296,16 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
         }
         if (pred[(int)cur.x][(int)cur.y].x == -1 && pred[(int)cur.x][(int)cur.y].y == -1) {
             temp_door;
-            temp_door.pos.x = cur.y;
-            temp_door.pos.y = cur.x;
+            temp_door.pos.x = (int)cur.y;
+            temp_door.pos.y = (int)cur.x;
+            if (map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
+                temp_door.speed_shift_movement_x = 0.1;
+                temp_door.speed_shift_movement_y = 0;
+            }
+            else if (map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
+                temp_door.speed_shift_movement_x = 0;
+                temp_door.speed_shift_movement_y = 0.1;
+            }
             temp_door.status = door_close;
             get_world()->door_array.array[get_world()->door_array.len++] = temp_door;
         }
@@ -394,4 +410,18 @@ void create_map(world_t* world) {
     world->map = map;
     world->map_height = height;
     world->map_width = width;
+    world->door_shift_map_x = malloc(world->map_height * sizeof(double*));
+    for (int i = 0; i < world->map_height; i++) {
+        world->door_shift_map_x[i] = malloc(world->map_width * sizeof(double));
+        for (int j = 0; j < world->map_width; j++) {
+            world->door_shift_map_x[i][j] = 0;
+        }
+    }
+    world->door_shift_map_y = malloc(world->map_height * sizeof(double*));
+    for (int i = 0; i < world->map_height; i++) {
+        world->door_shift_map_y[i] = malloc(world->map_width * sizeof(double));
+        for (int j = 0; j < world->map_width; j++) {
+            world->door_shift_map_y[i][j] = 0;
+        }
+    }
 }

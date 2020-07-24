@@ -160,6 +160,8 @@ typedef struct {
 typedef struct {
     point_t pos;
     door_status_t status;
+    double speed_shift_movement_x;
+    double speed_shift_movement_y;
 } door_t;
 
 typedef struct {
@@ -255,6 +257,8 @@ typedef struct {
     double pistol_ammo;
     double rifle_ammo;
     double rocket_ammo;
+    double** door_shift_map_x;
+    double** door_shift_map_y;
 } world_t;
 
 void init_player(world_t* world);
