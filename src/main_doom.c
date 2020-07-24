@@ -130,6 +130,7 @@ int update(float time_elapsed) {
         draw_minimap(world);
         draw_hp(world);
         display_watch();
+        drop_timer(world, time_elapsed);
         draw_config_ui();
         drop_check(world);
         check_reload(get_active_weapon(world), world, time_elapsed);

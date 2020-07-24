@@ -59,3 +59,29 @@ void drop_check(world_t* world) {
         }
     }
 }
+
+void init_drop_spawner(world_t* world) {
+    world->drop_spawners[0] = get_rand_pos_on_floor(world, 1);
+    world->drop_spawners[1] = get_rand_pos_on_floor(world, 1);
+    world->drop_spawners[2] = get_rand_pos_on_floor(world, 1);
+    world->time_for_next_drop = 0;
+    world->time_since_last_drop = 0;
+}
+
+point_t get_rand_pos_around_point(point_t point) {
+    point_t pos;
+    do {
+        pos.x = rand() % 6 - 3 + point.x;
+        pos.y = rand() % 6 - 3 + point.y;
+    } while (is_wall_in_radius(pos.x, pos.y, 0.1));
+    return pos;
+}
+
+void drop_timer(world_t* world, double time_elapsed) {
+    world->time_since_last_drop += time_elapsed;
+    if (world->time_since_last_drop >= world->time_for_next_drop) {
+        add_drop(world, get_rand_pos_around_point(world->drop_spawners[rand() % 3]));
+        world->time_since_last_drop = 0;
+        world->time_for_next_drop = rand() % 30 + 5;
+    }
+}

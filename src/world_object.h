@@ -236,6 +236,10 @@ typedef struct {
     double pistol_ammo;
     double rifle_ammo;
     double rocket_ammo;
+
+    point_t drop_spawners[3];
+    double time_since_last_drop;
+    double time_for_next_drop;
 } world_t;
 
 void init_player(world_t* world);

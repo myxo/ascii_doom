@@ -8,6 +8,7 @@
 #include "config.h"
 #include "barrel.h"
 #include "map_generator.h"
+#include "drop.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -194,7 +195,7 @@ int init_world_object() {
     init_music_array();
     init_sound_effects();
     create_map(world_global);
-
+    init_drop_spawner(world_global);
     init_player(world_global);
     return 1;
 }
