@@ -65,12 +65,7 @@ void handle_player_movement(float time_elapsed) {
         move_vec_y += 1;
     }
     if (olc_get_key('M').pressed) {
-        if (get_world()->is_mute) {
-            get_world()->is_mute = 0;
-        }
-        else {
-            get_world()->is_mute = 1;
-        }
+        get_world()->is_mute = !get_world()->is_mute;
         olc_stop_all_samples();
     }
     if (olc_get_key('1').pressed) {

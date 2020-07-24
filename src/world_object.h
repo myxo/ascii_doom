@@ -261,5 +261,7 @@ point_array_t init_point_array(int capacity);
 void increase_arr_point_capacity(point_array_t* point_array);
 int has_wall_between_by_angle(point_t pos1, point_t pos2, double angle, double d_distance);
 void update_world_from_config();
+void play_sound(int id);
 
 #endif
+

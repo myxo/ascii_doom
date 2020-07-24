@@ -4,7 +4,7 @@
 #include "logging.h"
 
 void update_music(world_t* world) {
-    if (!olc_is_sample_playing(world->music.current_id) && !world->is_mute) {
+    if (!olc_is_sample_playing(world->music.current_id)) {
         int index = world->music.current_index;
         index++;
         if (index >= world->music.len) {
@@ -12,6 +12,6 @@ void update_music(world_t* world) {
         }
         world->music.current_index = index;
         world->music.current_id = world->music.music_array[world->music.current_index];
-        olc_play_sound(world->music.current_id);
+        play_sound(world->music.current_id);
     }
 }

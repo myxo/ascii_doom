@@ -27,7 +27,12 @@ void init_music_array() {
     world_global->music.current_index = 0;
     world_global->music.current_id = world_global->music.music_array[world_global->music.current_index];
     world_global->is_mute = 0;
-    olc_play_sound(world_global->music.current_id);
+    play_sound(world_global->music.current_id);
+}
+
+void play_sound(int id) {
+    if (!world_global->is_mute)
+        olc_play_sound(id);
 }
 
 void deinit_music_array() {

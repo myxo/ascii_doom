@@ -43,8 +43,7 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
             else {
                 shoot_rocket(get_world(), get_world()->player.pos, get_world()->player.angle, weapon->host, weapon->damage, weapon->expl_radius);
             }
-            if (!get_world()->is_mute)
-                olc_play_sound(weapon->fire_sound);
+            play_sound(weapon->fire_sound);
             weapon->shot_delay = 1 / weapon->fire_rate;
             *time_since_last_shot = 0;
         }

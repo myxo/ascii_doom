@@ -1,4 +1,4 @@
-#ifndef RENDER_H_
+ #ifndef RENDER_H_
 #define RENDER_H_
 
 typedef struct {
