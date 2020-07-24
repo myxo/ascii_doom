@@ -125,9 +125,7 @@ int update(float time_elapsed) {
 
         update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
-        if (world->player.health < world->player.maxhealth) {
-            player_regen(time_elapsed);
-        }
+        player_regen(time_elapsed);
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
