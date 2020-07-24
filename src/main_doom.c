@@ -125,20 +125,15 @@ int update(float time_elapsed) {
 
         update_music(world, time_elapsed);
         update_life_time(world, time_elapsed);
-        if (world->player.health < world->player.maxhealth) {
-            player_regen(time_elapsed);
-        }
+        player_regen(time_elapsed);
         draw_screen(world);
         draw_minimap(world);
         draw_hp(world);
         display_watch();
         draw_config_ui();
         drop_check(world);
+        check_reload(get_active_weapon(world), world, time_elapsed);
         draw_bullets_counter(world);
-        if (world->weapon_list->is_reloading == 1) {
-            update_time_since_reload(world, time_elapsed);
-            reload_active_weapon(world);
-        }
     }
     return 1;
 }
