@@ -4,6 +4,7 @@
 #include "render.h"
 #include "config.h"
 #include "logging.h"
+#include "weapon.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -306,22 +307,22 @@ void draw_bullets_counter(world_t* world) {
     int height = olc_screen_height() / 16;
     int width = olc_screen_width() / 3;
     double bullet;
-    weapon_t* weapon;
-    if (world->weapon_list->active_weapon == PISTOL) {
-        weapon = world->weapon_list->pistol;
+    weapon_t* weapon = get_active_weapon(world);
+    double reload_animation = 0;
+    if (world->weapon_list->is_reloading == 1) {
+        double is_not_reloaded = 1;
+        reload_animation = (world->weapon_list->time_since_last_reload / weapon->reload_delay) * (1 - weapon->magazine_bullets / weapon->max_magazine_bullets) * weapon->max_magazine_bullets;
+        if (weapon->bullets + weapon->magazine_bullets < weapon->max_magazine_bullets) {
+            reload_animation *= weapon->bullets + weapon->magazine_bullets / weapon->max_magazine_bullets;
+        }
     }
-    else if (world->weapon_list->active_weapon == RIFLE){
-        weapon = world->weapon_list->rifle;
-    }
-    else {
-        weapon = world->weapon_list->rocket_launcher;
-    }
-    bullet = (weapon->magazine_bullets * width) / weapon->max_magazine_bullets;
+    weapon->reload_delay;
+    bullet = ((weapon->magazine_bullets + reload_animation) * width) / weapon->max_magazine_bullets;
     if (bullet > width) {
         bullet = width;
     }
     olc_fill(0, olc_screen_height() - (height * 2), (int)round(bullet), olc_screen_height() - height, ' ', BG_YELLOW);
-    bullet = (weapon->bullets * width) / (weapon->max_magazine_bullets * 10);
+    bullet = ((weapon->bullets) * width) / (weapon->max_magazine_bullets * 10);
     if (bullet > width) {
         bullet = width;
     }

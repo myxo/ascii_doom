@@ -43,6 +43,7 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
             else {
                 shoot_rocket(get_world(), get_world()->player.pos, get_world()->player.angle, weapon->host, weapon->damage, weapon->expl_radius);
             }
+            play_sound(weapon->fire_sound);
             weapon->shot_delay = 1 / weapon->fire_rate;
             *time_since_last_shot = 0;
         }
@@ -50,9 +51,6 @@ void shoot_from_weapon(weapon_t* weapon, double* time_since_last_shot) {
             get_world()->weapon_list->time_since_last_reload = 0;
             get_world()->weapon_list->is_reloading = 1;
         }
-        olc_play_sound(weapon->fire_sound);
-        weapon->shot_delay = 1 / weapon->fire_rate;
-        *time_since_last_shot = 0;
     }
 }
 
@@ -150,4 +148,27 @@ void update_time_since_reload(world_t* world, float time_elapsed) {
 
 void set_active_weapon(world_t* world, enum GUN weapon) {
     world->weapon_list->active_weapon = weapon;
+}
+
+weapon_t* get_active_weapon(world_t* world) {
+    if (world->weapon_list->active_weapon == PISTOL) {
+        return world->weapon_list->pistol;
+    }
+    else if (world->weapon_list->active_weapon == RIFLE) {
+        return world->weapon_list->rifle;
+    }
+    else if (world->weapon_list->active_weapon == ROCKET_LAUNCHER) {
+        return world->weapon_list->rocket_launcher;
+    }
+    return world->weapon_list->rocket_launcher;
+}
+
+void check_reload(weapon_t* weapon, world_t* world, double time_elapsed) {
+    if (weapon->magazine_bullets <= 0 && weapon->bullets > 0) {
+        world->weapon_list->is_reloading = 1;
+    }
+    if (world->weapon_list->is_reloading == 1) {
+        update_time_since_reload(world, time_elapsed);
+        reload_active_weapon(world);
+    }
 }

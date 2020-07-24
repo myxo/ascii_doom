@@ -126,7 +126,7 @@ void add_hound_enemy(world_t* world) {
     }
     enemy_t * enemy = &world->enemy_array.array[world->enemy_array.len++];
 
-    enemy->health = 3;
+    enemy->health = 100;
     enemy->radius = 0.2;
     enemy->pos = get_rand_pos_on_floor(world, 2 * enemy->radius);
     enemy->global_target = world->player.pos;
@@ -153,7 +153,7 @@ void add_enemy(world_t* world, type_of_enemy_t type) {
 }
 
 void bite_player(world_t* world, double damage) {
-    player_hit(50);
+    player_hit(damage);
 }
 
 void enemy_movement(world_t* world, float time_elapsed) {
@@ -170,7 +170,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                 if (enemy->time_from_last_shot >= 2) {
                     enemy->time_from_last_shot = 0;
                     if (is_in_circle(enemy->pos, world->player.pos, 1))
-                        bite_player(world, 1);
+                        bite_player(world, 50);
                 }
                 update_position = 0;
             }
@@ -188,7 +188,7 @@ void enemy_movement(world_t* world, float time_elapsed) {
                     if (distance_to_player <= 10 && enemy->time_from_last_shot >= 2) {
                         enemy->time_from_last_shot = 0;
                         shoot_bullet(world, enemy->pos, angle_to_player, time_elapsed, kBulletEnemy, 34, CACODEMON);
-                        olc_play_sound(world->sound_effects.caco_fire_sound_id);
+                        play_sound(world->sound_effects.caco_fire_sound_id);
                     }
                     if (distance_to_player <= 4) {
                         update_position = 0;
@@ -208,10 +208,10 @@ void enemy_movement(world_t* world, float time_elapsed) {
             if (delta >= 0.5) {
                 enemy->global_target = world->player.pos;
                 enemy->path = build_path(enemy);
-                enemy->local_target_id = 0;
+                enemy->local_target_id = 1;
                 enemy->last_player_pos = world->player.pos;
-                update_position = 1;
             }
+            update_position = 1;
         }
         if (update_position) {
             point_t new_pos = get_new_forward_pos(enemy->pos, enemy->angle, time_elapsed, enemy->speed);
@@ -237,12 +237,12 @@ void enemy_destruct(world_t* world, int index) {
         world->enemy_array.array[i] = world->enemy_array.array[i + 1];
     }
     world->enemy_array.len--;
-    olc_play_sound(world->sound_effects.caco_death_sound_id);
+    play_sound(world->sound_effects.caco_death_sound_id);
 }
 
 void enemy_hit(world_t* world, int index, double damage) {
     world->enemy_array.array[index].health -= damage;
     if (world->enemy_array.array[index].health <= 0)
         enemy_destruct(world, index);
-    olc_play_sound(world->sound_effects.caco_pain_sound_id);
+    play_sound(world->sound_effects.caco_pain_sound_id);
 }

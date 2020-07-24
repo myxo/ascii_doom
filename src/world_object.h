@@ -220,11 +220,10 @@ typedef struct {
 
 typedef struct {
     int* music_array;
-    float* duration_array;
     int len;
-    float current_music_time;
     int current_index;
-}music_array_t;
+    int current_id;
+} music_array_t;
 
 typedef struct {
     int caco_fire_sound_id;
@@ -253,6 +252,7 @@ typedef struct {
     door_array_t door_array;
     music_array_t music;
     sound_effects_t sound_effects;
+    int is_mute;
 
     drop_array_t drop_array;
     double first_aid_heal;
@@ -291,6 +291,7 @@ int has_door_between(point_t pos1, point_t pos2);
 int is_door_in_radius(double x, double y, double radius);
 void update_world_from_config();
 void update_doors_status(world_t* world);
-
+void play_sound(int id);
 
 #endif
+

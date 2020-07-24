@@ -23,4 +23,8 @@ void update_time_since_reload(world_t* world, float time_elapsed);
 
 void set_active_weapon(world_t* world, enum GUN weapon);
 
+weapon_t* get_active_weapon(world_t* world);
+
+void check_reload(weapon_t* weapon, world_t* world, double time_elapsed);
+
 #endif // !WEAPON_H_

@@ -1,4 +1,7 @@
 #include "olc.h"
+#include "olc.h"
+#include "olc.h"
+#include "olc.h"
 
 #include "olcConsoleGameEngine.h"
 
@@ -24,6 +27,20 @@ public:
 
 	void SamplePlay(int id) {
 		PlaySample(id);
+	}
+
+	void SampleStop(int id) {
+		StopSample(id);
+	}
+
+	void StopSamples() {
+		StopAllSamples();
+	}
+
+	int isPlaying(int id) {
+		if (isSamplePlaying(id))
+			return 1;
+		return 0;
 	}
 
 private:
@@ -98,6 +115,18 @@ extern "C"
 
 	void olc_play_sound(int id) {
 		g_engine->SamplePlay(id);
+	}
+
+	void olc_stop_sound(int id) {
+		g_engine->SampleStop(id);
+	}
+
+	void olc_stop_all_samples() {
+		g_engine->StopSamples();
+	}
+
+	int olc_is_sample_playing(int id) {
+		return g_engine->isPlaying(id);
 	}
 
 	key_state_t olc_get_key(int id) {

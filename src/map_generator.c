@@ -271,11 +271,11 @@ char** build_corridor(graph_of_rooms_t* g, char** map, node_of_room_t* start_roo
     door_t temp_door;
     temp_door.pos.x = (int)stop_door.y;
     temp_door.pos.y = (int)stop_door.x;
-    if (map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
+    if (temp_door.pos.x <= 0 || temp_door.pos.x >= get_world()->map_height || map[(int)temp_door.pos.x + 1][(int)temp_door.pos.y] == '|' || map[(int)temp_door.pos.x - 1][(int)temp_door.pos.y] == '|') {
         temp_door.speed_shift_movement_x = 0.1;
         temp_door.speed_shift_movement_y = 0;
     }
-    else if (map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
+    else if (temp_door.pos.y <= 0 || temp_door.pos.y >= get_world()->map_height || map[(int)temp_door.pos.x][(int)temp_door.pos.y + 1] == '|' || map[(int)temp_door.pos.x][(int)temp_door.pos.y - 1] == '|') {
         temp_door.speed_shift_movement_x = 0;
         temp_door.speed_shift_movement_y = 0.1;
     }
