@@ -85,8 +85,8 @@ void deinit_barrel_array() {
 
 void spawn_barrels() {
     while (world_global->barrel_array.len < 5) {
-        int new_x = rand() % world_global->map_height;
-        int new_y = rand() % world_global->map_width;
+        int new_x = rand() % world_global->map_width;
+        int new_y = rand() % world_global->map_height;
         double x_float = (1 + rand() % 9) / 10.0;
         double y_float = (1 + rand() % 9) / 10.0;
         if (!is_wall(new_x + x_float, new_y + y_float)) {
